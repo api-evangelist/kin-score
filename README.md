@@ -117,7 +117,11 @@ agent_readiness:
 ## Versioning
 
 The rubric is a living argument and is versioned (`schema_version`). Published snapshots live in
-[`rubric/`](rubric/); the full history is in [`CHANGELOG.md`](CHANGELOG.md). Current: **0.5**.
+[`rubric/`](rubric/); the full history is in [`CHANGELOG.md`](CHANGELOG.md), and where it's headed is
+in [`ROADMAP.md`](ROADMAP.md). Current: **0.5**.
+
+Every scoring pass also dumps a durable per-provider snapshot into that provider's own repo at
+`all/<slug>/kin/score-<timestamp>.yml`, so a provider accumulates its Kin Score history over time.
 
 ## What the score refuses to measure
 
