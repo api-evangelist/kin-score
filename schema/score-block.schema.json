@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/api-evangelist/kin-score/schema/score-block.schema.json",
+  "title": "Kin Score output block",
+  "description": "The score:, regulatory:, and agent_readiness: blocks written to a provider record by the Kin Score scorer. schema_version 0.5.",
+  "type": "object",
+  "properties": {
+    "score": {
+      "type": "object",
+      "description": "The composite Kin Score and its facet breakdown.",
+      "required": ["composite", "band", "schema_version", "facets"],
+      "properties": {
+        "composite": { "type": "number", "minimum": 0, "maximum": 100, "description": "0-100 weighted composite. For regulated providers = 0.85*base + 0.15*regulatory; otherwise = base." },
+        "band": { "type": "string", "enum": ["exemplar", "strong", "developing", "thin", "emerging", "minimal"] },
+        "scored_at": { "type": "string", "format": "date" },
+        "schema_version": { "type": "number", "description": "Rubric version, e.g. 0.5" },
+        "trend": { "type": "string", "enum": ["rising", "falling", "flat"] },
+        "delta": { "type": "number", "description": "Week-over-week composite change." },
+        "previous_composite": { "type": "number", "minimum": 0, "maximum": 100 },
+        "facets": {
+          "type": "object",
+          "description": "The six base facets, each 0-100. Weights (fixed in the rubric): contract_quality 0.25, developer_ergonomics 0.20, commercial_clarity 0.20, operational_transparency 0.13, governance 0.12, discoverability 0.10.",
+          "required": ["discoverability", "contract_quality", "governance", "operational_transparency", "developer_ergonomics", "commercial_clarity"],
+          "properties": {
+            "discoverability": { "type": "number", "minimum": 0, "maximum": 100 },
+            "contract_quality": { "type": "number", "minimum": 0, "maximum": 100 },
+            "governance": { "type": "number", "minimum": 0, "maximum": 100 },
+            "operational_transparency": { "type": "number", "minimum": 0, "maximum": 100 },
+            "developer_ergonomics": { "type": "number", "minimum": 0, "maximum": 100 },
+            "commercial_clarity": { "type": "number", "minimum": 0, "maximum": 100 }
+          }
+        },
+        "regulatory": {
+          "type": "object",
+          "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet.",
+          "required": ["applies", "regime", "regime_id", "score"],
+          "properties": {
+            "applies": { "const": true },
+            "regime": { "type": "string", "description": "Human label of the matched regime family, e.g. 'Banking & Open Finance'." },
+            "regime_id": { "type": "string", "enum": ["banking_open_finance", "securities_market_data", "health", "payments", "insurance", "government"], "description": "Extensible; new regime ids may be added in future rubric versions." },
+            "score": { "type": "number", "minimum": 0, "maximum": 100, "description": "The regulatory facet score, 0-100." }
+          }
+        }
+      }
+    },
+    "agent_readiness": {
+      "type": "object",
+      "description": "The standalone Agent Readiness score. Never merged into the composite.",
+      "required": ["score", "band", "dimensions"],
+      "properties": {
+        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "band": { "type": "string", "enum": ["agent-native", "agent-ready", "agent-aware", "human-only"] },
+        "scored_at": { "type": "string", "format": "date" },
+        "schema_version": { "type": "number" },
+        "dimensions": {
+          "type": "object",
+          "description": "Twelve boolean presence checks.",
+          "properties": {
+            "spec_presence": { "type": "boolean" },
+            "agentic_access": { "type": "boolean" },
+            "mcp_server": { "type": "boolean" },
+            "auth_clarity": { "type": "boolean" },
+            "idempotency": { "type": "boolean" },
+            "error_semantics": { "type": "boolean" },
+            "openapi_examples": { "type": "boolean" },
+            "rate_limit_signal": { "type": "boolean" },
+            "asyncapi_events": { "type": "boolean" },
+            "agent_skills": { "type": "boolean" },
+            "well_known_catalog": { "type": "boolean" },
+            "consent_identity": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}
