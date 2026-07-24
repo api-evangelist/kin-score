@@ -5,6 +5,27 @@ new sectors, until it stabilizes. This is the planned direction. Nothing here is
 date; it is the queue of improvements, most-ready first. See [`CHANGELOG.md`](CHANGELOG.md) for what
 has shipped.
 
+## Count every machine-readable contract — contract-type-agnostic scoring
+
+The single most important correctness fix the sector work surfaced, and it should land first.
+`contract_quality` (0.25 — the heaviest facet) and `spec_presence` are effectively **OpenAPI-only**:
+an OpenAPI or AsyncAPI counts, but a **FHIR CapabilityStatement, a GraphQL SDL, or X12 EDI
+transaction sets do not**. That is a measurement artifact, not a judgment about the provider.
+Scoring US healthcare made it concrete: **Epic reads `spec_presence: false`, `contract_quality: 22.6`
+while serving a 59-resource FHIR R4 CapabilityStatement (plus STU3, DSTU2, and a smart-configuration);
+1upHealth reads the same 22.6 on a 144-resource statement.** Medplum outscores them only because it
+*also* ships a literal OpenAPI file. Entire FHIR-native, GraphQL-native, and EDI-native markets are
+undercounted by roughly a band for a format the rubric simply declines to read.
+
+The fix: make the contract facet format-agnostic. Detect `spec_type` for FHIR
+CapabilityStatement/Conformance, GraphQL SDL, and X12, and grade `contract_quality`/`spec_presence`
+on their real richness — FHIR resource + interaction count, GraphQL type/field count, X12 transaction
+sets — the way OpenAPI paths/operations are graded today. This is a **base-facet** fix: it applies to
+every provider regardless of regime, and is distinct from the health-regime FHIR-conformance check in
+0.6 below. Because it moves the heaviest facet across a whole sector, it should ship **before the
+healthcare numbers circulate widely**, with a band recalibration — expect Epic, Cerner, 1upHealth, and
+the GraphQL players (Highnote, Semble, TELUS) to rise materially, correctly.
+
 ## Next up — 0.6: regime-specific regulatory checks
 
 The 0.5 regulatory facet is deliberately **regime-agnostic** — it measures the common posture every
@@ -23,10 +44,22 @@ conformance). 0.6 sharpens it with checks that only award where a specific regim
   an *actionable* regime from a read-only one — the UK scored 87% on idempotency where read-only
   Australia scored 0%. An agent that can act on an account is a different animal than one that can
   only read it, and the score should say so.
-- **Health — FHIR conformance.** Reward a published FHIR **capability statement**, US Core / EHDS
-  profile conformance, and SMART-on-FHIR scopes.
-- **Payments — PCI + SCA.** Reward PCI-DSS attestation/scope disclosure, strong customer
-  authentication, and ISO 20022 message conformance.
+- **Health — FHIR conformance, and the consent surface missing everywhere.** Reward a published FHIR
+  **CapabilityStatement** (with version + resource coverage), **US Core / USCDI** (or UK Core / AU
+  Core / CA Baseline / EHDS) conformance, a served **`.well-known/smart-configuration`** with published
+  **SMART-on-FHIR scopes**, **FHIR Bulk Data `$export`**, **CDS Hooks**, and — for payer / prior-auth —
+  **Da Vinci** (CRD/DTR/PAS) and **CARIN Blue Button**. The structural finding across all four
+  healthcare markets: the security *scopes* often exist, but the **smart-configuration is served almost
+  nowhere and a FHIR `Consent` resource is exposed by essentially no one** — so the check must weight a
+  *discoverable, consent-legible* surface, not the mere presence of scopes. The standards catalog now
+  carries every one of these (smart-on-fhir, us-core, uscdi, da-vinci, carin-blue-button,
+  fhir-bulk-data, cds-hooks) to resolve against.
+- **Payments — PCI, SCA, and the safety primitives.** Reward PCI-DSS attestation / scope disclosure,
+  **3-D Secure / strong customer authentication**, ISO 20022 message conformance, a published
+  **decline-code** catalog, and **Confirmation of Payee / Verification of Payee** where the scheme
+  provides it. Idempotency deserves *extra* weight inside this regime specifically — a retried charge
+  that double-charges is the highest-stakes miss in the sector, and it ran at only 36–43% of leaders.
+  (The catalog now carries 3-d-secure and confirmation-of-payee to resolve against.)
 - **Securities & market data — entitlement & licensing.** Reward machine-readable entitlement and
   redistribution terms, and MiFID II / exchange data-licensing disclosure.
 
@@ -40,6 +73,13 @@ regime → standard → regulation graph, the check can resolve against it — c
 `banking_open_finance` provider for conforming to the standard *recognized for its regime* (OBIE, CDS,
 FDX, Berlin Group), and carrying the regulation that applies to it. This turns the catalogs into
 scoring inputs and closes the loop between the papers, the standards, the regulations, and the score.
+
+Since the payments and healthcare series, the catalogs also carry the full **FHIR ecosystem** (SMART on
+FHIR, US Core, USCDI, Da Vinci, CARIN Blue Button, Bulk Data, CDS Hooks, C-CDA), the **payment-scheme
+standards** (3-D Secure, Confirmation of Payee), the **compliance frameworks** (HITRUST, ISO 27001, ISO
+42001, SOC 2), and the first **healthcare regulations** (21st Century Cures Act, ONC certification,
+CMS-0057-F, HIPAA, HITECH, TEFCA, PHIPA, NHS DSPT/DTAC, EU MDR) — so the health and payments regime
+checks can resolve against a real regime → standard → regulation graph, exactly as banking already does.
 
 ## Provenance — provider-published vs. derived artifacts (from the four banking reports)
 
@@ -64,6 +104,12 @@ generated`, `published: false`, `url: null` — and grades on it:
 The effect is a score that measures what a provider actually publishes rather than what has been
 derived on its behalf. Expect it to *lower* a number of agent-native scores — correctly — so it lands
 with a band recalibration.
+
+The payments and healthcare series confirmed this is a cross-sector pattern, not a banking quirk. Across
+all six markets the genuinely provider-hosted MCP servers are a countable handful — Cash App, Elation,
+Aidbox, Pinch, Moneris, Modulr, Spreedly, Bridge, Paxos — while nearly everything else labelled "MCP"
+is an AE-derived candidate (`status: candidate`, `url: null`). Every report had to make that caveat by
+hand. Grading on the provenance the artifacts already carry lets the score make it automatically.
 
 ## Standalone Security Posture layer (under consideration)
 
@@ -100,6 +146,52 @@ providers.apievangelist.com — a provider's Kin Score over time, sourced from i
 Bands are cut against the observed distribution, not round numbers. After any material rubric change
 (new facet, weight shift, regime), re-run `band_distribution.rb` and re-cut so no band is empty or
 holds an uninformative 40% of the catalog.
+
+## Self-serve vs. gated access as a readiness signal
+
+Every provider carries an `access_model` (self-serve / partner-gated, public vs. private) that the
+score does not yet read. The agentic thesis is that an agent shops and routes around anything it cannot
+reach — a sales-gated or NDA-walled contract is, to that consumer, less ready than a self-serve one,
+however good the underlying API. It is exactly what separates Epic's partner-gated production FHIR from
+Medplum's self-serve signup, or Change Healthcare's gated surface from Stedi's, and it is invisible in
+the score today. Add a self-serve-access signal — a reachable sandbox and a self-serve credential path
+— as a graded input to developer ergonomics (or a small standalone dimension). Distinct from
+provenance: provenance asks *who published* the artifact; access model asks *whether the consumer can
+actually reach it*.
+
+## Broaden the base governance facet
+
+`governance` (0.12) is effectively a single check — a self-published Spectral ruleset in
+`all/<slug>/rules/` — and it scores ~0 across banking, payments, and healthcare, so at its current
+weight it barely discriminates. That is honest (almost nobody ships a public ruleset) but it under-uses
+the facet. Broaden it to credit the other ways a provider demonstrates it has *internalized* standards
+— Kin's actual definition of governance: a declared conformance profile (FHIR / FAPI / PCI), a
+`conformance/` artifact, an OpenAPI Overlay, or a published lint / CI posture — resolved against the
+standards catalog. This complements the regulatory-facet conformance check above and gives the base
+facet real signal in sectors that have genuine conformance but no Spectral file.
+
+## Graded signals, not bits — examples & compliance
+
+Two signals carry almost no information as flat 0/1 bits:
+
+- **OpenAPI examples** ran at ~0% across payments and healthcare — as a boolean it barely
+  discriminates. Grade it by the *share* of operations carrying request/response examples (or a live
+  mock server), so a provider that documents every operation outscores one with a single token example.
+- **Compliance attestations** (SOC 2, HITRUST, ISO 27001/42001, PCI) recur across every trust center.
+  Credit them — but as a *small, explicitly-capped* operational-transparency signal, documented as
+  **not** a substitute for a machine-readable contract or a consent surface. The reports' recurring
+  line — *compliant is not the same as usable* — belongs in the weighting, not just the prose.
+
+## Ship the next batch together
+
+These items are meant to land as **one coherent 0.6 release**, re-scored and band-recalibrated in a
+single pass, rather than dribbled out check by check. Several move the same providers at once — a
+FHIR-native EHR gains from the contract-type-agnostic fix, the health-regime checks, the broadened
+governance facet, and the access-model signal simultaneously — so scoring them together avoids three
+separate recalibrations and three rounds of headline-number churn. Sequence within the batch:
+(1) the contract-type-agnostic fix and provenance grading (base-facet correctness); (2) the 0.6
+regime-specific checks resolved against the catalogs; (3) access model, broadened governance, and the
+graded example/compliance signals; then one recalibration and a full re-score and page/paper refresh.
 
 ---
 
