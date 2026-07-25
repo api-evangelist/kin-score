@@ -67,7 +67,7 @@ Each ships as a check under `artifacts.regulatory.checks` with a `regime:` quali
 evaluator gated on the provider's matched regime.
 
 **Resolve conformance against the catalogs.** The `reg_standards_conformance` check currently credits
-any generic `Standard`/`Conformance` tag. With the [Standards](https://contracts.apievangelist.com)
+any generic `Standard`/`Conformance` tag. With the [Standards](https://standards.apievangelist.com)
 and [Regulations](https://regulations.apievangelist.com) catalogs now carrying the actual
 regime → standard → regulation graph, the check can resolve against it — crediting a
 `banking_open_finance` provider for conforming to the standard *recognized for its regime* (OBIE, CDS,
