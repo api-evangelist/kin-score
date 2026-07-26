@@ -70,11 +70,21 @@ stopping it, and a brighter attempt measured 1.84:1 and failed.
 
 Both **apievangelist.com** and **apis.io** use the same two layouts. Do not invent a third.
 
-**Provider detail pages** — a thin band, always in this order:
+**Provider detail pages** — a thin band, ONE ROW, in fixed proportions:
 
 ```
-[ sun glyph ] [ score · band pills · one-line read of the level ] ............ [ Kin mark ]
+|<------ 25% ------>|<---------------- 50% ---------------->|<------ 25% ------>|
+|      sun glyph    |  score · band pills · one-line read    |     Kin mark      |
 ```
+
+The proportions *are* the anatomy. Both the sun and the Kin mark scale to fill their column — the SVG
+carries a `viewBox`, so `width: 100%; height: auto` is all it needs; the mark is an `<img>` treated the
+same way. Render the sun at `data-size="170"` so it stays crisp at column width, and cap each with a
+`max-width` (170px sun / 150px mark) so neither explodes on an ultrawide screen. On narrow screens the
+row holds — only the caps tighten.
+
+The middle column stacks internally: score and pills on the first line, the one-line read beneath. That
+is still one row for the band as a whole.
 
 **Provider listing rows** — the sun on the **far right** of the row, after the scores.
 
