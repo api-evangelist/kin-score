@@ -62,6 +62,33 @@ conformance). 0.6 sharpens it with checks that only award where a specific regim
   (The catalog now carries 3-d-secure and confirmation-of-payee to resolve against.)
 - **Securities & market data — entitlement & licensing.** Reward machine-readable entitlement and
   redistribution terms, and MiFID II / exchange data-licensing disclosure.
+- **Insurance — conformance where a standard exists at all, and the certification signal.** The four
+  insurance markets (US/UK/AU/CA, 155 organizations) produced the emptiest regime in the series: no
+  mandate exists anywhere, so the check cannot reward compliance and must instead reward *voluntary*
+  conformance. Three signals earned their place. (1) **Named-standard conformance** — ACORD (AL3,
+  ACORD XML, NGDS, GRLC), CIECA BMS in auto physical damage, CSIO in Canada, and the Market Reform
+  Contract / JMRC in the London Market — with the honest finding that ACORD is live inside a
+  machine-readable contract at exactly one company worldwide, and CIECA has displaced it entirely in
+  US auto. (2) **A certification signal**, because Canada has the only public, tiered insurance API
+  certification programme in the world (CSIO) and it is invisible to the score today — its own table
+  lists the country's largest P&C insurer as *Not Yet Rated* while smaller competitors hold higher
+  tiers, which is exactly the kind of published signal the rubric should read. (3) **Consent**, which
+  ran at 2.5% in the US and zero among every market's leaders, in the most personally-invasive data
+  business in the economy. Weight consent heavily here: unlike health, no rule forces it, so its
+  presence is a genuine differentiator rather than a compliance artifact.
+- **Telecommunications — a regime that does not exist yet, and the CAMARA conformance check.** There
+  is no `telecommunications` regime in `industry_regulatory` at all, so scoring 83 telecom
+  organizations fired the conditional facet for only **7 of them**, via Government, Payments and
+  Health. A sector supervised by the FCC, Ofcom, ACMA and the ITU currently has no regulatory layer.
+  The regime should reward: **CAMARA conformance** (an `x-camara-commonalities` version, `/camara/`
+  paths, and the specific APIs implemented against the 30 canonical definitions); **CIBA**, the
+  Client-Initiated Backchannel Authentication flow CAMARA specifies for network authorization, which
+  appeared in 3 of 19 standards repositories and was absent from both specs of the one exposure
+  platform with a callable endpoint; **TM Forum Open API conformance**, held widely by carriers who
+  publish no network API; and a **consent/CPNI-ePrivacy surface**, since the identity verbs operate
+  on exactly the subscriber data those regimes restrict. The regulations catalog now carries the US
+  Communications Act (with CPNI), the UK Communications Act 2003, the Australian Telecommunications
+  Act, the ITU Constitution and the ePrivacy Directive to resolve against.
 
 Each ships as a check under `artifacts.regulatory.checks` with a `regime:` qualifier plus a matching
 evaluator gated on the provider's matched regime.
@@ -81,7 +108,7 @@ standards** (3-D Secure, Confirmation of Payee), the **compliance frameworks** (
 CMS-0057-F, HIPAA, HITECH, TEFCA, PHIPA, NHS DSPT/DTAC, EU MDR) — so the health and payments regime
 checks can resolve against a real regime → standard → regulation graph, exactly as banking already does.
 
-## Provenance — provider-published vs. derived artifacts (from the four banking reports)
+## Provenance — provider-published vs. derived artifacts (the blocking fix)
 
 The clearest lesson from scoring four national banking sectors — roughly 260 institutions — is one the
 rubric cannot yet see: **who published the artifact.** Agent-readiness credits the *presence* of an MCP
@@ -111,6 +138,96 @@ Aidbox, Pinch, Moneris, Modulr, Spreedly, Bridge, Paxos — while nearly everyth
 is an AE-derived candidate (`status: candidate`, `url: null`). Every report had to make that caveat by
 hand. Grading on the provenance the artifacts already carry lets the score make it automatically.
 
+**The insurance and telecom series moved this from important to blocking.** In sectors where few
+providers publish anything, the derived artifacts stop being noise and start deciding the standings.
+Both series' reports now commit *in print* to this fix, which makes it the highest-priority item on
+this roadmap:
+
+- **Insurance.** Five of the largest names in US insurance — Guidewire, Duck Creek, Majesco, Verisk
+  and ACORD itself — contribute 45 OpenAPI paths between them and **API Evangelist wrote every one**;
+  two point at literal `example.com` hosts. The original finding that "the vendor layer out-publishes
+  the carriers by 17 points" turned out to be substantially an artifact of *which companies got
+  modeled*. In the UK the distortion was worse: the data credits 14.3% of the cohort with an MCP
+  server and **the real number is zero**, all 27 agent skills were generated by AE, and four providers
+  (Ki, Zego, WTW, Ripe) sit at or near the top of the market on reconstructed specs — Ki's 102 paths
+  recovered from a JavaScript bundle, Ripe's two being Umbraco CMS boilerplate.
+- **Telecom.** **Zero of 28 aggregators publish an AsyncAPI**, yet ten score the credit for documents
+  AE wrote. Seven would score an MCP credit for servers that do not exist — 8x8's own artifact states
+  that the 312-tool catalog is a proposal, not an 8x8 product. Seven carriers hold only AE-written
+  specs, including **AT&T's 23**, twenty of which carry `x-generated-from: documentation`. Worst of
+  all for a public catalog: a regulator (ACMA) advertises five agent artifact types — MCP server, tool
+  crosswalk, agent skills, agentic access, Arazzo — while publishing no OpenAPI at all, and the ITU's
+  two specs carry a review stating verbatim that the ITU has not published, reviewed or endorsed them.
+
+Provenance gating should therefore ship **first**, ahead of every other item here, and the affected
+reports should be re-issued at v1.1 against the corrected numbers.
+
+## A contract you cannot call — placeholder and template-only servers
+
+Distinct from provenance, and surfaced hard by telecom: a specification can be genuinely
+provider-published, verbatim, and still be uncallable. **Every CAMARA server declaration in the entire
+telecom stack is the template variable `{apiRoot}`, and every `openIdConnectUrl` is the CAMARA
+placeholder pointing at `example.com`.** Across 19 standards and exposure repositories there was
+exactly one absolute base URL. The line that framed the report — *you can download 351 specifications
+and call none of them* — describes a condition the rubric currently scores as full `contract_quality`.
+
+Insurance produced the same defect from the other direction: Majesco's specs declare
+`api.majesco.example.com` and ACORD's declare `api.insurer-internal.example.com`.
+
+The check is mechanically simple — parse `servers[].url` and flag documents whose only servers are
+template-only (`{apiRoot}`, `{tenant}`, `{environment}`) or placeholder hosts (`example.com`,
+`localhost`, `your-app.*`). Grade a spec with a resolvable production host above one without. A
+caution learned the hard way while measuring this: `example.com` appears legitimately inside *examples*
+and callback URLs in real specs, and a naive full-text grep over the catalog returned 4,320 false
+positives. The check must parse the `servers` block specifically, and must handle unindented YAML list
+items, which a first attempt silently missed.
+
+## Reachable only through a channel
+
+Telecom exposed a posture the rubric cannot express: **the capability is real, commercially launched,
+and reachable only through a third party.** Twelve carriers launched CAMARA APIs commercially through
+Aduna, EnStream, Jersey Telecom or TMT ID — BT/EE, Virgin Media O2, Three and Vodafone all on the same
+day — and score identically to carriers that have done nothing. Rogers, Bell and TELUS reach the market
+solely through their shared identity joint venture. That distinction is the single most important fact
+in the sector and is invisible in the score.
+
+This is not the same as gated access (already queued under *Self-serve vs. gated access*): the provider
+here is not gating its own surface, it has **delegated the surface entirely**. A candidate signal
+records whether a provider's capability is first-party callable, first-party gated, channel-only, or
+absent — a four-state ladder rather than a bit. It would also correctly separate the two exposure
+platforms that ostensibly do the same job: one publishes a contract, an absolute base URL and self-serve
+signup; the other publishes no specification at all, every declared base URL null, onboarding behind a
+login.
+
+## Portal decay — a dead developer surface is not the same as none
+
+Across the Australian and Canadian insurance cohort there were **more decommissioned developer portals
+than live ones**. Suncorp's Bingle developer hosts are dangling CNAMEs pointing at dead load balancers;
+Ensurance's API and developer hosts return HTTP 200 serving a default Bootstrap template; the
+Co-operators still links a developer portal from live marketing that 404s, and its specification had to
+be recovered from the Internet Archive; Canada Life's developer subdomain points at an Apigee host that
+no longer resolves. In telecom, Three UK's developer subdomains are dangling wildcard DNS that have
+never had a single Wayback capture.
+
+Today a dead portal and no portal score the same. There is a reasonable argument the dead one should
+score *worse* — it misleads an integrator and an agent alike, and an HTTP 200 serving an SPA shell or a
+default template is a false positive that automated tooling will bank. The enrichment pipeline already
+probes and records these states (`deadOrAbsentSubdomains`, `real: false`); the rubric should read them.
+
+## Standards bodies are measured against the wrong yardstick
+
+The CAMARA Project scores **27.9** while publishing the single most valuable public asset in its sector:
+30 openly downloadable API definitions that the entire industry builds against. 3GPP, ETSI, MEF, GSMA
+and TM Forum publish 351 provider-authored contracts between them and sell nothing. The rubric measures
+*services* — operational transparency, commercial clarity, developer ergonomics — and a standards body
+has none of those by design.
+
+This is a scoring artifact rather than a finding, and it distorts any sector where bodies sit in the
+same ranked list as vendors. The likely fix is a provider `kind` (standards body, regulator, market
+infrastructure) that either scores against an appropriate sub-rubric or is excluded from band
+comparison with commercial providers — the same argument that applies to regulators, who have now
+out-published the industries they supervise in four separate sectors (FCC, Ofcom, ACMA, OSFI, the FCA).
+
 ## Standalone Security Posture layer (under consideration)
 
 Security signals currently live across two facets (operational_transparency, commercial_clarity) and
@@ -124,9 +241,21 @@ the composite and agent-readiness as a third lens.
 
 `industry_regulatory` is tag-matched and extensible. As each new sector is scored, widen the regime
 `tags` (and add regimes) so applicability keeps pace with the catalog — e.g. energy/utilities (smart
-meter data access), telecom (number portability, lawful intercept posture), and additional national
-open-banking regimes. The rule of thumb: keep tags specific enough not to regulate APIs a regime
-doesn't actually cover.
+meter data access) and additional national open-banking regimes. The rule of thumb: keep tags specific
+enough not to regulate APIs a regime doesn't actually cover.
+
+**A confirmed misassignment to fix first — the `broker` tag collision.** `securities_market_data`
+matches on the tags `broker`, `brokerage` and `exchange`, which insurance brokers, broker networks and
+brokerage-technology vendors match cleanly. The result, measured across the insurance cohort: **16 of
+35 UK, 10 of 20 Canadian and 7 of 20 Australian insurance organizations are scored against a
+securities regime.** Beazley — a Lloyd's syndicate — is scored against MiFID; so are QBE, IAG,
+Steadfast and PPL. The `insurance` regime already exists and is well-drawn; it is simply losing the
+match. This is the cheapest high-impact correctness fix on the roadmap and should land with the 0.6
+batch, with the affected providers re-scored.
+
+**And a regime that is missing entirely — telecommunications.** Six regimes exist and telecom is not
+among them, so 83 telecom organizations fired the conditional facet 7 times. See the telecom bullet
+under 0.6 above for the checks it should carry.
 
 ## Weights follow the reader
 
@@ -162,13 +291,22 @@ actually reach it*.
 ## Broaden the base governance facet
 
 `governance` (0.12) is effectively a single check — a self-published Spectral ruleset in
-`all/<slug>/rules/` — and it scores ~0 across banking, payments, and healthcare, so at its current
-weight it barely discriminates. That is honest (almost nobody ships a public ruleset) but it under-uses
+`all/<slug>/rules/` — and it now scores ~0 across **all six sectors**: 63 of 79 US insurance
+organizations at zero, 34 of 35 UK, 19 of 20 Canadian, and 66 of 83 in telecom. At its current weight
+it barely discriminates. That is honest (almost nobody ships a public ruleset) but it under-uses
 the facet. Broaden it to credit the other ways a provider demonstrates it has *internalized* standards
 — Kin's actual definition of governance: a declared conformance profile (FHIR / FAPI / PCI), a
 `conformance/` artifact, an OpenAPI Overlay, or a published lint / CI posture — resolved against the
 standards catalog. This complements the regulatory-facet conformance check above and gives the base
 facet real signal in sectors that have genuine conformance but no Spectral file.
+
+**One boundary to hold while broadening it.** Telecom is full of organizations that have adopted an
+external standard — CAMARA, TM Forum, GSMA Open Gateway — and score zero on governance, which makes it
+tempting to credit adoption directly. That would be the wrong move and the telecom report argues
+against it in print: adopting someone else's standard is not governance, governance is what you do to
+yourself. The broadened facet should credit evidence a provider has *internalized* a standard — a
+declared conformance profile, an overlay, a published lint or CI posture — not the bare fact of
+membership in a programme.
 
 ## Graded signals, not bits — examples & compliance
 
@@ -189,9 +327,19 @@ single pass, rather than dribbled out check by check. Several move the same prov
 FHIR-native EHR gains from the contract-type-agnostic fix, the health-regime checks, the broadened
 governance facet, and the access-model signal simultaneously — so scoring them together avoids three
 separate recalibrations and three rounds of headline-number churn. Sequence within the batch:
-(1) the contract-type-agnostic fix and provenance grading (base-facet correctness); (2) the 0.6
-regime-specific checks resolved against the catalogs; (3) access model, broadened governance, and the
-graded example/compliance signals; then one recalibration and a full re-score and page/paper refresh.
+(1) **provenance grading and the placeholder-server check**, plus the contract-type-agnostic fix —
+base-facet correctness, and provenance now leads because two published report series commit to it in
+print; (2) the `broker`-collision fix and the new `telecommunications` regime, then the 0.6
+regime-specific checks resolved against the catalogs; (3) access model including channel
+reachability, portal liveness, broadened governance, and the graded example/compliance signals; then
+one recalibration and a full re-score and page/paper refresh.
+
+**Reports to re-issue after the batch.** Provenance gating will move numbers in reports that are
+already selling, and several of those reports name the providers that will fall. The nine affected —
+the four insurance Sector Reports, the telecom Sector Report, and the four banking reports that first
+raised provenance — should be re-issued at v1.1 against corrected data rather than left to disagree
+with the live catalog. The insurance and telecom reports were written to survive this: each names
+which providers rest on derived artifacts and predicts the direction of the change.
 
 ---
 
