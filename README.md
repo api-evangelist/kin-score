@@ -114,6 +114,23 @@ agent_readiness:
   band: agent-native
 ```
 
+## The mark — the K'in sun
+
+Every Kin Score has a visual form: **the K'in sun**. Six concentric rings, one per facet, each filled
+to its score and coloured by *which facet it is*; twelve triangular rays around the outside, one per
+agent-readiness dimension, solid when satisfied. K'in is the Mayan word for sun, and for day.
+
+The glyph lives in [`glyph/`](glyph/) — **that directory is the source of truth**, and
+[`glyph/GLYPH.md`](glyph/GLYPH.md) is its spec: the palettes and why each was chosen, the fixed
+anatomy on detail pages and listings, the data every consuming site has to supply, and the
+limitations. Nothing re-implements the geometry; sites copy `glyph/dist/kin-glyph.js` and emit a
+placeholder.
+
+```
+node glyph/build.mjs      # -> glyph/dist/kin-glyph.js  (parse-checked)
+node glyph/make-demo.mjs  # -> glyph/demo.html          (self-contained comparison)
+```
+
 ## Versioning
 
 The rubric is a living argument and is versioned (`schema_version`). Published snapshots live in

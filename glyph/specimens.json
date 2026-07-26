@@ -1,0 +1,147 @@
+{
+ "twilio": {
+  "name": "Twilio",
+  "score": 75.6,
+  "band": "exemplar",
+  "agent_score": 77.9,
+  "agent_band": "agent-native",
+  "facets": {
+   "discoverability": 67.5,
+   "contract_quality": 61.8,
+   "governance": 73.7,
+   "operational_transparency": 94.7,
+   "developer_ergonomics": 84.8,
+   "commercial_clarity": 76.3
+  },
+  "agent_dims": {
+   "spec_presence": true,
+   "agentic_access": true,
+   "mcp_server": true,
+   "auth_clarity": true,
+   "idempotency": false,
+   "error_semantics": true,
+   "openapi_examples": false,
+   "rate_limit_signal": true,
+   "asyncapi_events": true,
+   "agent_skills": true,
+   "well_known_catalog": false,
+   "consent_identity": false
+  }
+ },
+ "kpn": {
+  "name": "KPN",
+  "score": 59.1,
+  "band": "developing",
+  "agent_score": 70.2,
+  "agent_band": "agent-native",
+  "facets": {
+   "discoverability": 80.0,
+   "contract_quality": 65.1,
+   "governance": 0.0,
+   "operational_transparency": 94.7,
+   "developer_ergonomics": 78.3,
+   "commercial_clarity": 34.2
+  },
+  "agent_dims": {
+   "spec_presence": true,
+   "agentic_access": false,
+   "mcp_server": true,
+   "auth_clarity": true,
+   "idempotency": false,
+   "error_semantics": true,
+   "openapi_examples": false,
+   "rate_limit_signal": true,
+   "asyncapi_events": true,
+   "agent_skills": true,
+   "well_known_catalog": true,
+   "consent_identity": true
+  }
+ },
+ "att": {
+  "name": "AT&T",
+  "score": 6.7,
+  "band": "minimal",
+  "agent_score": 0.0,
+  "agent_band": "human-only",
+  "facets": {
+   "discoverability": 60.0,
+   "contract_quality": 0.0,
+   "governance": 0.0,
+   "operational_transparency": 5.3,
+   "developer_ergonomics": 0.0,
+   "commercial_clarity": 0.0
+  },
+  "agent_dims": {
+   "spec_presence": false,
+   "agentic_access": false,
+   "mcp_server": false,
+   "auth_clarity": false,
+   "idempotency": false,
+   "error_semantics": false,
+   "openapi_examples": false,
+   "rate_limit_signal": false,
+   "asyncapi_events": false,
+   "agent_skills": false,
+   "well_known_catalog": false,
+   "consent_identity": false
+  }
+ },
+ "manulife": {
+  "name": "Manulife",
+  "score": 8.3,
+  "band": "minimal",
+  "agent_score": 0.0,
+  "agent_band": "human-only",
+  "facets": {
+   "discoverability": 67.5,
+   "contract_quality": 0.0,
+   "governance": 0.0,
+   "operational_transparency": 5.3,
+   "developer_ergonomics": 0.0,
+   "commercial_clarity": 0.0
+  },
+  "agent_dims": {
+   "spec_presence": false,
+   "agentic_access": false,
+   "mcp_server": false,
+   "auth_clarity": false,
+   "idempotency": false,
+   "error_semantics": false,
+   "openapi_examples": false,
+   "rate_limit_signal": false,
+   "asyncapi_events": false,
+   "agent_skills": false,
+   "well_known_catalog": false,
+   "consent_identity": false
+  }
+ },
+ "socotra": {
+  "name": "Socotra",
+  "score": 52.3,
+  "band": "developing",
+  "agent_score": 72.1,
+  "agent_band": "agent-native",
+  "facets": {
+   "discoverability": 100.0,
+   "contract_quality": 44.4,
+   "governance": 0.0,
+   "operational_transparency": 31.6,
+   "developer_ergonomics": 87.0,
+   "commercial_clarity": 36.8
+  },
+  "agent_dims": {
+   "spec_presence": true,
+   "agentic_access": true,
+   "mcp_server": true,
+   "auth_clarity": true,
+   "idempotency": true,
+   "error_semantics": false,
+   "openapi_examples": false,
+   "rate_limit_signal": false,
+   "asyncapi_events": true,
+   "agent_skills": true,
+   "well_known_catalog": false,
+   "consent_identity": false
+  }
+ }
+}
