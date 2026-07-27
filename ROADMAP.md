@@ -449,7 +449,112 @@ certifies, and still lands mid-table because it has no commercial API product to
 sector, and the same shape from the mandator's side. Both belong under whatever provider `kind`
 treatment the earlier item settles on.
 
+## Switchability — a third standalone lens, for procurement
+
+*Proposed. This is the largest single addition contemplated for the score, and it targets a reader the
+rubric does not currently serve.*
+
+The composite answers **"is this a good API?"** — a builder's question. Agent Readiness answers **"can a
+machine drive it?"** Neither answers the question procurement in a large organization actually asks:
+**"if this goes wrong, what does it cost me to leave?"**
+
+That question is orthogonal to quality. A superbly engineered, well-governed, agent-native API can be
+the most expensive thing in the estate to exit, and the composite will rate it highly right up until the
+renewal. Procurement, vendor-risk and architecture-review boards all need a number the current score
+cannot produce.
+
+### Why standalone, and why it absorbs the access-model work
+
+Three reasons not to make it a seventh base facet:
+
+1. **Different reader.** The composite serves builders and the sector reports serve operators and
+   investors. Switchability serves procurement, and a number blended into a composite cannot be lifted
+   into a vendor scorecard.
+2. **The composite is full.** Six base facets plus the conditional regulatory facet is already at the
+   limit, and the K'in sun glyph deliberately draws six rings — a seventh was considered and rejected.
+3. **Divergence is the product.** The value of this lens is precisely where it *disagrees* with the
+   composite. Yardi tops US real estate at 59.7 on a proprietary property-management platform; a
+   procurement read of the same company looks very different. Merging the two destroys the signal.
+
+It should also **absorb the access-model item above**, because entry and exit are one conversation.
+*Access* asks "can I get in?" *Switchability* asks "can I get out?" Both are commercial rather than
+technical, both are orthogonal to code quality, and the access data has already been shown not to belong
+in `developer_ergonomics`. One lens, two halves.
+
+### Candidate dimensions
+
+Split by what is computable **today from artifacts already collected** versus what needs new detection.
+Being honest about that split matters — this lens will be quoted in purchasing decisions.
+
+**Computable now:**
+
+| Dimension | Signal | Source |
+|---|---|---|
+| `standard_conformance` | implements a shared standard rather than a bespoke shape | `conformance/` — **3,669 providers already carry one**, resolved against the standards catalog |
+| `second_source` | how many *other* catalog providers implement the same standard or resource shape | the 25,416-provider catalog + the refined per-resource OpenAPI filenames |
+| `bulk_export` | a documented bulk export / dump operation | operation and tag scan across `openapi/` |
+| `data_model_published` | schemas separable from the transport | `data-model/`, `json-schema/` |
+| `wire_protocol_documented` | usable without a vendor SDK | `openapi/` present, not SDK-only in `packages/` |
+| `deprecation_policy` · `versioning_policy` · `changelog` | will they break you, and will you hear about it | already collected for governance |
+| `commercial_terms_published` | pricing and plans in machine-readable form | `plans/`, `rate-limits/` |
+| `access_model` | the seven-value entry ladder | the `access_gate` field the real estate quartet field-tested |
+
+**Needs new detection:**
+
+| Dimension | Why it is hard |
+|---|---|
+| `identifier_portability` | requires distinguishing shared identifiers from proprietary keys |
+| `contractual_lock_in` | minimum commitments, termination notice and exclusivity live in ToS prose, not artifacts |
+| `escape_hatch` | self-host or open-source availability is only partly inferable from `SourceCode` pointers |
+
+**`second_source` is the dimension nobody else can compute**, and it is the reason this lens belongs in
+this catalog rather than in a consultancy's spreadsheet. Given 25,416 profiled providers, a resource
+taxonomy and a standards catalog, the question *"if we drop this vendor, who else does this?"* is a
+lookup. `find_similar_providers` and `compare_providers` already exist as MCP tools; this formalises what
+they imply into a scored dimension.
+
+### Bands
+
+Mirroring Agent Readiness — own score, own bands, never merged:
+
+| Band | Meaning |
+|---|---|
+| **Portable** | standard interface, real second source, documented exit |
+| **Substitutable** | alternatives exist but migration is a project |
+| **Sticky** | proprietary shape, weak exit path, few alternatives |
+| **Captive** | no standard, no export, no second source, no published terms |
+
+### What real estate already demonstrated
+
+The sector that raised this makes the case concretely, and shows the two lenses genuinely separate:
+
+- **CoreLogic publishes both the standard RESO UPI 2.0 and its own proprietary CLIP identifier.** Key
+  your records on CLIP and leaving means re-keying your data estate; key them on UPI and you can move.
+  Switching cost expressed as a field name — and invisible to every facet the score has today.
+- **RESO conformance makes three certified distributors interchangeable at the contract level**
+  (Trestle, Spark, MLS Grid) while all three are gated at the access level. High switchability, low
+  accessibility, in the same providers. That combination is unrepresentable today and is exactly why the
+  two halves need to sit in one lens with separate dimensions rather than collapse into a single number.
+- **Britain's UPRN is the counter-example**: an identifier published under an open licence, which is why
+  the UK market keys on it without anyone mandating that they do.
+
+### Cautions
+
+- **v1 measures the technical switching cost, not the commercial one.** Minimum-term commitments,
+  termination notice and exclusivity clauses dominate real procurement decisions and are not
+  machine-readable. Say so on the page rather than letting a buyer assume otherwise.
+- **Same standard is not the same capability.** Two providers conformant to one standard may not be
+  substitutable in practice; `second_source` should be reported with the standard named, not as a bare
+  count.
+- **Conformance claims must be reachability-checked**, per *Certification is not reachability* above —
+  otherwise this lens inherits exactly the inflation that made a mandated standard worth two points.
+- **It will be gamed differently from the composite.** A vendor cannot easily fake a second source, but
+  can claim a conformance profile. Weight the dimensions that are hard to assert and easy to verify.
+
 ## Ship the next batch together
+
+Switchability is explicitly **not** in the 0.6 batch — it is a new lens with its own collection work and
+its own audience, and it should follow the base-facet corrections rather than ride along with them.
 
 These items are meant to land as **one coherent 0.6 release**, re-scored and band-recalibrated in a
 single pass, rather than dribbled out check by check. Several move the same providers at once — a
