@@ -563,6 +563,140 @@ The sector that raised this makes the case concretely, and shows the two lenses 
   different economics. That is a deliberate fork, not a natural extension, and taking it would change
   who API Evangelist serves. Recorded here so the decision stays explicit if it is ever made.
 
+## What the rest of the field measures — a competitive read (July 2026)
+
+*A landscape review, recorded here because three of its findings are concrete rubric changes and one is
+a positioning decision. Nothing in this section is a commitment; it is the queue of what a competitor
+already does better and what nobody does at all.*
+
+Agent-readiness scoring stopped being a category of one somewhere around the end of 2025. The field now
+sorts into four tiers, and only the first is a genuine peer:
+
+| System | Unit scored | Input | Math | Corpus |
+|---|---|---|---|---|
+| **Jentic JAIRF** | one OpenAPI file | OpenAPI 3.x/2.x only, no live calls | weighted **harmonic** mean, hard gates | self-serve upload, **no leaderboard** |
+| **Cloudflare Agent Readiness** | a website | HTTP probes | 16 signals / 5 layers, 0–100 | top 200k domains |
+| **Treblle "AI Readiness"** | one OpenAPI file | OpenAPI | binary pass/fail badge, 5 checks | none |
+| **Postman APIFlow-Bench** | **the model, not the API** | 467 synthetic tasks, 44,362 trials | 7 capability axes | n/a |
+| **Elogic Agentic Commerce Index** | a commerce platform | hand research, evidence-graded | 8 weighted criteria | 14 platforms |
+
+Survey instruments that share the name — Fivetran's and E3's *Agentic AI Readiness Index*, Hard2bit's
+EU enterprise report — measure organizational data maturity from questionnaires and are not competitors
+to an artifact-measured score. The GEO-flavoured website scanners (AgentScore, GEO Metrics, FirstShelf)
+are marketing tools reading the same robots.txt Cloudflare reads.
+
+**Jentic is the only system that should change what we build.** It is an Apache-2.0 specification on
+GitHub, free CLI and web UI, on AWS Marketplace, developed with OpenAPI Initiative input, shipped
+December 2025. Six dimensions across three pillars: Foundational Compliance (0.16), Developer
+Experience & Tooling (0.18), AI-Readiness & Agent Experience (0.24), Agent Usability (0.20), Security
+(0.12), AI Discoverability (0.10); five levels from *Not Ready* to *Agent-Optimized*. Its claims —
+auditable, no self-attestation, no proprietary algorithm — are our claims, made by someone else, in a
+published spec.
+
+### Where the moat actually is, and where it is not
+
+The moat is **the corpus, not the rubric**, and that distinction should drive the roadmap. Jentic scores
+one uploaded file at a time with no public leaderboard, no comparison, no history. Cloudflare has scale
+but reads websites, not APIs. Nobody else can answer *"how does this provider rank against the 9,000
+others in its market, and which way is it moving?"* — which is the same argument the *Switchability*
+lens makes for `second_source`, and it holds for the same reason.
+
+Two structural advantages worth defending in print because they are not obvious:
+
+- **JAIRF cannot see most of what matters, by construction.** From a single OpenAPI file it cannot know
+  whether an MCP server exists, whether pricing is machine-readable, whether there is a sandbox, a
+  status page, a portal or agent skills. Our `mcp_server` (12), `agent_skills` (5),
+  `well_known_catalog` (4) and `agentic_access` (15) have no JAIRF equivalent, and `x-agentic-access` —
+  action-class, consequence, human-in-the-loop escalation — has no equivalent anywhere in the field.
+  **Provider-level scoring is the differentiator, not a rounding error.**
+- **We already probe reachability; JAIRF explicitly does not.** The *contract-fetchability check*,
+  *placeholder servers*, and *portal decay* items above put us ahead of a competitor that states it
+  requires no live calls. That is a lead worth widening rather than quietly holding.
+
+### The one criticism that lands: link presence is not spec analysis
+
+`scoring.yml` already carries four `planned_dimensions` — `idempotency_key_param`,
+`rate_limit_headers`, `error_envelope`, `dry_run_mode` — that supersede link-based proxies with actual
+spec parsing. **JAIRF ships that class of check today.** Per-operation `auth_coverage`,
+`error_standardization` against RFC 9457/7807, pagination as a *ratio* of paginated GET resources,
+`type_specificity`, `opid_quality`, `secret_hygiene`, `sensitive_handling`, and embedding-based
+operation `distinctiveness` are all live in a public spec.
+
+Today a provider earns the full 9 idempotency points for a documentation page titled *Idempotent
+Requests*. That is the gap a reviewer will find first, it is the one criticism of us that is fair, and
+the fix is already specified. **Promote the four planned dimensions into the batch** — this is the
+highest-value item in this section and the cheapest to justify.
+
+Note the same evidence cuts the other way on `pagination` and `distinctiveness`: neither exists in our
+rubric at all, and both are computable from the refined per-tag OpenAPIs the catalog already carries.
+
+### Compensation — additive scoring produces a false Agent-Native
+
+**New finding, not previously on this roadmap.** Agent Readiness is additive across 104 points, so
+strengths cover for absent safety rails. The four largest awards plus examples — `spec_presence` (18),
+`agentic_access` (15), `mcp_server` (12), `auth_clarity` (10), `openapi_examples` (7) — total **62 of
+104** and clear the Agent-Native floor with `idempotency`, `error_semantics` and `rate_limit_signal`
+all at **zero**. That is precisely the provider whose agent retries a payment twice, branches on
+free-text errors, and backs off only after a 429. JAIRF's weighted harmonic mean makes that
+configuration impossible: *no dimension compensates for another.*
+
+The recommendation is **not** to adopt a harmonic mean — it would destabilise every score in the
+catalog and force a recalibration for a problem that lives in one band. The proportionate fix is a
+**band gate**: no provider reaches **Agent-Native** without `idempotency` **and** `error_semantics`.
+Cheap, mechanically simple, defensible in a sentence, and it kills the worst false positive without
+touching the arithmetic below the top band.
+
+This is the same family of reasoning as JAIRF's structural gates (`FC < 40` caps at Level 0; hardcoded
+secrets cap Security at 20) and as *The rubric can reward a security failure* above — a score that adds
+up without ever refusing to award is a score that can be farmed.
+
+### Two blind spots nobody on this roadmap has claimed
+
+- **Agentic commerce protocols.** Elogic weights protocol support — **UCP, ACP, AP2, MCP** — at 25% of
+  its index, and Cloudflare tracks **x402** and UCP as a fifth layer. The Kin Score does not read any of
+  them. For a catalog whose thesis is that agents will transact, this is a visible hole, and it is
+  arriving fastest in exactly the commerce-adjacent providers the catalog is thick in. A candidate
+  dimension sits naturally beside `agentic_access`.
+- **The web layer Cloudflare just legitimised.** Markdown content negotiation via `Accept`, AI-specific
+  `robots.txt` directives, RFC 8288 `Link` headers, sitemap quality. Our `consent_identity` gestures at
+  this with **3 points** for AIPREF/Content-Signals/Web Bot Auth. This connects directly to
+  *Discoverability is saturated and no longer discriminates* above: that item asks for a raised bar of
+  *machine* discoverability, and Cloudflare has now published a field-tested vocabulary for exactly
+  that, along with the adoption baseline to cut bands against — **4%** Content Signals, **3.9%** markdown
+  negotiation, and **fewer than 15 sites in 200,000** carrying an MCP Server Card or API catalog. Those
+  numbers are the strongest external evidence yet that machine discoverability discriminates where human
+  findability does not.
+
+### Provenance gating is now competitively load-bearing
+
+The *Provenance* item above is already ranked blocking on correctness grounds. The landscape adds a
+second reason: a funded competitor is publicly marketing **"no self-attestation, fully open to
+inspection, Apache-2.0."** That is our differentiator too, and AE-derived artifacts scoring as
+provider-published is the single finding that could be used to undercut it. Nothing about the priority
+changes; the cost of being late does.
+
+### Positioning — name the competition
+
+The July 21, 2026 post *How the API Evangelist Rating System Differs From Other Agent-Readiness Scores*
+makes the differentiation argument without naming a single competing system. That was defensible when
+the alternatives were website scanners. It is no longer defensible against a published Apache-2.0
+specification. A **crosswalk** — Kin Score ↔ JAIRF ↔ Cloudflare ARS, dimension by dimension, showing
+where we are a superset and conceding the spec-parsing depth we owe — is stronger than abstract
+framing, is the page that ranks for the search, and is the honest version of the argument. It should
+follow the batch, so it can be written against the corrected numbers rather than promising them.
+
+### Cautions
+
+- **Do not chase JAIRF into single-file scoring.** Its per-spec depth is real, but adopting its unit of
+  analysis would forfeit the provider-level signals that are the actual differentiator. Take the checks,
+  not the scope.
+- **Do not merge Agent Readiness into the composite to look more like a competitor's single index.**
+  The separate axis is the design, per *Switchability* above.
+- **Some of the field is not measuring what its name implies.** APIFlow-Bench scores *models*; the
+  Fivetran/E3 indices score *organizations from surveys*. Any comparison written for publication should
+  say so plainly rather than treating every "agent readiness index" as a rival, which would be both
+  inaccurate and easy to rebut.
+
 ## Ship the next batch together
 
 Switchability is explicitly **not** in the 0.6 batch — it is a new lens with its own collection work and
@@ -581,6 +715,19 @@ reachability **and the contract-fetchability check**, portal liveness, broadened
 graded example/compliance signals; then one recalibration and a full re-score and page/paper refresh.
 The **detector sanity pass** should land first of all of these — it is a day's work and it guards every
 other number in the batch.
+
+**Where the competitive read lands in this sequence.** Two of its items are batch-ready and two are
+not. The **Agent-Native band gate** (`idempotency` **and** `error_semantics` required) belongs in step
+(3) alongside the other gating work, and it must land *before* the recalibration since it moves the top
+band. The **four `planned_dimensions`** — `idempotency_key_param`, `rate_limit_headers`,
+`error_envelope`, `dry_run_mode` — are already specified in `scoring.yml` and are spec-parsing work of
+the same kind as the placeholder-server check, so they ride in step (1) with it and share its parser.
+Note the interaction: promoting these supersedes the link-based proxies that the band gate keys on, so
+the gate should be written against the *superseding* dimensions where they have landed and the legacy
+proxies where they have not. The **agentic-commerce dimension** and the **machine-discoverability
+rework** are new collection work, not corrections, and should follow the batch rather than delay it —
+the discoverability item in particular is better done once against Cloudflare's published adoption
+baseline than guessed at now.
 
 **Reports to re-issue after the batch.** Provenance gating will move numbers in reports that are
 already selling, and several of those reports name the providers that will fall. The **thirteen**
