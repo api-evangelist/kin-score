@@ -449,27 +449,35 @@ certifies, and still lands mid-table because it has no commercial API product to
 sector, and the same shape from the mandator's side. Both belong under whatever provider `kind`
 treatment the earlier item settles on.
 
-## Switchability — a third standalone lens, for procurement
+## Switchability — a third standalone lens
 
-*Proposed. This is the largest single addition contemplated for the score, and it targets a reader the
-rubric does not currently serve.*
+*Proposed, and deliberately parked. Not in 0.6, and not a new audience.*
+
+**Positioning first, because it decides the design.** Procurement is *not* being adopted as an API
+Evangelist audience — the readers stay who they are. Switchability is leverage applied **on behalf of**
+those readers, aimed at the vendors selling into large organizations: *your enterprise buyers already
+evaluate you this way, and here is what they see.* That is a materially different frame from building a
+procurement product, and it keeps the lens pointed at the same people every other part of the score is
+pointed at.
 
 The composite answers **"is this a good API?"** — a builder's question. Agent Readiness answers **"can a
-machine drive it?"** Neither answers the question procurement in a large organization actually asks:
-**"if this goes wrong, what does it cost me to leave?"**
+machine drive it?"** Neither answers the question an enterprise buyer puts to a vendor before signing:
+**"if this goes wrong, what does it cost us to leave?"**
 
-That question is orthogonal to quality. A superbly engineered, well-governed, agent-native API can be
-the most expensive thing in the estate to exit, and the composite will rate it highly right up until the
-renewal. Procurement, vendor-risk and architecture-review boards all need a number the current score
-cannot produce.
+That question is orthogonal to quality, which is exactly why it is useful as leverage. A superbly
+engineered, well-governed, agent-native API can be the most expensive thing in an estate to exit, and the
+composite will rate it highly right up until the renewal. A vendor who scores well on the composite and
+badly here has a concrete, unflattering, evidence-backed gap to close — and closing it is work that
+benefits every consumer of that API, which is the point.
 
 ### Why standalone, and why it absorbs the access-model work
 
 Three reasons not to make it a seventh base facet:
 
-1. **Different reader.** The composite serves builders and the sector reports serve operators and
-   investors. Switchability serves procurement, and a number blended into a composite cannot be lifted
-   into a vendor scorecard.
+1. **It must stay liftable.** The argument only works if a vendor can be shown this number on its own,
+   next to the composite, without it being diluted into a single figure they can explain away. Blending
+   it into the composite would destroy the leverage and shift the composite's meaning at the same time —
+   the overloading worth avoiding.
 2. **The composite is full.** Six base facets plus the conditional regulatory facet is already at the
    limit, and the K'in sun glyph deliberately draws six rings — a seventh was considered and rejected.
 3. **Divergence is the product.** The value of this lens is precisely where it *disagrees* with the
@@ -550,6 +558,10 @@ The sector that raised this makes the case concretely, and shows the two lenses 
   otherwise this lens inherits exactly the inflation that made a mandated standard worth two points.
 - **It will be gamed differently from the composite.** A vendor cannot easily fake a second source, but
   can claim a conformance profile. Weight the dimensions that are hard to assert and easy to verify.
+- **Resist the pull toward a procurement product.** The obvious next step from a switchability score is
+  a per-vendor exit-risk assessment sold to buyers — a different product, a different audience and
+  different economics. That is a deliberate fork, not a natural extension, and taking it would change
+  who API Evangelist serves. Recorded here so the decision stays explicit if it is ever made.
 
 ## Ship the next batch together
 
