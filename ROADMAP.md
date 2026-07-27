@@ -288,6 +288,30 @@ the score today. Add a self-serve-access signal — a reachable sandbox and a se
 provenance: provenance asks *who published* the artifact; access model asks *whether the consumer can
 actually reach it*.
 
+**Real estate measured this properly, and the result contradicts the assumption above.** The quartet
+recorded an `access_gate` for all 67 newly researched organizations on a seven-value ladder —
+`self-serve`, `application-approval`, `membership-required`, `licence-agreement`,
+`broker-or-agent-only`, `partner-only`, `none-published`. Sorted by average composite the ladder does
+**not** run monotonically with quality:
+
+| access gate | n | avg |
+|---|---|---|
+| licence-agreement | 8 | **47.7** |
+| self-serve | 4 | 47.6 |
+| application-approval | 14 | 44.7 |
+| broker-or-agent-only | 1 | 40.7 |
+| partner-only | 15 | 37.2 |
+| membership-required | 5 | 32.5 |
+| none-published | 20 | 23.0 |
+
+The most contractually locked tier has the **best** contracts, edging out self-serve; only the bottom
+of the ladder behaves as expected. The design consequence is concrete: **do not fold access into
+`developer_ergonomics` as a penalty.** A grading that docks gated providers would systematically
+under-rate the best-engineered APIs in the sector. Access is an orthogonal axis and should be
+*reported* beside the composite — the way agent-readiness is — not blended into it. The seven-value
+enum above is the field-tested vocabulary; only four of 67 organizations were self-serve, and none of
+those four were American.
+
 ## Broaden the base governance facet
 
 `governance` (0.12) is effectively a single check — a self-published Spectral ruleset in
@@ -299,6 +323,14 @@ the facet. Broaden it to credit the other ways a provider demonstrates it has *i
 `conformance/` artifact, an OpenAPI Overlay, or a published lint / CI posture — resolved against the
 standards catalog. This complements the regulatory-facet conformance check above and gives the base
 facet real signal in sectors that have genuine conformance but no Spectral file.
+
+**A caution from real estate, aimed directly at this item.** Crediting a declared conformance profile
+is exactly the change real estate shows can inflate. RESO certification is real, independently tested,
+publicly verifiable and industry-mandated — and it is worth **2.0 points** of measured difference
+(certified 38.0, uncertified 36.0, n=67). All three certified organizations return **401** on the very
+contract they are certified against. If this facet learns to read conformance claims, it must check
+them against reachability in the same pass, or it will credit a badge for a document the consumer
+cannot fetch.
 
 **One boundary to hold while broadening it.** Telecom is full of organizations that have adopted an
 external standard — CAMARA, TM Forum, GSMA Open Gateway — and score zero on governance, which makes it
@@ -320,6 +352,103 @@ Two signals carry almost no information as flat 0/1 bits:
   **not** a substitute for a machine-readable contract or a consent surface. The reports' recurring
   line — *compliant is not the same as usable* — belongs in the weighting, not just the prose.
 
+## Certification is not reachability
+
+Real estate is the only sector in the series with a **genuinely mandated** machine-readable contract —
+NAR Policy Statement 7.90 requires association-owned MLSs to certify against the RESO Web API and Data
+Dictionary — and measuring what that mandate bought produced the cleanest evidence yet that the rubric
+credits the wrong half of a conformance claim.
+
+**RESO-certified organizations average 38.0; uncertified average 36.0.** Two points, for the only
+self-imposed machine-readable mandate in the API economy. The mechanism is not a defect in the standard:
+all three certified parties are data resellers whose OData `$metadata` — the actual machine-readable
+contract, the document the certification is *about* — returns **401** to any caller without an executed
+MLS licence. The documentation portal is public and genuinely good. The contract is not fetchable.
+
+This is a third distinct failure mode, and it needs separating from the two already on this roadmap:
+
+| Condition | Spec exists | Host real | Contract fetchable |
+|---|---|---|---|
+| Placeholder servers (telecom) | yes | **no** — `{apiRoot}` / `example.com` | n/a |
+| Channel-only (telecom) | often no | yes, third party's | n/a |
+| **Certified-but-closed (real estate)** | yes | **yes** | **no — 401** |
+
+The check is cheap and mechanical: attempt an unauthenticated fetch of the declared contract document
+(`$metadata`, `openapi.json`, the discovery URL) and grade *published and anonymously fetchable* above
+*published and 401*. It does not require judging whether the gate is legitimate — a licensed data
+product is a perfectly reasonable business — only that the rubric stop recording an unfetchable
+document as an equal contract.
+
+Corroborating signal from the same cohort: across all 45 US organizations, **not one publishes a
+specification for `mls`, `idx`, `media`, `openhouse` or `member`** — the mandated Data Dictionary's own
+core resources. A vocabulary can be mandated, certified and free to read, and never appear as a public
+contract.
+
+## The rubric can reward a security failure
+
+Knight Frank scores **36.4**, and a meaningful part of that comes from a live OpenAPI 3.0.1 served from
+an **unadvertised, unauthenticated** production host that declares no `securitySchemes` and returns real
+staff records — names, corporate email, direct-dial and mobile numbers — to any anonymous caller. The
+company publishes no developer programme at all; its properly-built surface sits behind Azure AD B2C on
+a different host. This is internal plumbing that was never meant to be a public product, and the rubric
+counted it as `spec_presence` and `contract_quality`.
+
+The score cannot currently distinguish **a published API** from **a leaked one**, and that gap points
+the wrong way: the less careful a provider is, the more it can score. A candidate guard combines signals
+the pipeline already collects — a spec that declares no security schemes, *and* returns data to an
+anonymous request, *and* has no discoverable developer portal, *and* is served from a host that
+advertises nothing — and flags rather than credits. Related to the Standalone Security Posture item
+below, but distinct: that item asks how good a provider's security posture is; this one asks whether the
+artifact should be scored as a product at all.
+
+Handled in the research itself by excluding the person-search operations from the published profile's
+agent skills and MCP tooling and naming the exposure in the report without naming any individual — but
+that was an editorial decision made by hand, not something the rubric caught.
+
+## Unanimous zeros are either a finding or a bug — and the difference matters
+
+Canadian real estate scores **0.0 on governance across all fourteen organizations**, and three
+agent-readiness dimensions are unanimous zeros in the same cohort: `rate_limit_signal` 0/14,
+`asyncapi_events` 0/14, `idempotency` 0/14. US real estate is 0/45 on both `idempotency` and
+`consent_identity`.
+
+Some of those are real and are the most quotable findings in the reports. But two detection bugs have
+already been caught by hand in this series — the placeholder-server scan that returned 4,320 false
+positives and then 7 true ones before it was written correctly, and a CAMARA count that summed the wrong
+YAML keys — and both looked entirely plausible until checked. A dimension that is *unanimously* zero
+across a whole cohort is exactly the shape a broken detector produces.
+
+Add a **detector sanity pass** to the scoring run: whenever a facet or dimension is zero for 100% of a
+cohort above some size, emit it for review rather than silently reporting it. Cheap to build, and it
+converts the catalog's most embarrassing failure mode into a routine check.
+
+## Discoverability is saturated and no longer discriminates
+
+Across the real estate quartet `discoverability` averages **84.6** with **zero providers scoring zero in
+any of the four markets** — 90.8 UK, 87.2 AU, 83.0 CA, 80.7 US. In the same cohort `governance` averages
+**3.1** and `contract_quality` **29.0**.
+
+A facet that nobody fails and almost everybody scores in the eighties is not carrying information. Its
+current bar — a findable website, documentation, support, terms — is met by any company with a marketing
+department, which in a 25,000-provider catalog is nearly all of them. Two candidate responses: raise the
+bar (credit *machine* discoverability — `.well-known` catalogs, `llms.txt`, an APIs.json, a linked
+OpenAPI — rather than human findability), or reduce its weight in favour of facets that do
+discriminate. The first is more in keeping with the agentic thesis: for an agent, a beautifully
+designed marketing site is not discoverability at all.
+
+## Standards bodies, second data point
+
+The *wrong yardstick* problem above now has a real-estate instance that sharpens it. **RESO scores
+41.6** while authoring the only mandated machine-readable contract in the series, running the public
+certification directory the whole market depends on, and — a correction to an earlier reading — operating
+a **production MCP server** at `services.reso.org/mcp` plus an authenticated certification API and seven
+first-party npm packages. The standards body has a better agent surface than most of the market it
+certifies, and still lands mid-table because it has no commercial API product to be transparent about.
+
+**NAR scores 34.6 with an agent-readiness of 72.1** — the widest composite/agent divergence in the
+sector, and the same shape from the mandator's side. Both belong under whatever provider `kind`
+treatment the earlier item settles on.
+
 ## Ship the next batch together
 
 These items are meant to land as **one coherent 0.6 release**, re-scored and band-recalibrated in a
@@ -331,15 +460,25 @@ separate recalibrations and three rounds of headline-number churn. Sequence with
 base-facet correctness, and provenance now leads because two published report series commit to it in
 print; (2) the `broker`-collision fix and the new `telecommunications` regime, then the 0.6
 regime-specific checks resolved against the catalogs; (3) access model including channel
-reachability, portal liveness, broadened governance, and the graded example/compliance signals; then
-one recalibration and a full re-score and page/paper refresh.
+reachability **and the contract-fetchability check**, portal liveness, broadened governance, and the
+graded example/compliance signals; then one recalibration and a full re-score and page/paper refresh.
+The **detector sanity pass** should land first of all of these — it is a day's work and it guards every
+other number in the batch.
 
 **Reports to re-issue after the batch.** Provenance gating will move numbers in reports that are
-already selling, and several of those reports name the providers that will fall. The nine affected —
-the four insurance Sector Reports, the telecom Sector Report, and the four banking reports that first
-raised provenance — should be re-issued at v1.1 against corrected data rather than left to disagree
-with the live catalog. The insurance and telecom reports were written to survive this: each names
-which providers rest on derived artifacts and predicts the direction of the change.
+already selling, and several of those reports name the providers that will fall. The **thirteen**
+affected — the four insurance Sector Reports, the telecom Sector Report, the four banking reports that
+first raised provenance, and the four real estate reports — should be re-issued at v1.1 against
+corrected data rather than left to disagree with the live catalog. Insurance, telecom and real estate
+were all written to survive this: each names which providers rest on derived artifacts and predicts the
+direction of the change.
+
+One sequencing note the real estate quartet exposed: **provenance gating will hit markets unevenly, in
+proportion to how little they genuinely publish.** Canada has the thinnest published surface of the four
+(seven of fourteen organizations publish any contract), so AE-derived artifacts are a larger share of
+what is being scored there, and its numbers will fall furthest. That is correct behaviour, but it means
+the *cross-market* comparisons those reports draw — Canada last for the fifth consecutive sector — must
+be re-verified after the batch rather than assumed to survive it.
 
 ---
 
