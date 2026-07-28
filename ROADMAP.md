@@ -46,8 +46,40 @@ Until then the honest position is the one the rubric states in print: `unknown` 
 because punishing providers for a gap in our own metadata would be a worse error than the one
 provenance grading exists to fix.
 
-**Second: re-issue the seventeen affected reports.** See *Reports to re-issue after the batch* at the
-foot of this file — that item is now live rather than anticipated.
+**Provenance grades the PRESENCE award, not the DEPTH awards — and Yardi shows the difference.**
+Grading `contract_present` caught Yardi correctly: all five of its specs are marked derived, and it
+fell 62.9 → 56.9. But it is still **Strong**, because `contract_present` is 20 of the 132 points in
+`contract_quality` and the other 112 — `info_complete`, `operations_summary_coverage`,
+`operations_description_coverage`, `operationIds`, `response_coverage`, `components_reuse`,
+`security_schemes_defined` — are still awarded in full for the quality of a document **API Evangelist
+wrote**. We write good specs, so a provider we modeled thoroughly scores well on spec craftsmanship it
+had no part in.
+
+The fix is mechanically simple and should land in 0.7: apply the provenance multiplier to **every
+check in the `openapi` artifact block**, not only to the presence check, so a derived corpus is graded
+down across its whole contribution rather than at one point of entry. It was left out of 0.6
+deliberately — the blast radius of grading 132 points instead of 20 needs measuring on its own rather
+than riding along with nine other changes — but the current state is a half-measure and should be
+described as one.
+
+**A related asymmetry worth deciding on at the same time:** the depth checks are also where a derived
+spec is most *useful* to a consumer. A thoroughly modeled OpenAPI with real descriptions and stable
+operationIds genuinely helps an agent, whatever its provenance. That argues for grading depth down to
+the `derived` floor rather than to zero — which is what the credit table already does, and is another
+reason the change is a multiplier rather than a gate.
+
+**Second: harvest the FHIR conformance surface.** Contract-type-agnostic scoring shipped, and
+healthcare barely moved — **Epic went 35.6 → 33.0**, down, because the catalog holds no
+CapabilityStatement for it. Only 22 statements exist across 11 providers. The rubric can now read
+them; nothing has fetched them. Every conformant FHIR server serves one at a well-known path, which
+makes this among the most tractable harvests available.
+
+**Third: re-issue the seventeen affected reports.** See *Reports to re-issue after the batch* at the
+foot of this file — that item is now live rather than anticipated. First movements measured against
+the 0.5.1 baseline, for the providers those reports name: Yardi 62.9 → 56.9, ACORD 56.5 → 50.7,
+AT&T 61.9 → 56.3, Guidewire 47.9 → 43.8, Majesco 51.5 → 47.4, Medplum 73.7 → 64.4. Agent readiness
+moved further and in the same direction — Stripe 100.0 → 63.5, 8x8 90.4 → 61.0, Twilio 77.9 → 58.1,
+Guidewire 53.8 → 36.0 — because that is where the derived artifacts were concentrated.
 
 ---
 
