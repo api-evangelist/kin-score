@@ -162,6 +162,27 @@ this roadmap:
 Provenance gating should therefore ship **first**, ahead of every other item here, and the affected
 reports should be re-issued at v1.1 against the corrected numbers.
 
+### A third provenance category energy surfaced: published by the provider, authored by someone else
+
+The provenance work above splits artifacts two ways — **provider-published** versus
+**API-Evangelist-derived**. Energy produced a third case that fits neither, and it is the dominant case
+in a mandated market.
+
+Three Ontario utilities publish the Green Button Alliance's ESPI specification. Four Australian retailers
+publish the Data Standards Body's `cds-energy` and `cds-common` documents. Those artifacts are genuinely
+hosted by the provider — nothing derived, nothing generated — and the provider did not write a line of
+them. They are **conformance**, not authorship.
+
+Crediting them identically to a first-party contract is defensible in a mandated sector and misleading
+outside one. It is what makes AGL's `contract_quality` look like Stripe's for a document AGL implements
+rather than designed. Both energy reports state it by hand; the rubric cannot see it.
+
+The fix is small if provenance grading is being built anyway: record an artifact's **author** alongside
+its **publisher**, and let the facet distinguish *wrote it*, *implements someone else's*, and *AE derived
+it from prose*. Three states, not two. The distinction also feeds the standards catalog directly — an
+organization implementing a standards body's specification is a conformance data point, which is
+precisely what the certification directories in real estate and energy exist to record.
+
 ## A contract you cannot call — placeholder and template-only servers
 
 Distinct from provenance, and surfaced hard by telecom: a specification can be genuinely
@@ -312,6 +333,15 @@ under-rate the best-engineered APIs in the sector. Access is an orthogonal axis 
 enum above is the field-tested vocabulary; only four of 67 organizations were self-serve, and none of
 those four were American.
 
+**Energy replicated the inversion in a completely unrelated industry**, which promotes this from a
+sector quirk to a property of the rubric. Across 95 energy organizations: `accredited-only` **48.6**,
+`licence-agreement` **48.5**, `self-serve` **45.6**, `application-approval` 35.5, `partner-only` 34.6,
+`none-published` 27.8, `customer-account-required` 26.5. The best-contracted data in Australian energy
+sits behind ACCC accreditation — a legal status, not a signup. Two unrelated sectors, same shape:
+**the better the contract, the harder the gate.** Note also that energy needed two enum values real
+estate did not (`accredited-only`, `customer-account-required`) and did not need three that it did.
+The vocabulary is sector-shaped; the axis is not.
+
 ## Broaden the base governance facet
 
 `governance` (0.12) is effectively a single check — a self-published Spectral ruleset in
@@ -422,11 +452,29 @@ Add a **detector sanity pass** to the scoring run: whenever a facet or dimension
 cohort above some size, emit it for review rather than silently reporting it. Cheap to build, and it
 converts the catalog's most embarrassing failure mode into a routine check.
 
+**It should also cover single-provider negatives, because two more turned up the same day the item was
+written.** REA Group was recorded as publishing no OpenAPI; a reprofile found **nine** provider-published
+OpenAPI 3.1.0 documents in a public Stoplight workspace, moving it 22.4 → 49.9 and inverting a headline
+finding in a report that was already built. AEMC was recorded as having no API; the enrichment round
+found an **entirely anonymous JSON API** serving the versioned text of the National Electricity Rules
+(304 versions), Gas Rules (115) and Energy Retail Rules (65), discovered by reading routes out of the
+organization's own production JavaScript bundle.
+
+Both were confident negatives. Both were wrong in the same direction — *the agent did not find it, so it
+concluded it did not exist.* A provider recorded as having no contract **in a tier where its peers
+publish one** is exactly as suspicious as a 100%-zero cohort, and far more common. Flag it the same way.
+
 ## Discoverability is saturated and no longer discriminates
 
 Across the real estate quartet `discoverability` averages **84.6** with **zero providers scoring zero in
 any of the four markets** — 90.8 UK, 87.2 AU, 83.0 CA, 80.7 US. In the same cohort `governance` averages
 **3.1** and `contract_quality` **29.0**.
+
+**Energy reproduced it exactly**: 90.3 UK, 87.7 AU, 86.7 CA, 82.5 US, and again **not one provider at
+zero in any market** — including thirteen US utilities that score 0.0 on every one of the twelve
+agent-readiness dimensions and publish no contract at all. A facet that a completely absent developer
+surface still scores in the eighties is not measuring what the rubric needs it to measure. Two sectors,
+252 organizations, zero zeros.
 
 A facet that nobody fails and almost everybody scores in the eighties is not carrying information. Its
 current bar — a findable website, documentation, support, terms — is met by any company with a marketing
@@ -697,6 +745,130 @@ follow the batch, so it can be written against the corrected numbers rather than
   say so plainly rather than treating every "agent readiness index" as a rival, which would be both
   inaccurate and easy to rebut.
 
+## Mandate status is the largest unmeasured effect in the catalog
+
+Energy exists in this series to test whether a data mandate is replicable, and answering that produced
+the single biggest effect any of these quartets has measured — on a variable the rubric does not read at
+all.
+
+Across the 95 organizations newly researched for the energy quartet, each was assigned a `mandate_status`
+during research, on a deliberately ruthless enum where `live-implemented` required finding the actual
+endpoint, register entry or standards-conformant surface:
+
+| mandate status | n | avg composite |
+|---|---|---|
+| **live-implemented** | 46 | **42.2** |
+| not-applicable | 32 | 36.6 |
+| designated, not yet live | 3 | 35.9 |
+| **live-claimed, unverified** | 8 | **30.4** |
+| none at all | 5 | 30.2 |
+
+**A verified mandate is worth about twelve points. A claimed one is worth less than having no obligation
+at all.** That second row is the finding. An organization asserting compliance it cannot demonstrate
+scores *below* an organization under no obligation — which means self-declared compliance is not merely
+uninformative, it is **negative signal**, and any assessment that reads compliance pages instead of
+calling endpoints will rank the field backwards at the top.
+
+Compare RESO in real estate: a genuine, tested, industry-mandated certification worth **2.0 points**
+(38.0 certified against 36.0 uncertified). Same question, two sectors, a six-fold difference in effect —
+because one mandate came with a public register, conformant discovery endpoints and a certificate
+authority, and the other came with a conformance badge.
+
+### Why it belongs in the rubric rather than in the research notes
+
+Three reasons:
+
+1. **It is machine-checkable.** A CDR Register lookup, an anonymous call to
+   `/cds-au/v1/discovery/status`, a Green Button Alliance certification row. These are the same class of
+   probe the rubric already runs for `spec_presence`.
+2. **It explains variance the composite currently attributes elsewhere.** Australian energy retailers
+   cluster inside eight points of each other; the unmandated distribution networks spread across
+   twenty-six. The mandate compressed the variance of the tier it touched, and the rubric records that
+   as eight providers happening to be similar.
+3. **The failure mode is already live in this catalog.** Two Ontario utilities present as Green Button
+   compliant and could not be verified — one because its onboarding host returns HTTP 200 for *every*
+   path including invented control paths, being a single-page-app catch-all. Without a verification
+   state, that provider scores as compliant.
+
+### And the mandate's *target* matters as much as its existence
+
+Energy showed that "has a mandate" is too coarse a bit, because four markets mandated four different
+things and got four different results:
+
+- **Australia** mandated a **consumer data right** → 13 live consumer APIs, the only shared vocabulary in
+  the series, agent-readiness 57.3.
+- **Britain** mandated **smart-meter infrastructure** (the Smart Energy Code and the DCC) → *more* live
+  mandates than Australia, four consumer APIs, and access by licensed-party status rather than credential.
+- **Britain also** mandated **network open data** (Ofgem's Data Best Practice Guidance, "presumed open",
+  via RIIO licence conditions) → the two highest agent-readiness scores in the entire study, 94.2, at
+  regulated monopolies.
+- **Ontario** mandated **adoption of an external standard** → three conformance implementations and two
+  unverifiable claims.
+- **The United States** mandated **wholesale transmission posting** in 1996 (FERC Order 889 / OASIS) and
+  never mandated retail → system operators 48.3, utility retailers 29.8.
+
+A regime field carrying *what was compelled* — consumer data, infrastructure, network data, a transaction
+rail, a schema — would let the score say something the composite cannot: not whether a provider is
+regulated, but whether the thing it was told to publish is the thing a developer needs.
+
+**A cautionary note for the implementation.** This item was nearly written on a false premise. The UK
+energy report originally claimed the distribution networks published superbly "and nothing required it,"
+and that survived into a published PDF. Researching the regulations catalog surfaced Ofgem's Data Best
+Practice Guidance — a real obligation, aimed at network data instead of customer data. **If the regime
+map is built from what a sector says about itself, it will miss the obligations that are not called data
+rights.** Build it from the instruments.
+
+## Commercial clarity penalises mandated data
+
+A narrower rubric defect, and energy is the clean demonstration.
+
+`commercial_clarity` is the one facet where the United States **beats** Australia — **34.1 against
+28.7** — in a market Australia leads overall by nine points and on agent-readiness by twenty-seven. The
+reason is not quality. **CDR data has no price, no plan tiers and no self-serve signup by design**: you
+reach it by becoming an accredited data recipient, not by paying. The mandate that produced the contracts
+removed the commercial surface the facet looks for.
+
+The same effect shows up wherever data is a public good rather than a product. Britain's open-data DNOs
+publish under an open licence with no pricing page. Government data agencies — EIA, NESO — score the same
+way.
+
+The rubric currently reads *absence of a commercial surface* as a deficiency, when it is sometimes a
+**regulatory outcome** and sometimes a **deliberate public-good posture**. The conditional-facet
+machinery already exists for exactly this: the regulatory facet only applies to providers in a regime.
+`commercial_clarity` needs the same treatment — either scored conditionally on whether the provider sells
+API access at all, or rebalanced so that "free, open, no signup" stops reading as "no commercial clarity."
+
+Left unfixed, the facet systematically flatters markets that monetise data access over markets that
+mandate it — which is precisely backwards for a reader trying to find data they can actually reach.
+
+## Two speeds inside one provider — consumer data versus market data
+
+Real estate found that a certified contract can be unreachable. Energy found the adjacent problem: **one
+organization can be wide open on one dataset and completely closed on another, and the composite averages
+them into a single number that describes neither.**
+
+The energy research recorded two independent booleans per organization — `consumer_data_api` (can a third
+party obtain an individual customer's usage and billing data) and `market_data_open` (does the provider
+publish grid or market data anonymously). Across 95 organizations they almost never coincide:
+
+| | n |
+|---|---|
+| market data open only | 33 |
+| consumer data only | 22 |
+| **both** | **6** |
+| neither | 34 |
+
+**AEMO is the case that matters.** It tops the Australian market at 59.5 and does two jobs: it publishes
+the national market data anonymously *and* operates the mandated CDR consumer gateway behind ACCC
+accreditation. Same institution, two products, two access models, one score. A developer reading 59.5
+learns nothing about which half they can reach.
+
+This is the same structural complaint as *Certification is not reachability* and *Reachable only through
+a channel*, arriving from a third direction, and together they point at one conclusion: **the composite
+needs to stop being the only number.** Whether that becomes a per-dataset breakdown, an access-model axis
+(see *Switchability*), or simply a reported split, the single-score summary is now demonstrably lossy in
+three separate sectors.
+
 ## Ship the next batch together
 
 Switchability is explicitly **not** in the 0.6 batch — it is a new lens with its own collection work and
@@ -714,7 +886,10 @@ regime-specific checks resolved against the catalogs; (3) access model including
 reachability **and the contract-fetchability check**, portal liveness, broadened governance, and the
 graded example/compliance signals; then one recalibration and a full re-score and page/paper refresh.
 The **detector sanity pass** should land first of all of these — it is a day's work and it guards every
-other number in the batch.
+other number in the batch, and energy gave it two more false negatives to justify it (REA Group, AEMC).
+**`mandate_status` should join the 0.6 batch rather than wait**, because it is machine-checkable with
+probes the pipeline already runs and it is the largest unmeasured effect in the catalog — twelve points
+against RESO's two.
 
 **Where the competitive read lands in this sequence.** Two of its items are batch-ready and two are
 not. The **Agent-Native band gate** (`idempotency` **and** `error_semantics` required) belongs in step
@@ -730,10 +905,11 @@ the discoverability item in particular is better done once against Cloudflare's 
 baseline than guessed at now.
 
 **Reports to re-issue after the batch.** Provenance gating will move numbers in reports that are
-already selling, and several of those reports name the providers that will fall. The **thirteen**
+already selling, and several of those reports name the providers that will fall. The **seventeen**
 affected — the four insurance Sector Reports, the telecom Sector Report, the four banking reports that
-first raised provenance, and the four real estate reports — should be re-issued at v1.1 against
-corrected data rather than left to disagree with the live catalog. Insurance, telecom and real estate
+first raised provenance, the four real estate reports and the four energy reports — should be re-issued
+at v1.1 against corrected data rather than left to disagree with the live catalog. Energy will move
+least: its enrichment ran 45% searched / 34% generated / 21% derived, the healthiest ratio recorded. Insurance, telecom and real estate
 were all written to survive this: each names which providers rest on derived artifacts and predicts the
 direction of the change.
 
