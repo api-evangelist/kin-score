@@ -11,4 +11,5 @@ version bump so the score stays citable and its history auditable. See [`../CHAN
 
 | Version | File | Notes |
 |---------|------|-------|
+| 0.5.1 | [`scoring-0.5.1.yml`](scoring-0.5.1.yml) | Graded `agent_card` dimension (A2A) + Agent Readiness band re-cut. |
 | 0.5 | [`scoring-0.5.yml`](scoring-0.5.yml) | Conditional regulatory facet + industry_regulatory map. |

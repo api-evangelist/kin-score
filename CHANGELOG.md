@@ -5,6 +5,47 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.5.1 — 2026-07-28
+
+**Added the A2A Agent Card to Agent Readiness, and re-cut its bands.**
+
+Additive and standalone: the composite, the six base facets and the conditional regulatory
+facet are untouched. No provider's composite score moves.
+
+- New **`agent_card` dimension** (8 points) in the standalone Agent Readiness score. The
+  provider serves a machine-readable agent discovery manifest at the A2A well-known path,
+  `/.well-known/agent-card.json` ([RFC 8615](https://www.rfc-editor.org/rfc/rfc8615)),
+  advertising its identity, capabilities, skills, endpoint and auth.
+- **The first *graded* dimension in the rubric.** Every other dimension is a bit; this one is
+  scored against the [A2A 1.0.0](https://a2a-protocol.org/latest/specification/) `AgentCard`
+  object on a three-step scale — `conformant` 1.0, `near-conformant` 0.6, `flavored` 0.25.
+- **Agent Readiness bands re-cut, 60/45/15 → 56/42/14.** Mandatory, not cosmetic: the score is
+  `earned / max`, so a new dimension raised `max` from 104 to 112 and rescaled every provider's
+  score by 104/112. At the old cut points that arithmetic alone would have **demoted 3,726
+  providers (14.6% of the catalog)** for publishing nothing different — the baseline plateau
+  falls from 48 to 44.6, just under the old 45 line. The cuts are re-derived at the same valleys
+  in the rescaled distribution. Net effect: **15 providers change band, every one of them
+  upward, and every one because it publishes an agent card.**
+- Scored output now records the **grade**, not a boolean: `dimensions.agent_card: conformant`.
+
+**Motivation.** A survey of the catalog on 2026-07-28 — every absolute host recorded across
+25,622 providers, reduced to **22,341 unique hosts** and fetched at the canonical path plus the
+pre-0.3 `/.well-known/agent.json` — found **65 providers serving an agent card, and only 10
+conformant.** Fifty-five invented their own shape: `capabilities` as an array where the spec
+defines an object, `supportedInterfaces` where the spec says `additionalInterfaces`, no
+`protocolVersion` at all. A boolean would have recorded 65 adopters of a specification 41 of
+them are not following, which is why this dimension grades.
+
+Two findings shaped the weighting. First, the Agent Card is **decoupling from A2A**: several
+conformant cards point at MCP endpoints, and one declares `preferredTransport: MCP`, which is
+not an A2A transport. What is being scored is machine-readable agent *discovery*; A2A
+conformance is a grade within it, not the container. Second, and the reason it outweighs
+`agent_skills` despite 0.29% adoption — **an agent card cannot be derived.** It is served from
+the provider's own host or it does not exist. Where `mcp_server`, `agent_skills` and
+`agentic_access` can all credit an artifact API Evangelist authored on a provider's behalf —
+the provenance defect that distorted the insurance and telecom sector reports — this dimension
+is provider-published by construction and immune to it.
+
 ## 0.5 — 2026-07-23
 
 **Added a conditional regulatory facet.**

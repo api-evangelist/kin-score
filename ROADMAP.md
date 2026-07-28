@@ -183,6 +183,83 @@ it from prose*. Three states, not two. The distinction also feeds the standards 
 organization implementing a standards body's specification is a conformance data point, which is
 precisely what the certification directories in real estate and energy exist to record.
 
+## The Agent Card — a provenance-proof signal, measured across the whole catalog
+
+*Unlike most items on this roadmap, this one is not a proposal from a sector read. It is a completed
+first-party measurement, run 2026-07-28 against every host the catalog knows about, and it should be
+scored on the strength of that evidence.*
+
+The A2A Protocol reached **1.0.0** under the Linux Foundation and defines an **Agent Card** — a
+machine-readable manifest served at `/.well-known/agent-card.json` (RFC 8615) advertising an agent's
+identity, capabilities, skills, endpoint and auth. A2A's own discovery documentation names three
+adoption strategies, and the second is **"Curated Registries (Catalog-Based Discovery)"** — a central
+service holding agent cards queryable by skill, tag and provider. That is a description of this
+catalog, written by someone else.
+
+**What the probe found.** Every absolute host recorded in `all/*/apis.yml` — Website, Portal,
+MCPServer, Documentation, APIReference — was reduced to 22,341 unique hosts and fetched at the
+canonical path, plus the pre-0.3 `/.well-known/agent.json` on any host that answered. No hosts were
+invented. 20,185 were reachable.
+
+**Sixty-four companies serve an agent card. That is 0.29%.** Graded against the A2A 1.0.0 `AgentCard`
+object:
+
+| Grade | n | Condition |
+|---|---|---|
+| **conformant** | 9 | `capabilities` an object, `protocolVersion` present, `skills` an array |
+| **near-conformant** | 14 | right shape, missing `preferredTransport` / default modes |
+| **flavored** | 41 | fails a hard structural check — an agent card in spirit, not in schema |
+| *(legacy path)* | *15* | *still served at `/.well-known/agent.json`* |
+
+Three findings, each with a direct consequence for the rubric.
+
+**1. The format is fragmenting faster than it is spreading.** Fifty-five of sixty-four publishers
+invented their own shape. `agentcard.sh` serves `capabilities` as an *array* of skill objects where
+the spec defines an object of booleans, uses `supportedInterfaces` where the spec says
+`additionalInterfaces`, and omits `protocolVersion` entirely. This is the *Graded signals, not bits*
+argument arriving before the signal is even scored: a boolean `has_agent_card` would record the
+catalog as 64 adopters of a standard that 41 of them are not following. **Score the grade, not the
+presence.**
+
+**2. The Agent Card is decoupling from A2A, and the score should not conflate them.** Several
+*conformant* cards point `url` at an MCP endpoint. `pydantic.dev` declares `preferredTransport: MCP`
+— which is not an A2A transport at all; the spec defines JSONRPC, GRPC and HTTP+JSON. `buddy.works`
+and `superset.sh` both resolve to `/mcp`. Providers are adopting the Agent Card as a **discovery
+manifest for MCP servers**, decoupled from A2A the wire protocol. The dimension to score is
+*machine-readable agent discovery*; A2A conformance is a grade within it, not the container. A
+dimension named `a2a_support` would be measuring the wrong thing on day one.
+
+**3. It is the first agent signal that cannot be AE-derived — which makes it provenance-proof by
+construction.** Every other agent-readiness dimension is vulnerable to the defect the provenance item
+above exists to fix: `mcp_server`, `agent_skills` and `agentic_access` all credit artifacts this
+pipeline frequently authored on the provider's behalf, and in insurance and telecom that distortion
+decided the standings. **An agent card cannot be derived.** It is served from the provider's own
+domain over the provider's own TLS, or it does not exist. The probe records an observed HTTP status
+and a verbatim body; there is no path by which enrichment can manufacture one. In a rubric whose
+highest-priority correction is *stop crediting our own work to providers*, a dimension that is
+immune to that failure mode deserves weight out of proportion to its adoption rate.
+
+**Implementation.**
+
+- A new agent-readiness dimension — `agent_card`, graded rather than binary, awarding full credit for
+  a conformant card, partial for near-conformant, and a floor for flavored. It sits naturally beside
+  `well_known_catalog` (4) and `mcp_server` (12).
+- **Probe both paths.** The legacy `/.well-known/agent.json` still carries 21% of everything found;
+  a harvester that reads only the current path silently under-counts early adopters by a fifth.
+- **Reject SPA shells.** 2,475 hosts returned 200 with non-JSON — the same false positive the
+  `all/stripe/well-known/` harvest documented by hand, and the same one *Portal decay* warns about. A
+  card counts only on a 200 that parses as a JSON object carrying real `AgentCard` shape.
+- Re-run the probe on a schedule. At 0.29% this is a frontier signal, and the point of measuring a
+  frontier is the second measurement.
+
+**Corroboration, and a caution about the denominator.** Cloudflare's top-200k scan found *fewer than
+15 sites in 200,000* carrying an MCP Server Card or API catalog — 0.0075%. This catalog returns
+0.29%, roughly forty times that rate, because it probes API providers rather than the web at large.
+Both numbers are right; they answer different questions, and the comparison belongs in any write-up
+so nobody reads our rate as a contradiction of theirs. The honest limitation on ours: hosts came only
+from URLs already in `apis.yml`, so a card served from an unlisted subdomain is invisible to this
+run — the count is a floor, not a census.
+
 ## A contract you cannot call — placeholder and template-only servers
 
 Distinct from provenance, and surfaced hard by telecom: a specification can be genuinely
@@ -734,6 +811,11 @@ up without ever refusing to award is a score that can be farmed.
 
 ### Two blind spots nobody on this roadmap has claimed
 
+*One of these has since been claimed. **A third — agent discovery via the A2A Agent Card — has been
+measured and moved to its own section above** (*The Agent Card*), where the finding that matters is
+that no competitor in this table reads it either, and that it is the only agent signal in the rubric
+that provenance gating cannot undermine.*
+
 - **Agentic commerce protocols.** Elogic weights protocol support — **UCP, ACP, AP2, MCP** — at 25% of
   its index, and Cloudflare tracks **x402** and UCP as a fifth layer. The Kin Score does not read any of
   them. For a catalog whose thesis is that agents will transact, this is a visible hole, and it is
@@ -1026,6 +1108,26 @@ proxies where they have not. The **agentic-commerce dimension** and the **machin
 rework** are new collection work, not corrections, and should follow the batch rather than delay it —
 the discoverability item in particular is better done once against Cloudflare's published adoption
 baseline than guessed at now.
+
+**The `agent_card` dimension was the exception and shipped ahead of the batch, in 0.5.1
+(2026-07-28).** Every other item here is queued because the collection work has not been done;
+that one's was finished — 22,341 hosts probed, 65 cards captured verbatim with their observed
+HTTP status, graded three ways. It is additive (a new dimension; no existing dimension changes
+meaning) and provenance-proof by construction, so it did not need to wait for the 0.6 batch.
+
+**It did, however, need its own band recalibration — and that is a lesson worth generalising to
+every remaining item on this roadmap.** The reasoning that it "moves almost nobody's band because
+almost nobody publishes one" was wrong, and measurement caught it before release. Agent Readiness
+is `earned / max`, so adding an 8-point dimension raised `max` from 104 to 112 and rescaled *every
+provider in the catalog* by 104/112 — including the ~3,300-provider baseline plateau, which fell
+from 48 to 44.6 and straight through the old 45 cut. Left alone, a dimension 99.7% of the catalog
+does not participate in would have **demoted 3,726 providers**. Re-cut at the same valleys
+(56/42/14), 15 providers moved, all upward, all of them publishers.
+
+The general rule this establishes: **in a normalised score, adoption rate does not predict blast
+radius — the denominator does.** Any future dimension added to Agent Readiness moves the whole
+catalog whether or not anyone scores on it, so a band re-cut is part of the change, not a
+follow-up. The same arithmetic applies to the four `planned_dimensions` when they are promoted.
 
 **Reports to re-issue after the batch.** Provenance gating will move numbers in reports that are
 already selling, and several of those reports name the providers that will fall. The **seventeen**
