@@ -18,9 +18,22 @@ It is also what keeps the glyph colourful for every provider. The alternative �
 band each facet landed in — was built, tested and rejected: a provider scoring uniformly high comes
 out near-monochrome, which is exactly backwards for a mark meant to read as a sun.
 
-**Rays — twelve triangles around the outside, one per agent-readiness dimension.** Solid when the
-dimension is satisfied, hollow outline when not. Twelve is a happy accident of the data: the agent
-score has exactly twelve dimensions, so the rays sit at a clean 30°.
+**Rays — fourteen triangles around the outside, one per agent-readiness dimension.** Solid and full
+length when the dimension is satisfied, solid but **short (55%)** when it is only partially credited,
+hollow outline when it is not satisfied at all. The ray count follows the rubric: twelve at 0.4,
+thirteen when `agent_card` shipped in 0.5.1, fourteen at 0.6 with `dry_run_mode`. Geometry is
+parametric on `DIMENSIONS.length`, so adding a dimension needs no layout work — but the ray *does*
+have to be added here, and for two days after 0.5.1 it was not, leaving the sun silently a ray short
+of the score it was illustrating.
+
+**The three-state ray is new in 0.6**, and it exists because seven of the fourteen dimensions can now
+land on partial credit — four graded on evidence (`documented`, `partial`), three graded on
+authorship (`derived`, `mixed`), plus the agent card's own conformance ladder. A derived MCP server
+should not draw the same ray as a running one. Partial is encoded as **length, not opacity or hue**:
+opacity does not survive greyscale, print or forced-colors, and the point of the silhouette is that
+it reads at a glance. A stubby ray says *there, but not all the way there* in any rendering. The
+tooltip states the grade verbatim — "MCP Server: derived" is a different fact from "MCP Server:
+satisfied", and telling the two apart is the entire purpose of 0.6.
 
 **The composite band** is stated as text under the number, because it left the rings when they took
 facet hues. Below ~96px the number and band label drop and the core becomes a band-coloured dot — the
@@ -147,6 +160,26 @@ The glyph needs the facet breakdown and the agent dimensions, not just the compo
   payload size: `provider_bands.yml` covers every provider in the network.
 - The AE section listings already carry both in `providers/_data/companies-*.json`.
 
+### The compact encoding
+
+Facets ride as a positional **array** in `FACETS` order; dimensions as a positional **string** in
+`DIMENSIONS` order. Keyed objects doubled `provider_bands.yml` from 13.9 to 28.2 MB; compact brought
+it to 17.7. `FACET_ORDER` / `DIM_ORDER` in `build_listings.py` **must** stay in sync with `FACETS` /
+`DIMENSIONS` here — the encoding is positional, so reordering either is a breaking change.
+
+The dimension string was a bitstring through 0.5.1 and is a **trit string** from 0.6:
+
+| char | means |
+|---|---|
+| `0` | not satisfied |
+| `1` | satisfied, full credit |
+| `2` | **partial credit** — graded on evidence (`documented`, `partial`) or on authorship (`derived`, `mixed`) |
+
+`1` deliberately keeps its old meaning, so an encoding written before 0.6 still renders correctly
+rather than silently demoting every satisfied dimension to a stub. Keyed objects may instead carry the
+grade verbatim — `"mcp_server": "derived"`, which is what provider frontmatter emits — and
+`rayState()` normalizes either form.
+
 ## Known limitations
 
 - **A radial mark is an identity glyph, not a measuring instrument.** Equal values read as different
@@ -164,6 +197,6 @@ The glyph needs the facet breakdown and the agent dimensions, not just the compo
 
 Three implementations were built and compared (see `NOTES.md`). SVG won on the deciding argument:
 Kin Scores are computed at build time and consumed by Jekyll sites, so the glyph wants to be a string
-a build step can emit — and a 90KB runtime to draw six arcs and twelve triangles is not a trade worth
+a build step can emit — and a 90KB runtime to draw six arcs and fourteen triangles is not a trade worth
 making. D3 earns its place the moment there is an explorer to animate. Canvas only if bulk PNG
 generation becomes a bottleneck.

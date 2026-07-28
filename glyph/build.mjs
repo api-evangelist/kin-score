@@ -52,13 +52,19 @@ ${src}
     return out;
   }
 
-  /* Dimensions accept a keyed object or a COMPACT bitstring in DIMENSIONS
-     order, '1' = satisfied:  data-dims='110100101010' */
+  /* Dimensions accept a keyed object or a COMPACT TRIT STRING in DIMENSIONS
+     order:  '0' unsatisfied, '1' satisfied, '2' PARTIAL.  data-dims='11020120...'
+
+     '2' is the 0.6 addition. '1' deliberately keeps its old meaning so an
+     encoding written before 0.6 still renders correctly rather than silently
+     demoting every satisfied dimension to a stub. Keyed objects may instead
+     carry the grade verbatim ('verified', 'documented', 'derived'), which is
+     what provider frontmatter does — rayState() normalizes either form. */
   function readDims(el) {
     const raw = el.getAttribute('data-dims');
-    if (raw && /^[01]+$/.test(raw.trim())) {
+    if (raw && /^[012]+$/.test(raw.trim())) {
       const bits = raw.trim(), out = {};
-      for (let i = 0; i < DIMENSIONS.length; i++) out[DIMENSIONS[i].id] = bits.charAt(i) === '1';
+      for (let i = 0; i < DIMENSIONS.length; i++) out[DIMENSIONS[i].id] = bits.charAt(i);
       return out;
     }
     return parseJSONAttr(el, 'data-dims');

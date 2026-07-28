@@ -2,8 +2,26 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/api-evangelist/kin-score/schema/score-block.schema.json",
   "title": "Kin Score output block",
-  "description": "The score:, regulatory:, and agent_readiness: blocks written to a provider record by the Kin Score scorer. schema_version 0.5.",
+  "description": "The score:, regulatory:, provenance:, and agent_readiness: blocks written to a provider record by the Kin Score scorer. schema_version 0.6.",
   "type": "object",
+  "$defs": {
+    "authorship": {
+      "type": "string",
+      "enum": ["first-party", "conformance", "derived", "mixed", "unknown"],
+      "description": "Who published the artifact. first-party = the provider wrote and serves it (credit 1.00). conformance = the provider serves it, a standards body wrote it (0.75). derived = API Evangelist authored it on the provider's behalf (0.25). mixed = a part-derived contract corpus, credit interpolated on the derived share. unknown = no marker either way, credited in full.",
+      "$comment": "unknown is credited in full deliberately: only artifacts the enrichment pipeline authored carry a marker, so absence of one is not evidence of derivation."
+    },
+    "dimension": {
+      "description": "A dimension is false, true, or a GRADE STRING. Graded-on-evidence dimensions return verified/partial/documented; provenance-graded dimensions return their authorship state; agent_card returns its A2A conformance grade. A grade string is never merely truthy - 'derived' is a different fact from 'the provider runs one'.",
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "string",
+          "enum": ["verified", "partial", "documented", "first-party", "conformance", "derived", "mixed", "conformant", "near-conformant", "flavored"]
+        }
+      ]
+    }
+  },
   "properties": {
     "score": {
       "type": "object",
@@ -11,9 +29,9 @@
       "required": ["composite", "band", "schema_version", "facets"],
       "properties": {
         "composite": { "type": "number", "minimum": 0, "maximum": 100, "description": "0-100 weighted composite. For regulated providers = 0.85*base + 0.15*regulatory; otherwise = base." },
-        "band": { "type": "string", "enum": ["exemplar", "strong", "developing", "thin", "emerging", "minimal"] },
+        "band": { "type": "string", "enum": ["exemplar", "strong", "developing", "thin", "emerging", "minimal"], "description": "Cut points re-derived in 0.6: exemplar 66+, strong 56, developing 42, thin 28, emerging 13, minimal 0." },
         "scored_at": { "type": "string", "format": "date" },
-        "schema_version": { "type": "number", "description": "Rubric version, e.g. 0.5" },
+        "schema_version": { "type": "number", "description": "Rubric version, e.g. 0.6" },
         "trend": { "type": "string", "enum": ["rising", "falling", "flat"] },
         "delta": { "type": "number", "description": "Week-over-week composite change." },
         "previous_composite": { "type": "number", "minimum": 0, "maximum": 100 },
@@ -37,8 +55,37 @@
           "properties": {
             "applies": { "const": true },
             "regime": { "type": "string", "description": "Human label of the matched regime family, e.g. 'Banking & Open Finance'." },
-            "regime_id": { "type": "string", "enum": ["banking_open_finance", "securities_market_data", "health", "payments", "insurance", "government"], "description": "Extensible; new regime ids may be added in future rubric versions." },
-            "score": { "type": "number", "minimum": 0, "maximum": 100, "description": "The regulatory facet score, 0-100." }
+            "regime_id": {
+              "type": "string",
+              "enum": ["banking_open_finance", "securities_market_data", "health", "payments", "insurance", "telecommunications", "energy_utilities", "government"],
+              "description": "Extensible; telecommunications and energy_utilities were added in 0.6."
+            },
+            "score": { "type": "number", "minimum": 0, "maximum": 100, "description": "The regulatory facet score, 0-100." },
+            "matched_via": {
+              "type": "string",
+              "enum": ["tags", "weak_tags"],
+              "description": "0.6+. 'tags' means a strong tag matched. 'weak_tags' means the regime matched only on an ambiguous tag (broker, brokerage, exchange, trading) because nothing else matched anywhere - a weaker claim, and the mechanism that stopped insurance brokers being scored against MiFID II."
+            }
+          }
+        },
+        "provenance": {
+          "type": "object",
+          "description": "0.6+. WHO PUBLISHED the artifacts being scored. Read this before quoting the composite: a strong contract_quality built on specs API Evangelist modeled is a different fact from one built on specs the provider serves.",
+          "properties": {
+            "mcp": { "$ref": "#/$defs/authorship" },
+            "skills": { "$ref": "#/$defs/authorship" },
+            "agentic_access": { "$ref": "#/$defs/authorship" },
+            "conformance": { "$ref": "#/$defs/authorship" },
+            "contracts": {
+              "type": "object",
+              "description": "The provider's OpenAPI corpus.",
+              "properties": {
+                "total": { "type": "integer", "minimum": 0 },
+                "derived": { "type": "integer", "minimum": 0, "description": "Specs positively marked as API-Evangelist-authored." },
+                "marker_coverage": { "type": "number", "minimum": 0, "maximum": 100, "description": "Percentage of this provider's specs carrying ANY provenance marker. Catalog-wide this is 2.4%, so contract provenance is a floor rather than a census - an unmarked spec is credited in full." },
+                "callable": { "type": "number", "minimum": 0, "maximum": 100, "description": "Percentage whose servers[].url resolves to a registrable host, as opposed to a placeholder domain (example.com) or a bare template variable ({apiRoot})." }
+              }
+            }
           }
         }
       }
@@ -49,25 +96,31 @@
       "required": ["score", "band", "dimensions"],
       "properties": {
         "score": { "type": "number", "minimum": 0, "maximum": 100 },
-        "band": { "type": "string", "enum": ["agent-native", "agent-ready", "agent-aware", "human-only"] },
+        "band": {
+          "type": "string",
+          "enum": ["agent-native", "agent-ready", "agent-aware", "human-only"],
+          "description": "Cut points re-derived in 0.6: agent-native 46+, agent-ready 34, agent-aware 6, human-only 0. A BAND GATE applies: no provider is agent-native without both idempotency and error_semantics, however high it scores."
+        },
         "scored_at": { "type": "string", "format": "date" },
         "schema_version": { "type": "number" },
         "dimensions": {
           "type": "object",
-          "description": "Twelve boolean presence checks.",
+          "description": "Fourteen dimensions as of 0.6 (twelve at 0.4, plus agent_card in 0.5.1 and dry_run_mode in 0.6). Most are booleans; seven can carry a grade string - see $defs/dimension.",
           "properties": {
-            "spec_presence": { "type": "boolean" },
-            "agentic_access": { "type": "boolean" },
-            "mcp_server": { "type": "boolean" },
+            "spec_presence": { "type": "boolean", "description": "0.6: satisfied by an OpenAPI, AsyncAPI, GraphQL SDL or FHIR CapabilityStatement." },
+            "agentic_access": { "$ref": "#/$defs/dimension" },
+            "mcp_server": { "$ref": "#/$defs/dimension" },
             "auth_clarity": { "type": "boolean" },
-            "idempotency": { "type": "boolean" },
-            "error_semantics": { "type": "boolean" },
-            "openapi_examples": { "type": "boolean" },
-            "rate_limit_signal": { "type": "boolean" },
+            "idempotency": { "$ref": "#/$defs/dimension" },
+            "error_semantics": { "$ref": "#/$defs/dimension" },
+            "openapi_examples": { "$ref": "#/$defs/dimension" },
+            "rate_limit_signal": { "$ref": "#/$defs/dimension" },
             "asyncapi_events": { "type": "boolean" },
-            "agent_skills": { "type": "boolean" },
+            "agent_skills": { "$ref": "#/$defs/dimension" },
             "well_known_catalog": { "type": "boolean" },
-            "consent_identity": { "type": "boolean" }
+            "consent_identity": { "type": "boolean" },
+            "agent_card": { "$ref": "#/$defs/dimension" },
+            "dry_run_mode": { "type": "boolean" }
           }
         }
       }

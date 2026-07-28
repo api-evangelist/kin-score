@@ -27,6 +27,14 @@ export const FACETS = [
   { id: 'commercial_clarity',       label: 'Commercial Clarity',       light: '#008300', dark: '#008300' },
 ];
 
+/* One ray per agent-readiness dimension, in scoring.yml order. MUST stay in
+   sync with `agent_readiness.dimensions` in scoring.yml and with DIM_ORDER in
+   network/scripts/build_listings.py — the compact encoding is POSITIONAL, so
+   reordering here is a breaking change.
+
+   Fourteen as of 0.6. Was twelve at 0.4; `agent_card` shipped in 0.5.1 and was
+   never drawn, so for two days the sun was silently a ray short of the score it
+   was illustrating. `dry_run_mode` is new in 0.6. */
 export const DIMENSIONS = [
   { id: 'spec_presence',      label: 'Machine-Readable Contract' },
   { id: 'agentic_access',     label: 'Agentic Access Contract' },
@@ -40,15 +48,41 @@ export const DIMENSIONS = [
   { id: 'agent_skills',       label: 'Agent Skills' },
   { id: 'well_known_catalog', label: 'Well-Known Catalog' },
   { id: 'consent_identity',   label: 'Consent & Bot Identity' },
+  { id: 'agent_card',         label: 'A2A Agent Card' },
+  { id: 'dry_run_mode',       label: 'Dry-Run / Simulate Mode' },
 ];
 
-// Band thresholds, high → low (scoring.yml `bands`).
+/* Grades that mean PARTIAL credit rather than full. 0.6 made seven of the
+   fourteen dimensions capable of landing here — four graded on evidence
+   (`documented`, `partial`) and three graded on authorship (`derived`,
+   `mixed`), plus the agent card's own conformance ladder.
+
+   A partial ray is drawn SHORT and solid rather than faded: opacity does not
+   survive greyscale, print or forced-colors, and the whole point of the
+   silhouette is that it reads at a glance. A stubby ray says "there, but not
+   all the way there" in any rendering. */
+export const PARTIAL_GRADES = new Set([
+  'documented', 'partial', 'derived', 'mixed', 'conformance',
+  'near-conformant', 'flavored',
+]);
+
+/* off | partial | full — from a bool, a grade string, or a trit char. */
+export function rayState(v) {
+  if (v === true || v === 1 || v === '1') return 'full';
+  if (v === false || v === 0 || v === '0' || v == null) return 'off';
+  if (v === 2 || v === '2') return 'partial';
+  const s = String(v).toLowerCase();
+  if (PARTIAL_GRADES.has(s)) return 'partial';
+  return 'full';   // 'verified', 'conformant', 'first-party'
+}
+
+// Band thresholds, high → low (scoring.yml `bands`). Re-cut at Kin Score 0.6.
 export const BANDS = [
-  { id: 'exemplar',   label: 'Exemplar',   min: 70 },
-  { id: 'strong',     label: 'Strong',     min: 60 },
-  { id: 'developing', label: 'Developing', min: 45 },
-  { id: 'thin',       label: 'Thin',       min: 30 },
-  { id: 'emerging',   label: 'Emerging',   min: 15 },
+  { id: 'exemplar',   label: 'Exemplar',   min: 66 },
+  { id: 'strong',     label: 'Strong',     min: 56 },
+  { id: 'developing', label: 'Developing', min: 42 },
+  { id: 'thin',       label: 'Thin',       min: 28 },
+  { id: 'emerging',   label: 'Emerging',   min: 13 },
   { id: 'minimal',    label: 'Minimal',    min: 0  },
 ];
 
@@ -195,20 +229,34 @@ export function kinGlyph(p, opts = {}) {
 
     DIMENSIONS.forEach((d, i) => {
       const a = (i / DIMENSIONS.length) * Math.PI * 2 - Math.PI / 2;
-      const on = !!p.agent_dims?.[d.id];
+      const raw = p.agent_dims?.[d.id];
+      const state = rayState(raw);
+      // A partial ray reaches 55% of the way out. Solid, so it still reads as a
+      // ray; short, so the shortfall is visible without colour or opacity.
+      const reach = state === 'partial' ? 0.55 : 1;
+      const thisTipR = baseR + (tipR - baseR) * reach;
       const px = Math.cos(a), py = Math.sin(a), nx = -py, ny = px;
       const pts = [
-        [cx + px * tipR, cy + py * tipR],
+        [cx + px * thisTipR, cy + py * thisTipR],
         [cx + px * baseR + nx * halfW, cy + py * baseR + ny * halfW],
         [cx + px * baseR - nx * halfW, cy + py * baseR - ny * halfW],
       ].map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
 
+      const filled = state !== 'off';
+      // The grade itself is the most useful thing the tooltip can say — "MCP
+      // Server: derived" is a different fact from "MCP Server: satisfied", and
+      // telling them apart is the entire point of 0.6.
+      const detail = typeof raw === 'string' && raw !== 'true'
+        ? raw
+        : (state === 'off' ? 'not satisfied' : 'satisfied');
+
       parts.push(
         `<polygon points="${pts}" ` +
-        (on ? `fill="${rayCol}" stroke="${rayCol}" stroke-width="${(strokeW * 0.5).toFixed(2)}"`
-            : `fill="none" stroke="${C.rayOff}" stroke-width="${strokeW.toFixed(2)}"`) +
-        ` stroke-linejoin="round" data-kind="ray" data-label="${esc(d.label)}" data-on="${on}">` +
-        `<title>${esc(d.label)}: ${on ? 'satisfied' : 'not satisfied'}</title></polygon>`);
+        (filled ? `fill="${rayCol}" stroke="${rayCol}" stroke-width="${(strokeW * 0.5).toFixed(2)}"`
+                : `fill="none" stroke="${C.rayOff}" stroke-width="${strokeW.toFixed(2)}"`) +
+        ` stroke-linejoin="round" data-kind="ray" data-label="${esc(d.label)}" ` +
+        `data-on="${filled}" data-state="${state}">` +
+        `<title>${esc(d.label)}: ${esc(detail)}</title></polygon>`);
     });
   }
 

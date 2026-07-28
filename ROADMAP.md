@@ -5,7 +5,54 @@ new sectors, until it stabilizes. This is the planned direction. Nothing here is
 date; it is the queue of improvements, most-ready first. See [`CHANGELOG.md`](CHANGELOG.md) for what
 has shipped.
 
+---
+
+## Status after 0.6 (2026-07-28)
+
+**The 0.6 batch shipped**, and it took most of this roadmap with it. Sections below that landed are
+marked **`SHIPPED IN 0.6`** and kept rather than deleted — the evidence and the argument in each is
+what a reader needs to judge whether the check was worth building, and several are cited in reports
+that are still selling.
+
+Shipped: contract-type-agnostic scoring · provenance grading · placeholder/template servers · the
+regime-specific checks · the `broker` collision fix · the `telecommunications` and `energy_utilities`
+regimes · broadened governance · machine discoverability · graded examples · the four spec-verified
+agent dimensions · the Agent-Native band gate · `mandate_status` · the detector sanity pass · both
+band recalibrations.
+
+### The gap 0.6 exposed, and the top of the queue now
+
+**Backfill `x-provenance` across the OpenAPI corpus.** Provenance grading works — and it can only see
+what is marked. For MCP servers, agent skills, agentic-access contracts and conformance declarations
+the enrichment pipeline stamps every artifact, so the grading there is complete and decisive. For the
+**OpenAPI corpus, marker coverage is 2.6%: 2,278 of 87,612 specs.** Contract provenance is therefore a
+*floor, not a census*, and the roadmap's own proof cases prove it — AT&T is caught (20 of its 23 specs
+carry `x-generated-from: documentation`) and Yardi is caught only because its `apis.yml` carries an
+index-level `x-provenance` block a human wrote by hand, while **Guidewire, Duck Creek and Verisk are
+invisible**: their AE-authored specs declare plausible hosts and carry no marker at all.
+
+This is collection work, not rubric work, and it is now the single highest-value thing that would
+sharpen the release that just shipped. Two tractable parts:
+
+1. **Stamp forward.** Every enrichment path that writes an OpenAPI should emit an `x-provenance` block
+   with the same `method:` / `provider_published:` vocabulary the other artifact classes already use.
+   Cheap, and it stops the gap growing.
+2. **Stamp backward.** The 85,333 unmarked specs need classifying. A `_original/` counterpart is
+   suggestive but not decisive (Yardi has one holding an AE-authored file). The reliable signal is
+   whether the document was ever fetched from a provider host, which the harvest logs know and the
+   spec does not.
+
+Until then the honest position is the one the rubric states in print: `unknown` is credited in full,
+because punishing providers for a gap in our own metadata would be a worse error than the one
+provenance grading exists to fix.
+
+**Second: re-issue the seventeen affected reports.** See *Reports to re-issue after the batch* at the
+foot of this file — that item is now live rather than anticipated.
+
+---
+
 ## Count every machine-readable contract — contract-type-agnostic scoring
+### `SHIPPED IN 0.6`
 
 The single most important correctness fix the sector work surfaced, and it should land first.
 `contract_quality` (0.25 — the heaviest facet) and `spec_presence` are effectively **OpenAPI-only**:
@@ -27,6 +74,7 @@ healthcare numbers circulate widely**, with a band recalibration — expect Epic
 the GraphQL players (Highnote, Semble, TELUS) to rise materially, correctly.
 
 ## Next up — 0.6: regime-specific regulatory checks
+### `SHIPPED IN 0.6 — eleven regime-specific checks, each N/A outside its regime`
 
 The 0.5 regulatory facet is deliberately **regime-agnostic** — it measures the common posture every
 regulated regime expects (consent-scoped auth, security + disclosure, legal basis, standards
@@ -109,6 +157,7 @@ CMS-0057-F, HIPAA, HITECH, TEFCA, PHIPA, NHS DSPT/DTAC, EU MDR) — so the healt
 checks can resolve against a real regime → standard → regulation graph, exactly as banking already does.
 
 ## Provenance — provider-published vs. derived artifacts (the blocking fix)
+### `SHIPPED IN 0.6 — complete for MCP/skills/agentic-access/conformance; 2.6% marker coverage on OpenAPI, see the status note at the top`
 
 The clearest lesson from scoring four national banking sectors — roughly 260 institutions — is one the
 rubric cannot yet see: **who published the artifact.** Agent-readiness credits the *presence* of an MCP
@@ -261,6 +310,7 @@ from URLs already in `apis.yml`, so a card served from an unlisted subdomain is 
 run — the count is a floor, not a census.
 
 ## A contract you cannot call — placeholder and template-only servers
+### `SHIPPED IN 0.6 — `servers_resolvable`, 10,950 of 87,612 specs uncallable`
 
 Distinct from provenance, and surfaced hard by telecom: a specification can be genuinely
 provider-published, verbatim, and still be uncallable. **Every CAMARA server declaration in the entire
@@ -348,6 +398,7 @@ and auth hardening. This would apply to **every** provider, not just regulated o
 the composite and agent-readiness as a third lens.
 
 ## Widen the regulatory applicability map
+### `SHIPPED IN 0.6 — most-specific matching, plus the telecommunications and energy_utilities regimes`
 
 `industry_regulatory` is tag-matched and extensible. As each new sector is scored, widen the regime
 `tags` (and add regimes) so applicability keeps pace with the catalog — e.g. energy/utilities (smart
@@ -381,6 +432,7 @@ into per-provider **trend** surfaces (movement, momentum, regressions) on APIs.i
 providers.apievangelist.com — a provider's Kin Score over time, sourced from its own repo.
 
 ## Band recalibration
+### `SHIPPED IN 0.6 — composite 66/56/42/28/13, agent readiness 46/34/6`
 
 Bands are cut against the observed distribution, not round numbers. After any material rubric change
 (new facet, weight shift, regime), re-run `band_distribution.rb` and re-cut so no band is empty or
@@ -444,6 +496,7 @@ estate did not (`accredited-only`, `customer-account-required`) and did not need
 The vocabulary is sector-shaped; the axis is not.
 
 ## Broaden the base governance facet
+### `SHIPPED IN 0.6 — declared conformance profiles and OpenAPI Overlays`
 
 `governance` (0.12) is effectively a single check — a self-published Spectral ruleset in
 `all/<slug>/rules/` — and it now scores ~0 across **all six sectors**: 63 of 79 US insurance
@@ -472,6 +525,7 @@ declared conformance profile, an overlay, a published lint or CI posture — not
 membership in a programme.
 
 ## Graded signals, not bits — examples & compliance
+### `PARTIALLY SHIPPED IN 0.6 — examples are graded by operation share; the capped compliance-attestation signal is not built`
 
 Two signals carry almost no information as flat 0/1 bits:
 
@@ -547,6 +601,7 @@ Two instances in two sectors, both caught by hand. The guard proposed above — 
 schemes, answers anonymously, no discoverable developer portal — would have flagged both.
 
 ## Unanimous zeros are either a finding or a bug — and the difference matters
+### `SHIPPED IN 0.6 — the detector sanity pass runs on every scoring pass`
 
 Canadian real estate scores **0.0 on governance across all fourteen organizations**, and three
 agent-readiness dimensions are unanimous zeros in the same cohort: `rate_limit_signal` 0/14,
@@ -576,6 +631,7 @@ concluded it did not exist.* A provider recorded as having no contract **in a ti
 publish one** is exactly as suspicious as a 100%-zero cohort, and far more common. Flag it the same way.
 
 ## Discoverability is saturated and no longer discriminates
+### `SHIPPED IN 0.6 — .well-known, llms.txt and a self-hosted index; facet mean 84.6 -> 61.2`
 
 Across the real estate quartet `discoverability` averages **84.6** with **zero providers scoring zero in
 any of the four markets** — 90.8 UK, 87.2 AU, 83.0 CA, 80.7 US. In the same cohort `governance` averages
@@ -772,7 +828,7 @@ Two structural advantages worth defending in print because they are not obvious:
   *placeholder servers*, and *portal decay* items above put us ahead of a competitor that states it
   requires no live calls. That is a lead worth widening rather than quietly holding.
 
-### The one criticism that lands: link presence is not spec analysis
+### The one criticism that lands: link presence is not spec analysis  `SHIPPED IN 0.6`
 
 `scoring.yml` already carries four `planned_dimensions` — `idempotency_key_param`,
 `rate_limit_headers`, `error_envelope`, `dry_run_mode` — that supersede link-based proxies with actual
@@ -789,7 +845,7 @@ highest-value item in this section and the cheapest to justify.
 Note the same evidence cuts the other way on `pagination` and `distinctiveness`: neither exists in our
 rubric at all, and both are computable from the refined per-tag OpenAPIs the catalog already carries.
 
-### Compensation — additive scoring produces a false Agent-Native
+### Compensation — additive scoring produces a false Agent-Native  `SHIPPED IN 0.6`
 
 **New finding, not previously on this roadmap.** Agent Readiness is additive across 104 points, so
 strengths cover for absent safety rails. The four largest awards plus examples — `spec_presence` (18),
@@ -862,6 +918,7 @@ follow the batch, so it can be written against the corrected numbers rather than
   inaccurate and easy to rebut.
 
 ## Mandate status is the largest unmeasured effect in the catalog
+### `SHIPPED IN 0.6 — `reg_mandate_verified`, credited only where a callable surface backs the claim`
 
 Energy exists in this series to test whether a data mandate is replicable, and answering that produced
 the single biggest effect any of these quartets has measured — on a variable the rubric does not read at
