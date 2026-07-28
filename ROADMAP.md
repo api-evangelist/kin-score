@@ -249,6 +249,18 @@ infrastructure) that either scores against an appropriate sub-rubric or is exclu
 comparison with commercial providers — the same argument that applies to regulators, who have now
 out-published the industries they supervise in four separate sectors (FCC, Ofcom, ACMA, OSFI, the FCA).
 
+**Energy supplies the first clean counter-example, and it is worth recording so the pattern is not
+overstated.** Ofgem scores **26.7** — Emerging — below eighteen of the twenty-six organizations it
+regulates, in a market where its own Data Best Practice Guidance is the reason the distribution networks
+publish at all. A regulator can write the obligation that produces the sector's best data and publish
+nothing itself. The pattern is "regulators frequently out-publish their industries," not "regulators
+publish well."
+
+The Australian contrast in the same quartet makes the point sharper: the AER scores 48.7 and the CDR
+programme 55.1, both above their sector's 41.6 average, while the AEMC — which writes the rules — was
+initially recorded as having no API at all until an undocumented one was found in its own JavaScript.
+Three regulators, one market, three entirely different postures.
+
 ## Standalone Security Posture layer (under consideration)
 
 Security signals currently live across two facets (operational_transparency, commercial_clarity) and
@@ -296,6 +308,18 @@ providers.apievangelist.com — a provider's Kin Score over time, sourced from i
 Bands are cut against the observed distribution, not round numbers. After any material rubric change
 (new facet, weight shift, regime), re-run `band_distribution.rb` and re-cut so no band is empty or
 holds an uninformative 40% of the catalog.
+
+**The Exemplar band is now empty across two consecutive quartets — 0 of 101 in real estate and 0 of 128
+in energy, 229 organizations without one.** Insurance produced none either. Telecom produced exactly one
+(Twilio, 75.6). That is not a calibration error on its own: these are genuinely sectors where nobody has
+built an exemplary API program, and a band that correctly reports "nobody" is doing its job.
+
+But it is worth watching for a specific reason. Six sectors in, the top of the scale is being exercised
+almost exclusively by the horizontal technology cohort — payments, developer tools, communications — and
+almost never by a vertical industry. If that holds through another two quartets, the honest read is that
+**Exemplar is a band for API-first companies rather than for anyone operating an API**, and either the
+label or the cut needs to say so. Re-run `band_distribution.rb` against the whole catalog after the 0.6
+batch and check whether the top two bands are describing an industry or a business model.
 
 ## Self-serve vs. gated access as a readiness signal
 
@@ -434,6 +458,16 @@ artifact should be scored as a product at all.
 Handled in the research itself by excluding the person-search operations from the published profile's
 agent skills and MCP tooling and naming the exposure in the report without naming any individual — but
 that was an editorial decision made by hand, not something the rubric caught.
+
+**Energy produced a second instance, which makes this a pattern rather than an anecdote.** JOLT, an
+Australian EV charging network, serves a live AWS API Gateway whose one observable operation is called by
+the company's own public website JavaScript using a **static API key hardcoded in that bundle**. The
+research recorded the exposure and deliberately did not commit the key value. Same shape as Knight Frank:
+a real, reachable, machine-readable surface that exists by accident rather than as a product, and which
+the rubric would happily credit.
+
+Two instances in two sectors, both caught by hand. The guard proposed above — no declared security
+schemes, answers anonymously, no discoverable developer portal — would have flagged both.
 
 ## Unanimous zeros are either a finding or a bug — and the difference matters
 
@@ -869,6 +903,95 @@ needs to stop being the only number.** Whether that becomes a per-dataset breakd
 (see *Switchability*), or simply a reported split, the single-score summary is now demonstrably lossy in
 three separate sectors.
 
+## The score has no concept of corporate structure
+
+Every provider is scored as a standalone organization. Real groups are not standalone, and when a parent
+and a subsidiary are both profiled, the same API surface can be counted twice, split in half, or attributed
+to the wrong entity — and the rubric has no way to know.
+
+**The case that forced this into the roadmap.** REA Group was recorded as publishing no OpenAPI and scored
+22.4. A reprofile found **nine provider-published OpenAPI 3.1.0 documents — every one of them from the
+public Stoplight workspace of PropTrack, the valuation business REA owns.** REA moved to 49.9 and
+agent-readiness to 74.0. PropTrack, profiled separately, still scores **22.2**.
+
+One API surface. Read at the group level it is a strength; read at the child level it is an absence.
+Neither number is wrong and neither is complete, and a reader comparing REA against Domain — nine tenths
+of a point apart — is comparing a group total against a single company.
+
+The same shape recurs across the catalog once you look for it:
+
+*   **CoStar Group** owns Homes.com (22.2) and Apartments.com (16.9); the group's published surface is
+    split across three profiles that each look thin.
+*   **Kraken Technologies** (27.7) is the platform Octopus Energy (58.9) built, and EDF (53.5) licenses it.
+    The technology's quality shows up in the licensees' scores and not the vendor's.
+*   **Bridge Interactive** is the only US real estate organization publishing listings, open-houses and
+    offices as separate contracts, and Zillow (28.2) owns it.
+*   **Trestle** is CoreLogic's, and `all/corelogic` already carries a separate profile of the same company
+    with its own harvested artifacts.
+
+### What to do about it
+
+The honest minimum is **disclosure rather than arithmetic**: record a provider's parent and children in
+`apis.yml`, and surface the relationship on the page and in the listing payload so a reader comparing two
+providers can see when one number is a group and the other is not. That is cheap, requires no scoring
+change, and would have prevented the misreading in the Australian real estate report.
+
+The harder question — whether a parent should inherit a subsidiary's artifacts, or a subsidiary should be
+suppressed when its parent is profiled — should stay open. Both rules break somewhere. Inheriting makes
+conglomerates look uniformly strong; suppressing loses the entity a developer actually integrates with.
+**Disclose first, decide later**, and let the sector reports keep stating the relationship in prose the way
+the real estate quartet had to.
+
+Related to *Standards bodies are measured against the wrong yardstick* — both are cases where the unit of
+analysis is wrong rather than the measurement.
+
+## Reports drift from the catalog, and nothing was watching
+
+A Sector Report is a snapshot. The catalog is continuous — enrichment, reprofiling and rescoring move
+provider scores every day. Nothing in the pipeline noticed when a **selling** report started disagreeing
+with the data behind it, and on 2026-07-27 that failed twice in one day.
+
+**REA Group 22.4 → 49.9.** A reprofile found nine provider-published OpenAPI documents the bootstrap had
+concluded did not exist. The Australian real estate report's headline finding — *"the market leader is
+twenty-seven points behind its challenger"* — was not merely stale, it was **inverted**: REA finished
+ahead of Domain. Caught before publication only because the papers repo happened to be unpushed.
+
+**Five US real estate providers moved 3–4.6 points within hours of publication.** Yardi 59.7 → **62.9**,
+which put an organization in the Strong band in a report that stated, twice, that the market had none.
+The band distribution in §3 was wrong as printed.
+
+A sweep of all eight real estate and energy reports then found **199 inline provider scores, 10 of which
+disagreed with the live catalog** — six from drift, and four from a second failure class the sweep caught
+by accident: **a report contradicting itself**, having written an agent-readiness score where a composite
+belonged (AESO 60.6, ATCO 61.5, REALTOR.ca 41.9). Each of those reports stated the correct figure
+elsewhere in the same document.
+
+### The check
+
+`papers/scripts/check_report_drift.py` re-extracts every inline provider score from a report and diffs it
+against the live `providers-*.json` cohort. It distinguishes the two failure modes — a claimed value that
+matches the provider's *agent* score is an authoring error, not drift — and exits non-zero so it can gate
+a publish step. It is a hundred lines and it would have caught every one of the ten.
+
+### What it implies for the reissue plan
+
+The roadmap's *Reports to re-issue after the batch* item assumes drift matters at v1.1, when provenance
+gating lands. It does not. **It matters daily**, and the gap between a report's numbers and the catalog's
+is largest in the days right after a sector is built, because that is when enrichment and reprofiling are
+still landing on those same providers.
+
+Two consequences worth adopting:
+
+- **Run the drift check before any publish, and on a schedule after.** The reports are living documents by
+  design; that only works if divergence is detected rather than discovered.
+- **Prefer computed figures over transcribed ones where the format allows.** Every one of the ten problems
+  came from a number typed into prose. The band tables and facet tables — generated from the cohort JSON —
+  drifted too, but were caught in the same pass because they are mechanical. Prose is where errors hide.
+
+This is a publishing-pipeline item rather than a rubric item, but it belongs here because it is the
+mechanism by which every other roadmap item eventually reaches a reader. A rubric correction that never
+propagates to the artifacts is a correction that did not happen.
+
 ## Ship the next batch together
 
 Switchability is explicitly **not** in the 0.6 batch — it is a new lens with its own collection work and
@@ -883,7 +1006,7 @@ separate recalibrations and three rounds of headline-number churn. Sequence with
 base-facet correctness, and provenance now leads because two published report series commit to it in
 print; (2) the `broker`-collision fix and the new `telecommunications` regime, then the 0.6
 regime-specific checks resolved against the catalogs; (3) access model including channel
-reachability **and the contract-fetchability check**, portal liveness, broadened governance, and the
+reachability **and the contract-fetchability check**, parent/child disclosure, portal liveness, broadened governance, and the
 graded example/compliance signals; then one recalibration and a full re-score and page/paper refresh.
 The **detector sanity pass** should land first of all of these — it is a day's work and it guards every
 other number in the batch, and energy gave it two more false negatives to justify it (REA Group, AEMC).
