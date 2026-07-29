@@ -83,6 +83,37 @@ Guidewire 53.8 → 36.0 — because that is where the derived artifacts were con
 
 ---
 
+## Defect: the published band contradicts the published range
+
+Found while reissuing the travel quartet against 0.6. **Seven of the sixty-four travel providers carry a
+`band` that does not match their own score under the ranges the payload prints beside it.**
+
+| Provider | Score | `band` | Printed range | Band the score implies |
+|---|---|---|---|---|
+| Cloudbeds | 42.1 | `developing` | 45–59.9 | thin |
+| UK Civil Aviation Authority | 42.0 | `developing` | 45–59.9 | thin |
+| HEDNA | 14.1 | `emerging` | 15–29.9 | minimal |
+| On the Beach | 14.4 | `emerging` | 15–29.9 | minimal |
+| Rex Airlines | 14.6 | `emerging` | 15–29.9 | minimal |
+| Helloworld Travel | 13.0 | `emerging` | 15–29.9 | minimal |
+| Porter Airlines | 14.9 | `emerging` | 15–29.9 | minimal |
+
+Every one is a **promotion** — the label sits one band above the score — which is the signature of a
+deliberate gate rather than a rounding error. If that is the 0.6 band gate doing intended work, the
+`range` string travelling with it is wrong and should say so; if it is not, the boundary comparison is
+off by one at both edges.
+
+**This is not cosmetic.** The section pages render the label, the report band tables count it, and a
+buyer reading *"Developing"* against a printed range of 45–59.9 next to a score of 42.0 has been given
+two contradictory facts by the same payload. The travel reports band by score and note the discrepancy;
+that is a workaround, not a fix.
+
+Cheapest resolution: make the band a **computed function of the score plus any gate**, emit the gate as
+its own field (`band_gated_from`), and have the payload print the effective range rather than the
+nominal one. Then a label can never disagree with the number beside it.
+
+---
+
 ## Count every machine-readable contract — contract-type-agnostic scoring
 ### `SHIPPED IN 0.6`
 
@@ -601,6 +632,35 @@ specification for `mls`, `idx`, `media`, `openhouse` or `member`** — the manda
 core resources. A vocabulary can be mandated, certified and free to read, and never appear as a public
 contract.
 
+### Travel: three states, and the industry treats them as one
+
+Travel supplies far stronger evidence than real estate did, because IATA runs a tiered certification
+programme and the tiers turn out to predict nothing. **Holding a certification, publishing a schema and
+operating a reachable endpoint are three independent variables**, and every combination occurs:
+
+| Provider | Certification | Schema published | Endpoint reachable | Score |
+|---|---|---|---|---|
+| Flight Centre | **NDC Level 4** — highest tier | no | no | 15.6 |
+| WestJet | NDC Level 2 since **March 2017** | yes (17.2, 21.3/24.1) | **not live**, Q4 2026 stated | 40.7 |
+| Transat | none claimed | NDC asserted, **Radixx SOAP shipped** | partial | 21.5 |
+| Air Canada | NDC@Scale | yes (17.2 EDIST) | yes, behind certification + discretionary revocation | 49.9 |
+| Qantas | NDC@Scale | no public endpoint or schema version | no | 35.6 |
+
+Flight Centre is the extreme case: the industry's highest conformance credential, and `/terms`,
+`/terms-of-use` and `/legal` all returning **404**. WestJet is the more instructive one — a **US$20–22
+surcharge on non-NDC bookings is already in force** while the NDC channel it penalises you for not using
+has not shipped nine years after certification.
+
+Two consequences for the rubric:
+
+- **Grade conformance in three states, not two.** 0.6 records `conformance: first-party | derived`,
+  which answers *who authored the claim* and not *whether anything backs it*. Add `claimed` /
+  `schema_published` / `endpoint_reachable`, and credit only the last one fully. The probe is the same
+  unauthenticated fetch the real-estate item already proposes.
+- **Check the governing documents resolve.** A terms, legal or API-licence URL that 404s is a
+  `commercial_clarity` failure that the facet currently cannot see, and it correlated perfectly with the
+  bottom of the travel table. One HEAD request per declared document.
+
 ## The rubric can reward a security failure
 
 Knight Frank scores **36.4**, and a meaningful part of that comes from a live OpenAPI 3.0.1 served from
@@ -695,6 +755,31 @@ certifies, and still lands mid-table because it has no commercial API product to
 **NAR scores 34.6 with an agent-readiness of 72.1** — the widest composite/agent divergence in the
 sector, and the same shape from the mandator's side. Both belong under whatever provider `kind`
 treatment the earlier item settles on.
+
+### Standards bodies, third data point — and the first one that is a spread
+
+Travel gives the cleanest instance yet, because it contains **two standards bodies in the same industry**
+and they are 33.6 points apart.
+
+**IATA scores 21.5.** It authors NDC and ONE Record, runs accreditation, the BSP settlement system, the
+ticketing resolutions and the PADIS code lists that every airline in the four-market study depends on,
+and operates an Open API Hub. Agent readiness 4.7, human-only, no MCP server, no packaged skills.
+
+**The OpenTravel Alliance scores 55.1** — a volunteer non-profit with a fraction of the budget,
+publishing a free developer portal, royalty-free machine-readable code lists, a compiler CLI, generated
+example payloads and one of only **four first-party MCP servers in the entire sixty-four-organization
+cohort**.
+
+The previous two data points argued that the rubric measures standards bodies against the wrong yardstick
+because they have no commercial API product to be transparent about. **This pair refutes that as a
+sufficient explanation.** Neither has a commercial API product. The spread between them is 33.6 points,
+and it is entirely a difference in how each chooses to distribute its own specification. A `kind`
+treatment that flattens both to "standards body" would hide the single most useful comparison in the
+sector.
+
+Whatever provider-kind adjustment lands, it must **preserve within-kind discrimination**. The correct
+output here is not "standards bodies score mid-table"; it is "one of these two is reachable by a machine
+and the other is not."
 
 ## Switchability — a third standalone lens
 
@@ -792,6 +877,51 @@ The sector that raised this makes the case concretely, and shows the two lenses 
   two halves need to sit in one lens with separate dimensions rather than collapse into a single number.
 - **Britain's UPRN is the counter-example**: an identifier published under an open licence, which is why
   the UK market keys on it without anyone mandating that they do.
+
+### What travel adds: a standard that *increases* switching cost
+
+Real estate showed a proprietary identifier sitting *beside* a standard one — CoreLogic's CLIP next to
+RESO UPI — and the buyer choosing which to key on. Travel shows something the lens does not yet
+anticipate: **the standard itself minting the vendor key.**
+
+IATA's NDC replaces the shared fare-and-availability model with an offer-and-order model, and the order
+is identified by an airline-minted **`OrderID`**, with `OfferID` and `OfferItemID` beneath it. The
+portable identifiers in air travel are the ones the industry collectively owns — IATA designators, PNR
+record locators, agency accreditation numbers, PADIS code lists, ATPCO fare bases, EMD documents. **NDC
+moved the primary booking record key out of that column and into the vendor column**, as a design
+decision, in the standard that exists to reduce distribution lock-in.
+
+This is the first instance in the programme of an interoperability standard raising switching cost
+through its own design, and it breaks an assumption the lens currently rests on: that
+`standard_conformance` is evidence of portability. Two corrections follow:
+
+- **Score the identifier, not the conformance.** `identifier_portability` moves from *needs new
+  detection* to **partly computable**: for a provider claiming a standard, check whether the standard's
+  own primary record key is issuer-scoped. That is a property of the standard, resolvable once per
+  standard in the standards catalog and then inherited by every conformant provider.
+- **`standard_conformance` must not carry positive switchability weight on its own.** Travel's most
+  common interface shape across forty researched organizations is **`standard-plus-proprietary` (13 of
+  40)** — adopt the standard, then extend or gate it. Qantas is NDC@Scale certified and prices GDS
+  bookings at A$11.50 per segment on EDIFACT and A$4.50 on Standard NDC while its own portal and an
+  **invitation-only Premium NDC tier** carry no surcharge at all. The standard was adopted and converted
+  into a channel-pricing instrument. Conformance without an access grade is not portability evidence.
+
+### Field data the travel quartet already collected
+
+Forty organizations, researched with the schema this lens specifies, which makes it a live calibration
+set rather than a design exercise:
+
+| `second_source` | n | | `interface_shape` | n | | `exit_path` | n | | `access_gate` | n |
+|---|---|---|---|---|---|---|---|---|---|---|
+| no alternative | **19** | | standard-plus-proprietary | **13** | | export on request | 19 | | commercial agreement | **13** |
+| alternatives, w/ migration | 17 | | proprietary, undocumented | 9 | | none published | 13 | | accredited or licensed | 7 |
+| few alternatives | 2 | | nothing published | 9 | | **bulk export documented** | **7** | | self-serve | 7 |
+| **interchangeable** | **2** | | proprietary, documented | 6 | | not applicable | 1 | | none published | 6 |
+| | | | **open standard** | **3** | | | | | partner-only / approval | 6 |
+
+**Four of seven documented exit paths belong to regulators**, and three of forty organizations publish an
+open standard — two railways on GTFS and OpenTravel itself. Not one airline, hotel group or GDS. If the
+lens had existed, travel would be the first sector to land a **Captive** median.
 
 ### Cautions
 
@@ -1116,6 +1246,79 @@ the real estate quartet had to.
 Related to *Standards bodies are measured against the wrong yardstick* — both are cases where the unit of
 analysis is wrong rather than the measurement.
 
+## A discovery document that resolves to nothing
+
+0.6 reworked discoverability to score machine-findability — `.well-known`, `llms.txt`, a self-hosted
+index — and it worked: the facet mean fell from 84.6 to 61.2 and the facet discriminates again. Travel
+exposed the next-order problem, and one market states it almost as an experiment.
+
+**Australian travel publishes discovery documents at 64% — the highest reading in the travel quartet,
+higher than the US, UK or Canada — and specifications at 9%, the lowest.**
+
+The front door is built and there is nothing behind it. A provider currently earns `well_known_catalog`
+for serving a discovery document regardless of whether anything it points at exists, resolves or is
+fetchable. That is the same mistake `servers_resolvable` was built to fix one layer down, and it is now
+the cheapest remaining source of inflation in the agent-readiness score.
+
+**The check:** follow the discovery document one hop. Grade *present and resolving to a fetchable
+contract* above *present*, and record *present but dangling* distinctly — it is a real signal, just not
+the one currently being credited. The same probe answers the certification question above, so the two
+items share an implementation.
+
+Worth stating plainly because it will recur: **every convention the agentic web adopts becomes, within a
+year or two, a thing that can be present and empty.** The rubric should assume that of each new signal
+it adds rather than discovering it a sector later.
+
+## Transaction safety should be weighted by what the API actually does
+
+`idempotency` is asked of every provider identically, and the answer has been near-zero everywhere:
+**0 of 64 in travel at full credit** — one partial across the whole quartet — 0 of 60 in US energy, 0 of
+108 in headless.
+
+Those zeros do not mean the same thing. Real estate's surfaces are largely read-only. Australia's
+mandated CDR energy data is read-only by design. **Travel is not: the core operations are book, pay,
+change, cancel and refund**, and a retried request without an idempotency key is a duplicated charge, a
+duplicated seat, or a cancellation that fires twice. The industry built forty years of settlement
+machinery — BSP, ARC, EMDs, ADMs — to reconcile exactly these failures after the fact, and published
+almost no mechanism to prevent them at the interface. Three consumer-protection regimes in this
+quartet — ATOL, the UK Package Travel Regulations, Canada's APPR — guarantee the traveller is made whole
+*after* a failure and ask nothing of the interface that would prevent it.
+
+**The proposal:** derive an operation class from the contract the provider already publishes — does it
+expose non-idempotent writes, does it move money, does it mutate a resource a third party depends on —
+and weight the transaction-safety dimensions (`idempotency`, `error_semantics`, `asyncapi_events`)
+against it. A read-only data API should not be marked down for lacking an idempotency key. A booking API
+should be marked down hard.
+
+This is computable from `openapi/` today: POST/PATCH/DELETE share, payment-adjacent schemas, and the
+`plans/` and `finops/` artifacts that already indicate whether money moves. It converts a dimension that
+currently reads as a flat industry-wide zero into one that discriminates — and it makes the strongest
+single build recommendation in the travel reports defensible in the rubric rather than only in the prose.
+
+## Vocabulary convergence is measurable, and it is the cleanest mandate effect yet
+
+Across four sectors the catalog now holds a signal nobody is scoring: **whether the organizations in a
+market ended up calling the same thing by the same name.**
+
+- **Mandated Australian energy** — four retailers publish byte-identical `cds-energy` and `cds-common`
+  documents. Three Ontario utilities share `green-button-espi`.
+- **Unmandated US travel** — with *three* standards bodies in the market, the most-shared resource name
+  in the entire 176-specification corpus is spelled **two different ways**: `bookings-api` at three
+  providers and `booking-api` at two.
+- **UK travel** — the entire shared vocabulary of the market is one entry, `webhooks-api`, at two
+  providers.
+- **Australian and Canadian travel** — one publisher each. Convergence is arithmetically undefined.
+
+`mandate_status` already measures whether an obligation exists and whether a callable surface backs it.
+**Vocabulary convergence measures what the obligation actually did to the market**, and it is a stronger
+result than the composite delta because it cannot be produced by anything except a shared schema.
+
+This is a **cohort-level metric rather than a per-provider dimension** — a provider cannot converge
+alone — which makes it a natural fit for the sector pages and the report data bundles rather than the
+score block. Compute it as the share of a cohort's resource names appearing in two or more providers,
+reported with the standard named. It would let a Sector Report state *"this market converged and that one
+did not"* as a measured figure instead of an observation.
+
 ## Reports drift from the catalog, and nothing was watching
 
 A Sector Report is a snapshot. The catalog is continuous — enrichment, reprofiling and rescoring move
@@ -1163,7 +1366,58 @@ This is a publishing-pipeline item rather than a rubric item, but it belongs her
 mechanism by which every other roadmap item eventually reaches a reader. A rubric correction that never
 propagates to the artifacts is a correction that did not happen.
 
+### The first reissue, measured (travel, 0.5 → 0.6)
+
+The travel quartet was published on 0.5.1 hours before 0.6 shipped, and became the first live test of
+the reissue plan. The drift check found **54 of 66 inline scores disagreeing with the live catalog**, and
+the failures were not evenly distributed between cosmetic and structural.
+
+Four findings **inverted** — not drifted, inverted:
+
+- **"The OpenTravel Alliance tops US travel"** — false under 0.6. Oracle Hospitality leads at 55.9;
+  OpenTravel is second at 55.1. A through-line in three of the four reports.
+- **"Nothing in Canada reaches the Developing band"** — false. Air Canada 43.2 → **49.9**, because 0.6
+  credits a contract that is not an OpenAPI. The market's second headline.
+- **"Exactly one UK organization clears Developing"** — became two; Virgin Atlantic 39.6 → 46.6.
+- **"Australian governance is 1.2 with ten of eleven at zero"** — became 7.7 with two zeros. The
+  headline was largely a measurement artefact of the narrow governance facet, not a market fact.
+
+Two things follow that the pre-0.6 version of this item did not anticipate:
+
+- **A rubric release is a different failure class from daily drift, and it needs a different response.**
+  Daily drift moves numbers. A rubric release moves *findings*, because the facets that changed are the
+  ones the prose was written about. The drift checker catches the first automatically and only catches
+  the second by accident — it compares scores, not claims. **Anything a report asserts as a superlative
+  ("tops the market", "nothing reaches", "the only one") should be machine-checkable against the cohort
+  and re-run on every rescore.** That is a small extension to the existing checker and it is the one that
+  would have caught all four.
+- **Report every figure with the rubric version that produced it.** The travel reissue carries
+  *"Scored on Kin Score v0.6"* in the masthead and names v1.0's figure wherever the change is large
+  enough to surprise a returning reader. Without that, a buyer who read v1.0 and re-reads v1.1 has no way
+  to tell a market movement from a rubric movement — and in this batch it was almost entirely the latter.
+
+**A useful positive result:** the findings that survived 0.6 unchanged are the ones grounded in absence
+rather than in a facet. Australian contract quality of 5.8 with nine of eleven at zero did not move,
+because nine organizations scored zero for having nothing to read and no rubric revision can change that.
+**Absence is the most durable evidence in this catalog**, which is an argument for writing report
+headlines against it wherever the data allows.
+
 ## Ship the next batch together
+
+**Post-0.6 addendum — what travel added, and where it goes.** The band-label defect at the top of this
+file is a **correctness bug, not a batch item**: seven of sixty-four travel providers carry a label that
+contradicts the range printed beside it, it is visible on live section pages today, and it should be
+fixed on its own rather than waiting for a release. Of the rest, three share one probe and should land
+together — *certification in three states*, *governing documents that 404*, and *a discovery document
+that resolves to nothing* are all one unauthenticated fetch per declared URL, and that same probe is
+already specified for the contract-fetchability check in step (3). *Transaction safety weighted by
+operation class* is spec-parsing work of the same kind as the `planned_dimensions` and rides with them.
+*Vocabulary convergence* is not a score dimension at all — it is a cohort metric for the sector pages and
+data bundles, and it can ship independently of any rubric release. The Switchability additions are
+calibration input for that lens rather than new work: travel supplies forty organizations already
+researched against its schema, and one correction — `standard_conformance` must not carry positive
+switchability weight on its own.
+
 
 Switchability is explicitly **not** in the 0.6 batch — it is a new lens with its own collection work and
 its own audience, and it should follow the base-facet corrections rather than ride along with them.
