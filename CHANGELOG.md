@@ -5,6 +5,41 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.7 — 2026-07-31
+
+**Security defects the contract declares about itself.** Three checks, all added to
+`contract_quality`, all measured at scale across 14,195 as-published OpenAPI documents in
+*The OAuth 2.0 Standard* and *The OpenID Connect Standard*, and none of them previously visible
+to the rubric.
+
+| Check | Points | What it catches |
+|---|---|---|
+| `oauth_flows_current` | 4 | A contract declaring the implicit or resource-owner-password grant. 775 and 72 in the corpus; both removed in OAuth 2.1. |
+| `credentials_not_in_query` | 3 | An `apiKey` scheme with `in: query`. 815 in the corpus; the credential lands in logs, history and referrer headers. |
+| `oauth_scopes_enumerated` | 4 | An `oauth2` scheme whose flows enumerate no scope. Only 15.3% of contracts enumerate any. |
+
+### All three are framed as "no violation present"
+
+N/A is handled per artifact **class**, not per check, so a check that simply returns false where
+the mechanism is unused would penalise an API for declining to use OAuth. Each of these is
+therefore vacuously satisfied by a contract that does not use the mechanism at all — they score
+the PRESENCE of a defect, not the absence of a feature. A bearer-token API passes all three.
+Both OAS 3 (`components.securitySchemes`) and Swagger 2.0 (`securityDefinitions`, single-string
+`flow`) shapes are handled.
+
+`oauth_scopes_enumerated` is deliberately distinct from `reg_oauth_scopes`, which sits on the
+conditional regulatory facet and therefore reaches only regulated providers. Scope is how OAuth
+expresses least privilege for everybody, and this check applies to everybody.
+
+### Impact
+
+- Composite mean 22.5 → 22.7. Bands drifted ≤0.5 points and none emptied or swelled, so the
+  documented shares were updated and the cuts left alone.
+- 25,574 providers re-scored, 0 errors. Agent-readiness untouched — these are composite checks.
+- Adding 11 points to the OpenAPI denominator means most providers gain (they pass vacuously or
+  genuinely) while contracts carrying a deprecated flow or a query-string credential lose ground
+  relative to their peers. That is the intended discrimination.
+
 ## 0.6.1 — 2026-07-31
 
 **Provenance gap fix.** 0.6 introduced authorship grading so the rubric would stop crediting a
