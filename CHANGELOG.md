@@ -5,6 +5,49 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.6.1 — 2026-07-31
+
+**Provenance gap fix.** 0.6 introduced authorship grading so the rubric would stop crediting a
+provider for artifacts API Evangelist wrote on their behalf. One dimension was left out of the map,
+and it was the one where derived work is most common.
+
+### `asyncapi_events` is now provenance-graded
+
+`provenance.applies_to` covered `mcp_server`, `agent_skills`, `spec_presence`, `agentic_access`,
+`contract_present` and `conformance_declared` — but not `asyncapi_events`, so its 6 points were
+awarded in full whether the provider published an AsyncAPI document, merely documented some
+webhooks, or had an event surface written for them here.
+
+This was found while researching *The AsyncAPI Standard*, which measured the underlying fact: across
+25,574 providers there are **zero** `asyncapi/_original/` archives — the directory the pipeline uses
+for anything harvested verbatim — against 6,776 for OpenAPI. No provider in the catalog publishes an
+AsyncAPI document we harvested. The 723 documents that exist were authored here from provider
+webhook and streaming documentation.
+
+### The indexer had to learn the class first
+
+`signals/build_provenance.py` did not emit an `asyncapi` provenance class at all, and the obvious fix
+was wrong in an instructive way. Reading the artifact header the way MCP and skills are read
+classified **966 providers as first-party**, because those records say `method: searched` — which
+here means *API Evangelist searched for and found the provider's event documentation*, not *the
+provider published AsyncAPI*. One such record cites `source: …/openapi.yaml (Webhooks tag)`.
+
+`index_asyncapi` now requires evidence of something the provider actually did: an `_original/`
+archive, or a `source:` resolving to an AsyncAPI specification file rather than to documentation.
+Result: **1,711 providers `derived`, 0 first-party** — which matches the measured reality.
+
+### Impact
+
+- Agent-readiness falls for providers holding an authored event surface. A representative case drops
+  **29.5 → 25.5** as the 6-point dimension is credited at 0.25.
+- Providers with no `asyncapi/` artifact are unchanged; `unknown` still carries full credit.
+- Composite scores are untouched — `asyncapi_events` is an agent-readiness dimension only.
+- The dimension now renders as `asyncapi_events: derived` rather than `true`, matching how
+  `mcp_server` and `agent_skills` already report.
+
+Three Market Reports resting on the old figure were corrected to v1.1 on the day the gap was found,
+before this fix shipped.
+
 ## 0.6 — 2026-07-28
 
 **The provenance release.** The largest correctness batch in the rubric's history, landing the
