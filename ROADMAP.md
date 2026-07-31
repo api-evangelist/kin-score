@@ -7,7 +7,7 @@ has shipped.
 
 ---
 
-## Status after 0.7 (2026-07-31)
+## Status after 0.8 (2026-07-31)
 
 Two releases landed on 2026-07-31, both out of the Standard Report research.
 
@@ -23,9 +23,11 @@ archives across 25,574 providers against 6,776 for OpenAPI. 1,711 providers recl
 framed as "no violation present" and vacuously satisfied where the mechanism is unused, because
 N/A is handled per artifact class rather than per check.
 
-### STILL OPEN after 0.7 — the provenance half-measure
+### CLOSED in 0.8 — the provenance half-measure
 
-**The item below is the one 0.7 was supposed to carry and did not.** `contract_present` is graded
+**Shipped.** Every check in the `openapi` block is now provenance-graded via
+`applies_to_artifact`. 318 providers fell, none rose, 187 changed band, and Yardi — the case the
+section below is written around — went 57.7 → 49.6, Strong → Developing. The original text: `contract_present` is graded
 by provenance; the other ~112 points of `contract_quality` are not, so a provider whose entire spec
 corpus API Evangelist wrote still earns full credit for spec craftsmanship it had no part in. The
 reasoning for holding it remains the reasoning given below — grading 132 points instead of 20 has a

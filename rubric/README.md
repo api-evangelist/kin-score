@@ -11,6 +11,7 @@ version bump so the score stays citable and its history auditable. See [`../CHAN
 
 | Version | File | Notes |
 |---------|------|-------|
+| 0.8 | [`scoring-0.8.yml`](scoring-0.8.yml) | **The provenance half-measure closed.** Every check in the `openapi` block is provenance-graded, not just `contract_present` — 132 points instead of 20. 318 providers fall, none rise. |
 | 0.7 | [`scoring-0.7.yml`](scoring-0.7.yml) | **Security defects the contract declares about itself.** Three new contract_quality checks: deprecated OAuth grants, credentials in the query string, and OAuth scope enumeration for every provider rather than only regulated ones. |
 | 0.6.1 | [`scoring-0.6.1.yml`](scoring-0.6.1.yml) | **Provenance gap fix.** `asyncapi_events` joins the provenance map — the one agent-readiness dimension that was awarding full credit for artifacts API Evangelist authored. 1,711 providers reclassified `derived`. |
 | 0.6 | [`scoring-0.6.yml`](scoring-0.6.yml) | **The provenance release.** Authorship grading, callable-server check, contract-type-agnostic scoring (GraphQL + FHIR), four spec-verified agent dimensions, the Agent-Native band gate, eleven regime-specific checks, two new regimes, the `broker`-collision fix, broadened governance, machine discoverability, the detector sanity pass — and both band sets re-cut. |

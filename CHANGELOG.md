@@ -5,6 +5,44 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.8 — 2026-07-31
+
+**The provenance half-measure, closed.** This is the item the roadmap slated for 0.7 and 0.7 did
+not carry.
+
+0.6 introduced authorship grading and applied it to `contract_present` — 20 of the 132 points in
+`contract_quality`. The other 112 were awarded in full regardless of who wrote the document, so a
+provider whose entire specification corpus API Evangelist authored still earned credit for
+`info_complete`, `operations_summary_coverage`, `operations_description_coverage`, `operationIds`,
+`response_coverage`, `components_reuse` and `security_schemes_defined` — spec craftsmanship it had
+no part in. We write good specs, so a thoroughly modeled provider scored well on our work.
+
+### One rule, not twenty entries
+
+`provenance.applies_to_artifact` grades every check in a named artifact block, so the rubric stays
+the single knob and no check id has to be listed twice. An explicit per-check entry in
+`applies_to` still wins. `PROV_APPLIES` is expanded from both at load.
+
+### It grades DOWN to the floor, not to zero — deliberately
+
+The roadmap raised this and answered it: the depth checks are also where a derived spec is most
+*useful*. A thoroughly modeled OpenAPI with real descriptions and stable operationIds genuinely
+helps a consumer whatever its provenance. Credit is a multiplier (derived = 0.25), never a gate.
+
+### Blast radius, measured before writing
+
+Measured with `--snapshot` against the live catalog rather than estimated:
+
+- **318 providers move. All 318 fall. None rise.** Only a corpus that is ≥75% derived is affected.
+- **187 change band** (0.7% of the catalog): developing→thin 90, strong→developing 56,
+  thin→emerging 24, **exemplar→strong 16**, emerging→minimal 1.
+- Mean composite 22.72 → 22.61. Band shares moved ≤0.3 points, so the cuts were left alone and the
+  documented shares updated.
+- The canonical case from the roadmap: **Yardi 57.7 → 49.6, Strong → Developing.** Its whole spec
+  corpus is ours, and it had been Strong on the strength of it.
+
+Agent readiness is untouched — these are composite checks.
+
 ## 0.7 — 2026-07-31
 
 **Security defects the contract declares about itself.** Three checks, all added to
