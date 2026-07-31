@@ -7,6 +7,31 @@ has shipped.
 
 ---
 
+## Status after 0.7 (2026-07-31)
+
+Two releases landed on 2026-07-31, both out of the Standard Report research.
+
+**0.6.1 — the asyncapi_events provenance gap.** `asyncapi_events` was the one graded-eligible
+dimension missing from `provenance.applies_to`, so 6 points were awarded in full for event
+surfaces API Evangelist authored. This is the item the section below predicted for 0.7; it shipped
+early because *The AsyncAPI Standard* measured the underlying fact — zero `asyncapi/_original/`
+archives across 25,574 providers against 6,776 for OpenAPI. 1,711 providers reclassified `derived`.
+
+**0.7 — security defects the contract declares about itself.** Three `contract_quality` checks:
+`oauth_flows_current` (775 contracts declare implicit, 72 password), `credentials_not_in_query`
+(815 put the key in the URL), `oauth_scopes_enumerated` (only 15.3% enumerate any scope). All
+framed as "no violation present" and vacuously satisfied where the mechanism is unused, because
+N/A is handled per artifact class rather than per check.
+
+### STILL OPEN after 0.7 — the provenance half-measure
+
+**The item below is the one 0.7 was supposed to carry and did not.** `contract_present` is graded
+by provenance; the other ~112 points of `contract_quality` are not, so a provider whose entire spec
+corpus API Evangelist wrote still earns full credit for spec craftsmanship it had no part in. The
+reasoning for holding it remains the reasoning given below — grading 132 points instead of 20 has a
+blast radius that needs measuring on its own rather than riding along with other changes — but it is
+now overdue rather than merely deferred, and it should be the whole content of the next release.
+
 ## Status after 0.6 (2026-07-28)
 
 **The 0.6 batch shipped**, and it took most of this roadmap with it. Sections below that landed are
@@ -55,7 +80,7 @@ fell 62.9 → 56.9. But it is still **Strong**, because `contract_present` is 20
 wrote**. We write good specs, so a provider we modeled thoroughly scores well on spec craftsmanship it
 had no part in.
 
-The fix is mechanically simple and should land in 0.7: apply the provenance multiplier to **every
+The fix is mechanically simple and was slated for 0.7. **It did not land there** — see "Status after 0.7" above. It is: apply the provenance multiplier to **every
 check in the `openapi` artifact block**, not only to the presence check, so a derived corpus is graded
 down across its whole contribution rather than at one point of entry. It was left out of 0.6
 deliberately — the blast radius of grading 132 points instead of 20 needs measuring on its own rather

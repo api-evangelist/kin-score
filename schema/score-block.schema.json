@@ -7,17 +7,36 @@
   "$defs": {
     "authorship": {
       "type": "string",
-      "enum": ["first-party", "conformance", "derived", "mixed", "unknown"],
+      "enum": [
+        "first-party",
+        "conformance",
+        "derived",
+        "mixed",
+        "unknown"
+      ],
       "description": "Who published the artifact. first-party = the provider wrote and serves it (credit 1.00). conformance = the provider serves it, a standards body wrote it (0.75). derived = API Evangelist authored it on the provider's behalf (0.25). mixed = a part-derived contract corpus, credit interpolated on the derived share. unknown = no marker either way, credited in full.",
       "$comment": "unknown is credited in full deliberately: only artifacts the enrichment pipeline authored carry a marker, so absence of one is not evidence of derivation."
     },
     "dimension": {
       "description": "A dimension is false, true, or a GRADE STRING. Graded-on-evidence dimensions return verified/partial/documented; provenance-graded dimensions return their authorship state; agent_card returns its A2A conformance grade. A grade string is never merely truthy - 'derived' is a different fact from 'the provider runs one'.",
       "oneOf": [
-        { "type": "boolean" },
+        {
+          "type": "boolean"
+        },
         {
           "type": "string",
-          "enum": ["verified", "partial", "documented", "first-party", "conformance", "derived", "mixed", "conformant", "near-conformant", "flavored"]
+          "enum": [
+            "verified",
+            "partial",
+            "documented",
+            "first-party",
+            "conformance",
+            "derived",
+            "mixed",
+            "conformant",
+            "near-conformant",
+            "flavored"
+          ]
         }
       ]
     }
@@ -26,44 +45,143 @@
     "score": {
       "type": "object",
       "description": "The composite Kin Score and its facet breakdown.",
-      "required": ["composite", "band", "schema_version", "facets"],
+      "required": [
+        "composite",
+        "band",
+        "schema_version",
+        "facets"
+      ],
       "properties": {
-        "composite": { "type": "number", "minimum": 0, "maximum": 100, "description": "0-100 weighted composite. For regulated providers = 0.85*base + 0.15*regulatory; otherwise = base." },
-        "band": { "type": "string", "enum": ["exemplar", "strong", "developing", "thin", "emerging", "minimal"], "description": "Cut points re-derived in 0.6: exemplar 66+, strong 56, developing 42, thin 28, emerging 13, minimal 0." },
-        "scored_at": { "type": "string", "format": "date" },
-        "schema_version": { "type": "number", "description": "Rubric version, e.g. 0.6" },
-        "trend": { "type": "string", "enum": ["rising", "falling", "flat"] },
-        "delta": { "type": "number", "description": "Week-over-week composite change." },
-        "previous_composite": { "type": "number", "minimum": 0, "maximum": 100 },
+        "composite": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "0-100 weighted composite. For regulated providers = 0.85*base + 0.15*regulatory; otherwise = base."
+        },
+        "band": {
+          "type": "string",
+          "enum": [
+            "exemplar",
+            "strong",
+            "developing",
+            "thin",
+            "emerging",
+            "minimal"
+          ],
+          "description": "Cut points re-derived in 0.6: exemplar 66+, strong 56, developing 42, thin 28, emerging 13, minimal 0."
+        },
+        "scored_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "schema_version": {
+          "type": "number",
+          "description": "Rubric version, e.g. 0.6"
+        },
+        "trend": {
+          "type": "string",
+          "enum": [
+            "rising",
+            "falling",
+            "flat"
+          ]
+        },
+        "delta": {
+          "type": "number",
+          "description": "Week-over-week composite change."
+        },
+        "previous_composite": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
         "facets": {
           "type": "object",
           "description": "The six base facets, each 0-100. Weights (fixed in the rubric): contract_quality 0.25, developer_ergonomics 0.20, commercial_clarity 0.20, operational_transparency 0.13, governance 0.12, discoverability 0.10.",
-          "required": ["discoverability", "contract_quality", "governance", "operational_transparency", "developer_ergonomics", "commercial_clarity"],
+          "required": [
+            "discoverability",
+            "contract_quality",
+            "governance",
+            "operational_transparency",
+            "developer_ergonomics",
+            "commercial_clarity"
+          ],
           "properties": {
-            "discoverability": { "type": "number", "minimum": 0, "maximum": 100 },
-            "contract_quality": { "type": "number", "minimum": 0, "maximum": 100 },
-            "governance": { "type": "number", "minimum": 0, "maximum": 100 },
-            "operational_transparency": { "type": "number", "minimum": 0, "maximum": 100 },
-            "developer_ergonomics": { "type": "number", "minimum": 0, "maximum": 100 },
-            "commercial_clarity": { "type": "number", "minimum": 0, "maximum": 100 }
+            "discoverability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "contract_quality": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "governance": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "operational_transparency": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "developer_ergonomics": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "commercial_clarity": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100
+            }
           }
         },
         "regulatory": {
           "type": "object",
           "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet.",
-          "required": ["applies", "regime", "regime_id", "score"],
+          "required": [
+            "applies",
+            "regime",
+            "regime_id",
+            "score"
+          ],
           "properties": {
-            "applies": { "const": true },
-            "regime": { "type": "string", "description": "Human label of the matched regime family, e.g. 'Banking & Open Finance'." },
+            "applies": {
+              "const": true
+            },
+            "regime": {
+              "type": "string",
+              "description": "Human label of the matched regime family, e.g. 'Banking & Open Finance'."
+            },
             "regime_id": {
               "type": "string",
-              "enum": ["banking_open_finance", "securities_market_data", "health", "payments", "insurance", "telecommunications", "energy_utilities", "government"],
+              "enum": [
+                "banking_open_finance",
+                "securities_market_data",
+                "health",
+                "payments",
+                "insurance",
+                "telecommunications",
+                "energy_utilities",
+                "government"
+              ],
               "description": "Extensible; telecommunications and energy_utilities were added in 0.6."
             },
-            "score": { "type": "number", "minimum": 0, "maximum": 100, "description": "The regulatory facet score, 0-100." },
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "The regulatory facet score, 0-100."
+            },
             "matched_via": {
               "type": "string",
-              "enum": ["tags", "weak_tags"],
+              "enum": [
+                "tags",
+                "weak_tags"
+              ],
               "description": "0.6+. 'tags' means a strong tag matched. 'weak_tags' means the regime matched only on an ambiguous tag (broker, brokerage, exchange, trading) because nothing else matched anywhere - a weaker claim, and the mechanism that stopped insurance brokers being scored against MiFID II."
             }
           }
@@ -72,18 +190,43 @@
           "type": "object",
           "description": "0.6+. WHO PUBLISHED the artifacts being scored. Read this before quoting the composite: a strong contract_quality built on specs API Evangelist modeled is a different fact from one built on specs the provider serves.",
           "properties": {
-            "mcp": { "$ref": "#/$defs/authorship" },
-            "skills": { "$ref": "#/$defs/authorship" },
-            "agentic_access": { "$ref": "#/$defs/authorship" },
-            "conformance": { "$ref": "#/$defs/authorship" },
+            "mcp": {
+              "$ref": "#/$defs/authorship"
+            },
+            "skills": {
+              "$ref": "#/$defs/authorship"
+            },
+            "agentic_access": {
+              "$ref": "#/$defs/authorship"
+            },
+            "conformance": {
+              "$ref": "#/$defs/authorship"
+            },
             "contracts": {
               "type": "object",
               "description": "The provider's OpenAPI corpus.",
               "properties": {
-                "total": { "type": "integer", "minimum": 0 },
-                "derived": { "type": "integer", "minimum": 0, "description": "Specs positively marked as API-Evangelist-authored." },
-                "marker_coverage": { "type": "number", "minimum": 0, "maximum": 100, "description": "Percentage of this provider's specs carrying ANY provenance marker. Catalog-wide this is 2.4%, so contract provenance is a floor rather than a census - an unmarked spec is credited in full." },
-                "callable": { "type": "number", "minimum": 0, "maximum": 100, "description": "Percentage whose servers[].url resolves to a registrable host, as opposed to a placeholder domain (example.com) or a bare template variable ({apiRoot})." }
+                "total": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "derived": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Specs positively marked as API-Evangelist-authored."
+                },
+                "marker_coverage": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Percentage of this provider's specs carrying ANY provenance marker. Catalog-wide this is 2.4%, so contract provenance is a floor rather than a census - an unmarked spec is credited in full."
+                },
+                "callable": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Percentage whose servers[].url resolves to a registrable host, as opposed to a placeholder domain (example.com) or a bare template variable ({apiRoot})."
+                }
               }
             }
           }
@@ -93,34 +236,81 @@
     "agent_readiness": {
       "type": "object",
       "description": "The standalone Agent Readiness score. Never merged into the composite.",
-      "required": ["score", "band", "dimensions"],
+      "required": [
+        "score",
+        "band",
+        "dimensions"
+      ],
       "properties": {
-        "score": { "type": "number", "minimum": 0, "maximum": 100 },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
         "band": {
           "type": "string",
-          "enum": ["agent-native", "agent-ready", "agent-aware", "human-only"],
+          "enum": [
+            "agent-native",
+            "agent-ready",
+            "agent-aware",
+            "human-only"
+          ],
           "description": "Cut points re-derived in 0.6: agent-native 46+, agent-ready 34, agent-aware 6, human-only 0. A BAND GATE applies: no provider is agent-native without both idempotency and error_semantics, however high it scores."
         },
-        "scored_at": { "type": "string", "format": "date" },
-        "schema_version": { "type": "number" },
+        "scored_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "schema_version": {
+          "type": "number"
+        },
         "dimensions": {
           "type": "object",
           "description": "Fourteen dimensions as of 0.6 (twelve at 0.4, plus agent_card in 0.5.1 and dry_run_mode in 0.6). Most are booleans; seven can carry a grade string - see $defs/dimension.",
           "properties": {
-            "spec_presence": { "type": "boolean", "description": "0.6: satisfied by an OpenAPI, AsyncAPI, GraphQL SDL or FHIR CapabilityStatement." },
-            "agentic_access": { "$ref": "#/$defs/dimension" },
-            "mcp_server": { "$ref": "#/$defs/dimension" },
-            "auth_clarity": { "type": "boolean" },
-            "idempotency": { "$ref": "#/$defs/dimension" },
-            "error_semantics": { "$ref": "#/$defs/dimension" },
-            "openapi_examples": { "$ref": "#/$defs/dimension" },
-            "rate_limit_signal": { "$ref": "#/$defs/dimension" },
-            "asyncapi_events": { "type": "boolean" },
-            "agent_skills": { "$ref": "#/$defs/dimension" },
-            "well_known_catalog": { "type": "boolean" },
-            "consent_identity": { "type": "boolean" },
-            "agent_card": { "$ref": "#/$defs/dimension" },
-            "dry_run_mode": { "type": "boolean" }
+            "spec_presence": {
+              "type": "boolean",
+              "description": "0.6: satisfied by an OpenAPI, AsyncAPI, GraphQL SDL or FHIR CapabilityStatement."
+            },
+            "agentic_access": {
+              "$ref": "#/$defs/dimension"
+            },
+            "mcp_server": {
+              "$ref": "#/$defs/dimension"
+            },
+            "auth_clarity": {
+              "type": "boolean"
+            },
+            "idempotency": {
+              "$ref": "#/$defs/dimension"
+            },
+            "error_semantics": {
+              "$ref": "#/$defs/dimension"
+            },
+            "openapi_examples": {
+              "$ref": "#/$defs/dimension"
+            },
+            "rate_limit_signal": {
+              "$ref": "#/$defs/dimension"
+            },
+            "asyncapi_events": {
+              "$ref": "#/$defs/dimension"
+            },
+            "agent_skills": {
+              "$ref": "#/$defs/dimension"
+            },
+            "well_known_catalog": {
+              "type": "boolean"
+            },
+            "consent_identity": {
+              "type": "boolean"
+            },
+            "agent_card": {
+              "$ref": "#/$defs/dimension"
+            },
+            "dry_run_mode": {
+              "type": "boolean"
+            }
           }
         }
       }
