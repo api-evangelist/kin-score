@@ -144,10 +144,26 @@ apostrophe once shipped a page whose script died silently — the CSS rendered a
 |---|---|---|---|
 | apievangelist.com/providers | `assets/js/kin-glyph.js` | `_layouts/provider.html` | `_includes/company-listing-rated.html` |
 | apis.io/providers | `assets/js/kin-glyph.js` | `_layouts/provider.html` | `network/_includes/band-list.html` |
+| **apis.io/badge/\*** | `lambdas/badge/kin-glyph.mjs` (ESM source, not the bundle) | — | — |
 
 **When the glyph changes:** edit `kin-glyph.js`, run `node build.mjs`, then copy `dist/kin-glyph.js`
 into each site's `assets/js/`. There is no package registry step — it is a deliberate copy, and the
-header of the generated file names this directory as the source.
+header of the generated file names this directory as the source. The badge service takes the **ESM
+source** rather than the browser bundle, because it composes `kinGlyph()` server-side; refresh it the
+same way, with a `cp` into `apis-io-aws/lambdas/badge/kin-glyph.mjs`.
+
+## Off-site — the embeddable badge
+
+A fourth consumer draws the sun on **other people's websites**: `apis.io/badge/*` renders it as a
+standalone SVG a provider pastes onto their own site, and it redraws from the live score. That
+context takes away hover, script, and every external resource, so the badge composes the glyph
+rather than extending it — and it is why `theme=auto` exists there and not here. The contract is
+[`../EMBED.md`](../EMBED.md); the service is `apis-io-aws/lambdas/badge/`.
+
+One rule this file's rules imply, restated because the badge is where it bites: **a ray added to the
+rubric but not to `DIMENSIONS` disappears from every embedded badge on every customer site at once**,
+silently, until the shard is rebuilt. The badge shard imports `FACETS`/`DIMENSIONS` from here for
+exactly that reason, and the index builder warns on any facet or dimension it cannot place.
 
 ## Data requirements
 
