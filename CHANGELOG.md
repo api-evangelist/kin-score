@@ -5,6 +5,42 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.9 — 2026-07-31
+
+**The dimension was named after an artifact, and measured the wrong thing.** `asyncapi_events` is
+renamed **`event_surface_described`** and widened to count a `webhooks` or `callbacks` object inside
+the provider's as-published OpenAPI, equally with an AsyncAPI document.
+
+**Why.** A webhook does not have to be described in AsyncAPI. OpenAPI 3.1 added a top-level
+`webhooks` object and `callbacks` has existed since 3.0. Measured across `openapi/_original/`,
+**125 providers describe their event surface that way** — 87 via `webhooks` across 2,218 individual
+events, 39 via `callbacks` across 174 — against **zero** who publish AsyncAPI. The old dimension read
+only the `asyncapi/` directory, which produced errors in both directions:
+
+- **False negatives — 100 providers.** They published a machine-readable event description in the
+  contract they actually maintain, never received an authored AsyncAPI document, and scored `false`
+  on a dimension they satisfy. These were the best-behaved providers on this axis and the rubric gave
+  them nothing.
+- **False positives — 19 providers.** 0.6.1 correctly cut authored AsyncAPI documents to `derived`
+  at 0.25, but for these the right answer was never 0.25 — it was **1.0 first-party**, because the
+  provider had published the same surface in their own OpenAPI and our document merely duplicated it.
+  0.6.1 was right about the artifact and wrong about the provider.
+
+**New rubric key: `provenance.first_party_when`.** A dimension satisfiable from more than one
+artifact class must grade against whichever class actually satisfied it. `openapi_events` is built
+from `openapi/_original/` — the verbatim harvest archive — so its presence is proof of provider
+action and outranks the authorship of anything API Evangelist wrote.
+
+**A pipeline defect this exposed.** The refinement that produces the per-tag specs **drops the
+top-level `webhooks` object**. OpenAI and Wise both publish it, and not one of their 37 and 47
+refined documents carries it. The new check therefore reads `_original/` via the provenance indexer
+rather than the spec index, which cannot see the thing being measured. The refinement loss is a
+separate open defect.
+
+**Impact.** Agent-readiness only; composites untouched. Webflow 56.8 → 60.8 (`derived` → `true`);
+Ada `false` → `true`. Consumers reading the `asyncapi_events` key must move to
+`event_surface_described`.
+
 ## 0.8 — 2026-07-31
 
 **The provenance half-measure, closed.** This is the item the roadmap slated for 0.7 and 0.7 did

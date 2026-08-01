@@ -271,11 +271,22 @@ node glyph/build.mjs      # -> glyph/dist/kin-glyph.js  (parse-checked)
 node glyph/make-demo.mjs  # -> glyph/demo.html          (self-contained comparison)
 ```
 
+### Embedding it
+
+A provider can put their own sun on their own site. `https://apis.io/badge/{slug}/` builds the
+snippet; the badge renders from the **live** score, so it stays current without being re-pasted.
+Three shapes (sun, card, README pill), light and dark, plus the score as JSON. The contract — the
+shapes, the parameters, the freshness guarantee, and what may and may not be done with the mark — is
+[`EMBED.md`](EMBED.md).
+
+The badge is also how the score travels: each embed is a plain, followed link from the provider's own
+site back to the profile the number came from.
+
 ## Versioning
 
 The rubric is a living argument and is versioned (`schema_version`). Published snapshots live in
 [`rubric/`](rubric/); the full history is in [`CHANGELOG.md`](CHANGELOG.md), and where it's headed is
-in [`ROADMAP.md`](ROADMAP.md). Current: **0.8**.
+in [`ROADMAP.md`](ROADMAP.md). Current: **0.9**.
 
 Every scoring pass also dumps a durable per-provider snapshot into that provider's own repo at
 `all/<slug>/kin/score-<timestamp>.yml`, so a provider accumulates its Kin Score history over time.

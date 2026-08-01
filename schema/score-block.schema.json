@@ -293,7 +293,7 @@
             "rate_limit_signal": {
               "$ref": "#/$defs/dimension"
             },
-            "asyncapi_events": {
+            "event_surface_described": {
               "$ref": "#/$defs/dimension"
             },
             "agent_skills": {
