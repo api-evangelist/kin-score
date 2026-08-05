@@ -5,6 +5,62 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.9.1 — 2026-08-04
+
+**A contract the reader cannot parse is indistinguishable from a contract that does not exist.**
+The scorer classified a specification by looking for an `openapi:` declaration, and every per-spec
+check read the OpenAPI 3.x container keys — `servers`, `components.schemas`,
+`components.securitySchemes`. A Swagger 2.0 document declares `swagger: "2.0"` and uses
+`host`/`basePath`, `definitions` and `securityDefinitions` instead. It was therefore dropped from
+the spec index before a single check ran, and a provider whose entire corpus is 2.0 scored as
+publishing **no contract at all**.
+
+This is a reader fix, not a rubric change. No weight, point value, check or band moved.
+
+**How much of the catalog it affected.** Measured 2026-08-04 across `all/*/openapi/`: **190 Swagger
+2.0 documents in a 3,024-file sample, spread across 90 providers** — Microsoft Azure the heaviest by
+a wide margin, then Kaltura, Mailchimp, Mastercard and Zuora. Rebuilding the index with the fix in
+place took it from **81,867 to 87,680 OpenAPI documents across 6,997 to 7,200 providers**, and cut
+parse errors from 800 to 126.
+
+**How it surfaced.** Oracle publishes a first-party contract for every Oracle Cloud Infrastructure
+service — 161 documents covering 7,918 operations, indexed at
+`https://docs.oracle.com/en-us/iaas/api/specs/index.json`. Harvesting them to replace six
+API-Evangelist-authored OpenAPI 3.1 documents *lowered* Oracle's contract quality, because the six
+models were the only documents the rubric could read. A provider was being scored on our modelling
+and penalised for its own engineering.
+
+**What changed in `score.rb`.** The index classifier now recognises `swagger:` as well as
+`openapi:`, anchored to the start of a line — "swagger" appears in prose and portal names far more
+often than "openapi:" does, and a description mentioning it must not classify a document as a
+contract. `adapt_swagger_2` then presents a 2.0 document through the 3.x-shaped keys the checks
+already read, filling `servers` from `host`/`basePath`/`schemes`, `components.schemas` from
+`definitions` and `components.securitySchemes` from `securityDefinitions`, leaving every original
+key in place.
+
+**What deliberately did not change.** `openapi_3_0` and `openapi_3_1` still return false for a 2.0
+document: shipping an eleven-year-old specification version earns fewer points than shipping the
+current one. It is simply not the same as shipping nothing. And a 2.0 document with no `host` keeps
+an empty `servers` and is reported by `servers_defined` rather than handed an invented hostname —
+that is the normal shape for a regional platform that publishes its endpoint list separately, as
+Oracle does across forty-odd regions.
+
+**A second reader fix shipped in the same release: a declaration can arrive late.** Both readers
+classified from a bounded head — 4 KB in `score.rb`, 24 KB in `build_provenance.py`. A YAML mapping
+is unordered, and a publisher emitting keys alphabetically puts `basePath`, `consumes` and
+`definitions` ahead of `swagger`; Oracle does exactly that across 161 contracts, one of them 3.8 MB,
+so 153 of them were counted as non-spec files even after `swagger:` was recognised. Both readers now
+fall back to a bounded stream for a column-zero declaration, and only when the head is inconclusive
+and the file is spec-shaped, so a 200-document sample still classifies in 38 ms.
+
+**Not yet applied to published scores.** The `--write` rescore is held until the next APIs.io
+rebuild, so the engine change, the mass re-score and the site deploy land together. Published scores
+remain 0.9 until then.
+
+This is the same class of blindness as the GraphQL correction in 0.6, and the lesson repeats: when a
+provider publishes an artifact in a form the reader does not speak, the score reports an absence
+that is really our own.
+
 ## 0.9 — 2026-07-31
 
 **The dimension was named after an artifact, and measured the wrong thing.** `asyncapi_events` is
