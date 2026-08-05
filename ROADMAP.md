@@ -7,6 +7,66 @@ has shipped.
 
 ---
 
+## Status after 0.9.1 (2026-08-04)
+
+**0.9.1 — Swagger 2.0 is a contract.** A reader fix. A 2.0 document was dropped from the spec index
+before any check ran, so a provider whose whole corpus is 2.0 scored as publishing nothing: 190 of a
+3,024-file sample across 90 providers, Microsoft Azure the heaviest. Found through Oracle, where
+harvesting 161 first-party OCI contracts *lowered* contract quality. The index gained ~5,800
+documents and 203 providers.
+
+Two fixes shipped in it, both in the reader rather than the rubric — no weight, point value, check
+or band moved:
+
+1. **`swagger:` is a contract declaration.** The index classifier recognised only `openapi:`, and
+   every per-spec check read the 3.x container keys. `adapt_swagger_2` now presents a 2.0 document
+   through `servers` (from `host`/`basePath`/`schemes`), `components.schemas` (from `definitions`)
+   and `components.securitySchemes` (from `securityDefinitions`), leaving every original key in
+   place. `openapi_3_0`/`openapi_3_1` still return false for 2.0 on purpose: an eleven-year-old
+   specification version earns fewer points than the current one, but not zero contract.
+2. **A declaration can arrive late in the document.** Both readers classified from a bounded head —
+   4 KB in `score.rb`, 24 KB in `build_provenance.py`. A YAML mapping is unordered, and a publisher
+   emitting keys alphabetically puts `basePath`, `consumes` and `definitions` ahead of `swagger`.
+   Oracle does exactly that across 161 contracts, one of them 3.8 MB, so **153 of them counted as
+   non-spec files**. Both readers now fall back to a bounded stream for a column-zero declaration,
+   but only when the head is inconclusive *and* the file is spec-shaped — a 200-document sample
+   classifies in 38 ms, so the index stays fast. Column-zero matters: a `swagger:` nested in a
+   description or an example is not a declaration.
+
+**⚠ NOT YET APPLIED TO PUBLISHED SCORES.** 0.9.1 is dry-run only. The `--write` rescore is
+deliberately held until the **next APIs.io rebuild**, so the engine change, the mass re-score and
+the site deploy land together rather than leaving published numbers disagreeing with the rubric that
+produced them. Until then every published score is 0.9. When it runs, expect movement concentrated
+in the ~203 providers who gained a readable corpus — Microsoft Azure (1,659 of 1,660 documents are
+2.0) and Mastercard (165 of 208) the largest — and re-cut the bands afterwards.
+
+**What this opens next.**
+
+- **A spec-version signal worth reporting, not just scoring.** The catalog can now measure how much
+  of the API economy is still on Swagger 2.0 versus 3.0 versus 3.1. That is a paper, and it is the
+  kind of number nobody else can produce at this sample size.
+- **Audit what else the reader cannot parse.** Swagger 2.0 and GraphQL were both found by accident,
+  one release apart, and both after a provider was scored as contract-less while publishing a real
+  contract. The remaining candidates are worth a deliberate sweep rather than a third accident:
+  Protobuf/gRPC service definitions, WSDL, RAML, API Blueprint, JSON Schema-only surfaces, and
+  Postman collections used as the primary contract.
+- **`securityDefinitions` is not the only way a contract states its auth.** Oracle's 161 documents
+  declare none, because OCI request signing is described in prose. `security_schemes_defined` reads
+  that as absent for a platform with a rigorous and fully documented signing scheme. Worth deciding
+  whether an out-of-band scheme documented in the artifact set should satisfy the check.
+- **Provenance markers are not reaching the indexer on large documents.** Oracle's harvested specs
+  are stamped `method: harvested` / `first_party: true` inside `info`, and on an alphabetically
+  ordered document `info` also falls outside the head window, so the marker is missed and the file
+  records `unknown`. The reordering fix covers documents API Evangelist writes out; it does not
+  cover a large provider-published document we store verbatim. The authorship scan wants the same
+  treatment the declaration scan just got.
+- **`FOUND_METHODS` still has no token a provider would reach for.** Captured in `scoring.yml`'s
+  `provenance:` block since 0.8 and still open: our vocabulary describes how OUR pipeline obtained
+  something, so a provider authoring its own artifact (`method: declared`) resolves to `unknown`.
+  Nothing in the score currently rewards a provider for making its authorship legible.
+
+---
+
 ## Status after 0.8 (2026-07-31)
 
 Two releases landed on 2026-07-31, both out of the Standard Report research.
@@ -72,6 +132,78 @@ sharpen the release that just shipped. Two tractable parts:
 Until then the honest position is the one the rubric states in print: `unknown` is credited in full,
 because punishing providers for a gap in our own metadata would be a worse error than the one
 provenance grading exists to fix.
+
+#### Re-measured 2026-08-04, after 0.8 graded the whole `openapi` block
+
+0.8 closed the half-measure below — every check in the `openapi` block is now provenance-graded. That
+makes marker coverage the binding constraint on the entire facet rather than on 20 of 132 points, so
+it was worth re-counting. **It has barely moved, and the affirmative marker is effectively unused:**
+
+| `provenance.json` (generated 2026-08-04) | |
+| --- | --- |
+| OpenAPI specs indexed | **88,456** |
+| marked `derived` | 2,795 (**3.2%**) |
+| marked `first_party` | **28** |
+| marked `conformance` | 0 |
+| **`unknown` → credited 1.0** | **85,633 (96.8%)** |
+
+Per provider, of the 7,168 holding at least one spec:
+
+| state | providers | share | credit |
+| --- | --- | --- | --- |
+| `unknown` — no marked spec | **6,815** | **95.1%** | 1.0, gate never engages |
+| `derived` — ≥75% marked | 349 | 4.9% | 0.25 |
+| `mixed` | 4 | 0.1% | interpolated |
+
+**So the gate that dropped 318 providers and rebanded 187 is reaching 4.9% of the corpus.** That is
+not an argument against it — the 349 it catches are caught correctly. It is an argument that the
+remaining 95% is unmeasured, and the facet now rests entirely on that.
+
+**The proof case is a pair, and it is sharper than Yardi.** Yardi shows the gate working when a marker
+exists. Segment and Stripe show what happens when it does not:
+
+| | specs | `first_party` | `derived` | `unknown` | fetchable spec from the provider? |
+| --- | --- | --- | --- | --- | --- |
+| **Twilio Segment** | 23 | 0 | 0 | **23** | **No.** `api.segmentapis.com/openapi.json` → 401; `docs.segmentapis.com/openapi.json` → 404. The 23 refined specs plus 4 in `_original/` are AE-derived from documentation. |
+| **Stripe** | 159 | 0 | 0 | **159** | **Yes.** Stripe publishes its OpenAPI. |
+
+Both score identically on authorship. **The rubric cannot currently distinguish a corpus we wrote for a
+provider that publishes nothing from a corpus the provider genuinely publishes** — because neither
+carries a marker, and `unknown` resolves to full credit for both. Restating the balance deliberately:
+the issue is not that AE authors contracts, which is intentional and raises the floor. The issue is
+that **authorship is illegible in both directions**, so neither Segment's floor nor Stripe's frontier
+can be read for what it is.
+
+**The backfill levers were measured, and the cheap ones are not available:**
+
+- **`openapi/_original/` is not a first-party proxy.** 6,807 of 7,479 providers with an `openapi/`
+  directory hold a non-empty `_original/` archive (14,327 documents), which looks like a strong signal
+  until you check a known case: Segment's `_original/` holds four documents that are *themselves*
+  AE-derived. The archive records "a parent document was split", not "a provider published it". Same
+  caution the Yardi note above already gives.
+- **The fetch evidence was mostly not retained.** Only **333 of 26,281** providers still carry a remote
+  (`http`) OpenAPI pointer in `apis.yml` that could be re-probed; 7,162 carry local paths only and
+  18,786 carry no OpenAPI pointer at all. And of the remote pointers that do exist, roughly 80% 404 —
+  so a failed fetch cannot be read as "never was first-party" either, only as "not verifiable now".
+
+**Which makes "stamp forward" the whole of the tractable work, and it should be treated as blocking on
+the enrichment side rather than as a scoring item.** Concretely: every path that writes or refines an
+OpenAPI records the authorship it already knows at the moment it knows it — a harvested document gets
+`first_party` plus the URL and status code it came from, a modeled one gets `derived` plus what it was
+modeled from, and `refine-openapis` propagates the parent's marker onto every child it splits out.
+Backward classification of the 85,633 stays a re-probe campaign against the surviving 333 plus
+whatever the harvest logs can still reconstruct, and should be scoped as its own project.
+
+**Two smaller items this surfaced:**
+
+1. **`FOUND_METHODS` has no token for provider-authored.** Already noted under 0.9.1 and confirmed by
+   the count above — `first_party: 28` across 88,456 specs is not a measurement, it is an unused code
+   path. Until a provider can say "I wrote this" in a way the reader recognises, the gate has one
+   populated state and one empty one.
+2. **A `marker_coverage` figure belongs on the scorecard.** `provenance.json` already computes it
+   (`marker_coverage: 3.2`). Publishing it per provider — "authorship known for N of M contracts" —
+   makes the floor legible to a reader without moving anybody's number, and is the honest companion to
+   crediting `unknown` in full.
 
 **Provenance grades the PRESENCE award, not the DEPTH awards — and Yardi shows the difference.**
 Grading `contract_present` caught Yardi correctly: all five of its specs are marked derived, and it
