@@ -537,6 +537,49 @@ so nobody reads our rate as a contradiction of theirs. The honest limitation on 
 from URLs already in `apis.yml`, so a card served from an unlisted subdomain is invisible to this
 run — the count is a floor, not a census.
 
+## Agentic payment — x402, and the first provider in the catalog to ship it
+
+*Claimed from the blind-spot list below, on the same grounds the Agent Card was: there is now a
+measurement rather than a proposal. It is a much smaller one — a single provider — and the section
+says so plainly.*
+
+**The count is one.** A sweep of `type:` values across every `all/*/apis.yml` on 2026-08-06 returned
+**zero** occurrences of x402, against 3,767 `MCPServer`, 1,380 `LlmsText` and 86 `AgentCard`.
+IBANforge, profiled the same day out of `api-search/inbox#3`, is the first — and it was found by
+reading a provider's submission, not by probing for x402, so the true catalog rate is unmeasured
+rather than zero.
+
+**What a shipped x402 surface actually looks like.** IBANforge, verified 2026-08-06:
+
+| Surface | Detail |
+|---|---|
+| `/.well-known/x402` | `x402Version: 1`, Base L2 (`eip155:8453`), USDC, Coinbase CDP facilitator, `pay_to` address |
+| Per-endpoint pricing | 5 endpoints priced $0.002–$0.02 USDC, each with an atomic amount and an `accepts` block |
+| OpenAPI `securitySchemes` | an `x402Payment` scheme (`X-Payment` header) declared alongside `apiKey` |
+| Operations | 6 of 18 declare `x402Payment` in their `security` |
+
+**The finding that matters for the rubric: x402 is readable from the contract, not only from a
+well-known.** That is the difference between a dimension that needs its own fetcher and one that
+falls out of spec parsing the rubric already does. A provider that prices per call in its OpenAPI has
+stated a machine-actionable commercial term in the one document an agent is guaranteed to read — and
+`commercial_clarity` currently has no way to see it. This is the cheapest version of the agentic
+commerce dimension, and it should be built first, before any protocol-presence check.
+
+**Cautions, mostly about not repeating known mistakes.**
+
+- **Do not score the well-known's presence.** `/.well-known/x402` is a pointer, and *Scored pointers
+  are never fetched* is an open defect against exactly that pattern. A priced operation in a parsed
+  contract is evidence; a 200 on a discovery document is not.
+- **A declared `x402Payment` scheme is not a working payment rail.** Nothing here settled a
+  transaction. The honest ceiling on a contract-read signal is "the provider has stated a price,"
+  which is worth points and is not the same claim as "an agent can pay."
+- **One provider is not a baseline.** Adoption is unmeasured, so there is no band to cut against. The
+  sweep this needs is the same shape as the Agent Card probe: fetch `/.well-known/x402` across the
+  known host set and parse every spec for a payment-flavoured `securityScheme`, then decide weights
+  against a real denominator. Until that runs, this section is a data point, not a rate.
+- **Do not let x402 stand in for the whole family.** UCP, ACP and AP2 remain unread. x402 is first
+  here only because a provider shipped it into view.
+
 ## A contract you cannot call — placeholder and template-only servers
 ### `SHIPPED IN 0.6 — `servers_resolvable`, 10,950 of 87,612 specs uncallable`
 
@@ -1203,7 +1246,10 @@ that provenance gating cannot undermine.*
   its index, and Cloudflare tracks **x402** and UCP as a fifth layer. The Kin Score does not read any of
   them. For a catalog whose thesis is that agents will transact, this is a visible hole, and it is
   arriving fastest in exactly the commerce-adjacent providers the catalog is thick in. A candidate
-  dimension sits naturally beside `agentic_access`.
+  dimension sits naturally beside `agentic_access`. **PARTIALLY CLAIMED — the x402 half has a first
+  data point and its own section above** (*Agentic payment*), which argues the cheapest build is to
+  read priced operations out of the contract rather than to probe for the protocol. UCP, ACP and AP2
+  remain unclaimed.
 - **The web layer Cloudflare just legitimised.** Markdown content negotiation via `Accept`, AI-specific
   `robots.txt` directives, RFC 8288 `Link` headers, sitemap quality. Our `consent_identity` gestures at
   this with **3 points** for AIPREF/Content-Signals/Web Bot Auth. This connects directly to
