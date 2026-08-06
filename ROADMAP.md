@@ -49,7 +49,13 @@ in the ~203 providers who gained a readable corpus — Microsoft Azure (1,659 of
   one release apart, and both after a provider was scored as contract-less while publishing a real
   contract. The remaining candidates are worth a deliberate sweep rather than a third accident:
   Protobuf/gRPC service definitions, WSDL, RAML, API Blueprint, JSON Schema-only surfaces, and
-  Postman collections used as the primary contract.
+  Postman collections used as the primary contract. **Add the capability-outside-the-contract case
+  to the same sweep:** blockchain and crypto returns `dry_run_mode` 0 of 285 leaders while
+  transaction simulation is a chain primitive in daily use, and data and analytics returns a data
+  plane that travels over JDBC and Arrow Flight rather than anything the spec describes. Neither is
+  a market failure and both read as one. The sweep should decide, per dimension, whether an
+  out-of-band capability documented in the artifact set satisfies it — the same question Oracle's
+  prose-documented request signing raises for `security_schemes_defined`.
 - **`securityDefinitions` is not the only way a contract states its auth.** Oracle's 161 documents
   declare none, because OCI request signing is described in prose. `security_schemes_defined` reads
   that as absent for a platform with a rigorous and fully documented signing scheme. Worth deciding
@@ -1326,8 +1332,16 @@ The same effect shows up wherever data is a public good rather than a product. B
 publish under an open licence with no pricing page. Government data agencies — EIA, NESO — score the same
 way.
 
+**A third class, found 2026-08-06: the fee model is not the vendor's to publish.** Blockchain and
+crypto scores `commercial_clarity` at 23.5 with 34.2% at zero, and the zeros split cleanly. The
+infrastructure tier — RPC providers, custody platforms, data vendors — publishes plans and quotas like
+any developer platform. Chains, protocols and DAOs have no price page because the fee is charged by the
+network and set by the protocol, on-chain, in public. A base fee determined by [EIP-1559](https://standards.apievangelist.com/store/eip-1559/) is more transparent, more machine-readable and
+more auditable than any pricing page in the catalog, and the facet reads it as an absent artifact.
+
 The rubric currently reads *absence of a commercial surface* as a deficiency, when it is sometimes a
-**regulatory outcome** and sometimes a **deliberate public-good posture**. The conditional-facet
+**regulatory outcome**, sometimes a **deliberate public-good posture**, and sometimes a **fee that
+lives somewhere more legible than a web page**. The conditional-facet
 machinery already exists for exactly this: the regulatory facet only applies to providers in a regime.
 `commercial_clarity` needs the same treatment — either scored conditionally on whether the provider sells
 API access at all, or rebalanced so that "free, open, no signup" stops reading as "no commercial clarity."
@@ -1453,6 +1467,120 @@ This is computable from `openapi/` today: POST/PATCH/DELETE share, payment-adjac
 `plans/` and `finops/` artifacts that already indicate whether money moves. It converts a dimension that
 currently reads as a flat industry-wide zero into one that discriminates — and it makes the strongest
 single build recommendation in the travel reports defensible in the rubric rather than only in the prose.
+
+**The positive control arrived 2026-08-06, and it settles the argument.** Every market cited above is a
+zero, which shows the dimension does not discriminate but not that consequence class is the reason.
+Blockchain and crypto is the first market scored where the dimension goes the other way: **idempotency
+at 5.9% of 1,120 companies against a whole-catalog 2.2%**, and 15.1% among the 285 leaders. Nothing
+compelled it. There is no idempotency mandate in any crypto regime, the market's governance facet is
+11.1 with 56% at zero, and it still publishes the safety property at nearly three times the catalog
+rate.
+
+Ranked by what a retry actually costs, the series now reads:
+
+| Consequence of a duplicate request | Market | `idempotency` |
+|---|---|---|
+| Immediate, irreversible, denominated | Blockchain & crypto | **5.9%** |
+| Physical, deferred, recoverable at cost | Supply chain | 1.2% |
+| Clinical, deferred, recoverable at cost | Digital health | 1.3% |
+| Read-only by design | US energy, US real estate | 0% |
+
+That is the operation-class hypothesis measured rather than argued, and it strengthens the proposal in
+two ways. It confirms the class is real and legible from outside. And it supplies the calibration
+anchor the weighting needs: **5.9% is what a market looks like when the consequence is unmissable**, so
+that is the bar an actionable API should be measured against, not the catalog's 2.2%.
+
+The same market supplies the counter-case for the sibling dimension. `dry_run_mode` is **0 of 285
+leaders** there, while transaction simulation — `eth_call`, testnets, provider simulation endpoints —
+is a chain primitive in daily use. The capability is real and undescribed in any contract, which is
+the reader-gap class in the 0.9.1 note rather than a market failure. Worth deciding whether a
+documented simulation endpoint outside the spec should satisfy the dimension, or whether the honest
+answer stays zero and the prose carries the nuance.
+
+## A contract that describes the platform is not a contract that describes the product
+
+The rubric asks whether a machine-readable contract exists, whether it is complete, whether it is
+callable and whether it is described. It never asks **what the contract covers**. A provider that
+publishes an excellent OpenAPI for provisioning workspaces, rotating keys and listing jobs scores
+identically to one that publishes the same quality of contract for the thing the customer actually
+bought.
+
+Data and analytics is the demonstration, and the numbers are not close. Reading the resources declared
+across 4,819 refined specification documents, the most-published nouns in that market are `users` (52
+providers), `jobs` (43), `search` (30), `authentication` (29), `projects` (23), `groups` (20) and
+`workspaces` (18). **Of the 321 companies in its upper three bands, 181 declare a control-plane
+resource and 32 declare query or SQL** — 10.0%. An agent can provision a workspace, schedule a job and
+check its status across most of that market, and cannot ask it a question.
+
+**The honest complication, which the check has to carry.** Analytical access has mature protocols of
+its own — [JDBC](https://standards.apievangelist.com/store/jdbc/),
+[ODBC](https://standards.apievangelist.com/store/odbc/),
+[Arrow](https://standards.apievangelist.com/store/arrow/) Flight, the SQL wire protocols — and they
+move a billion rows better than JSON over HTTP ever will. A warehouse whose primary read path is a REST
+endpoint would be making a mistake. So this is not a penalty for choosing the right protocol. It is a
+**coverage disclosure**: does the published contract set cover the provider's primary product surface,
+or only its administration, and is the other path described anywhere a machine can find it?
+
+That framing also explains a number the same report found and could not otherwise account for: MCP
+adoption in data and analytics runs at **11.3% against a catalog 5.7%**, the highest of any market
+scored. The vendors are bolting an agent interface across precisely the gap this check would measure.
+Where the data plane cannot be a REST resource, an MCP tool becomes the way to let something ask a
+question — which makes coverage and agent-readiness two views of one fact.
+
+**Computable from what is already held.** Resource tokens from the refined one-per-resource filenames,
+against the provider's own `description` and tags in `apis.yml`. The output is not a score penalty on
+its own; it is a per-provider ratio — administration versus product surface — that can inform
+`contract_quality` once calibrated, and that reads as a finding in its own right long before it is
+weighted.
+
+## Authentication is not authorization — delegated authority as a signal
+
+`auth_clarity` asks whether a provider explains how to authenticate. Nothing asks what a credential is
+then permitted to do. `oauth_scopes_enumerated` exists inside the OpenAPI block and the health regime
+weights SMART scopes as consent-legibility, but there is no general signal for **delegated authority**:
+can a customer — or an agent acting for one — read the boundary of the credential it holds?
+
+Blockchain and crypto makes the case at its sharpest, because it is the market with the largest
+irreversible blast radius per credential in the catalog. **Auth clarity 91.2% of leaders. Published
+scopes 29 of 285 — 10.2%**, the lowest scope discipline measured this year. That market explains
+thoroughly how to authenticate and rarely what the key may then do, and it does so while putting **36
+companies in the Agent-Native band, 3.2% against a catalog 1.4%** — the highest rate recorded. It has
+given agents the ability to act and not the ability to know their own limits.
+
+The pattern is not confined there. Marketing and advertising publishes scopes at 29.5% while describing
+consent at 3.1%; data and analytics at 16.8% while its products sit on top of an entire organization's
+data estate. In each case the same question is unanswered: **read-only or read-write, spend-limited or
+unlimited, address-restricted or open, time-boxed or permanent.**
+
+**Where it belongs.** This fits the standalone **Security Posture layer** already under consideration
+above — that section names auth hardening and does not name delegation. Delegated authority is the
+better anchor for it, because it is the signal an agentic consumer needs and the one an enterprise
+buyer already asks for in procurement. Candidate composition: scopes enumerated in the contract, scopes
+discoverable at a well-known location, a documented revocation path, and any expression of limits a
+credential carries. Scored as a lens rather than folded into the composite, on the Agent Readiness
+model.
+
+## Duplicate provider repos distort every cohort number the rubric produces
+
+Not a rubric defect, and recorded here because the reports are where it surfaces.
+
+Building the digital health cohort on 2026-08-05 found **65 companies carrying more than one
+`all/<slug>/` repository** — `elation` and `elation-health`, `athena-health` and `athenahealth`, three
+for Sword Health, five separate programme repos for NHS England. That is roughly **5% of a cohort**,
+not the occasional one-off the retirement procedure was written for.
+
+The scoring is correct in each case; the rollup is not. The thinner twin always scores lower, so
+counting both double-counts the company **and** drags the cohort average down for a reason that has
+nothing to do with the market, while inflating the Minimal band. Any published average, band
+distribution or market comparison inherits the error.
+
+Detection is cheap: group cohort slugs by a normalized key — strip non-alphanumerics, then strip a
+trailing `health|healthcare|technologies|systems|group|inc|co|com|io|ai|app|labs` — and again by
+normalized display name. Anything with two members is a candidate. The false pairs are real companies
+and need eyes: Candid Health the billing platform against Candid Co. the aligner brand, Pearl Health
+against Pearl the dental imaging company, Corti against Cortico. The report-time correction is a
+published canonical map; the durable fix is the merge procedure, run at catalog scale rather than one
+pair at a time.
 
 ## Vocabulary convergence is measurable, and it is the cleanest mandate effect yet
 
