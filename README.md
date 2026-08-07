@@ -291,6 +291,38 @@ in [`ROADMAP.md`](ROADMAP.md). Current: **0.9.1**.
 Every scoring pass also dumps a durable per-provider snapshot into that provider's own repo at
 `all/<slug>/kin/score-<timestamp>.yml`, so a provider accumulates its Kin Score history over time.
 
+## What counts as public — and why the gate is the point
+
+The score reads **only what a member of the public can reach with a browser and no credentials**.
+A company's own site, its developer portal and documentation, the specifications it publishes for
+public use, its public repositories, and its public status, pricing and changelog pages. Nothing is
+obtained by breaching a system, defeating an access control, or using credentials of any kind —
+**including credentials we have legitimately been granted**. Where API Evangelist holds a sandbox key
+issued by a provider, the score still reads only what answers anonymously.
+
+So an API behind a partner agreement, a signed developer contract, a sales call or a
+customer-sponsored integration is **out of scope by design**. It is not scored as a failure and it is
+not evidence of a defect. It simply cannot earn credit, because nothing about it can be verified by
+anyone else — and a rating nobody can reproduce is not a rating.
+
+**That boundary is the entire argument, not a limitation of it.**
+
+The score is comparative. When a provider gates something, the finding is not "you are hiding
+something" — it is that **a direct competitor published the same thing openly, and is legible to
+every developer and every agent evaluating that market while you are not.** Where a whole cohort
+gates a capability, that is a sector finding worth writing up. Where one company gates what its peers
+publish, that is a question its own customers will eventually ask.
+
+The fix is always the same and always available: **publish it.** Not a partnership, not a purchase,
+not a negotiation with us — a public URL. Every point on this rubric can be earned by a provider
+deciding to open something up, on their own timetable, without telling us. That is the intended
+response, and the reason the whole rubric is published rather than sold.
+
+When a provider says "but we do have that, it's just in our partner program," both things are true at
+once: they are right about the capability, and the score is right that the public cannot reach it.
+The profile should record the capability plainly so the company is not misrepresented, and the score
+should keep counting only what is open.
+
 ## What the score refuses to measure
 
 Traffic, revenue, or logos (lagging, private, gameable); subjective code taste (no human scoring);
