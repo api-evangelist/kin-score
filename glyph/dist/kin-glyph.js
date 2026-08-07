@@ -42,7 +42,15 @@ const FACETS = [
 
    Fourteen as of 0.6. Was twelve at 0.4; `agent_card` shipped in 0.5.1 and was
    never drawn, so for two days the sun was silently a ray short of the score it
-   was illustrating. `dry_run_mode` is new in 0.6. */
+   was illustrating. `dry_run_mode` is new in 0.6.
+
+   Slot 8 was `asyncapi_events` until rubric 0.9 renamed and widened it to
+   `event_surface_described` — it had read only the asyncapi/ directory, naming the
+   artifact rather than the capability, and so scored false for the 125 providers who
+   describe their event surface in OpenAPI `webhooks`/`callbacks` instead. The rename
+   was not carried here or into build_listings.py, so the index builder dropped the
+   dimension from every badge with a warning nobody was reading. Same slot, same label,
+   so this is a rename and not a reordering. */
 const DIMENSIONS = [
   { id: 'spec_presence',      label: 'Machine-Readable Contract' },
   { id: 'agentic_access',     label: 'Agentic Access Contract' },
@@ -52,7 +60,7 @@ const DIMENSIONS = [
   { id: 'error_semantics',    label: 'Stable Error Semantics' },
   { id: 'openapi_examples',   label: 'Request/Response Examples' },
   { id: 'rate_limit_signal',  label: 'Rate-Limit Signaling' },
-  { id: 'asyncapi_events',    label: 'Typed Event Surface' },
+  { id: 'event_surface_described', label: 'Typed Event Surface' },
   { id: 'agent_skills',       label: 'Agent Skills' },
   { id: 'well_known_catalog', label: 'Well-Known Catalog' },
   { id: 'consent_identity',   label: 'Consent & Bot Identity' },

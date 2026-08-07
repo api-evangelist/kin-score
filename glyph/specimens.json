@@ -22,7 +22,7 @@
    "error_semantics": true,
    "openapi_examples": false,
    "rate_limit_signal": true,
-   "asyncapi_events": true,
+   "event_surface_described": true,
    "agent_skills": true,
    "well_known_catalog": false,
    "consent_identity": false
@@ -51,7 +51,7 @@
    "error_semantics": true,
    "openapi_examples": false,
    "rate_limit_signal": true,
-   "asyncapi_events": true,
+   "event_surface_described": true,
    "agent_skills": true,
    "well_known_catalog": true,
    "consent_identity": true
@@ -80,7 +80,7 @@
    "error_semantics": false,
    "openapi_examples": false,
    "rate_limit_signal": false,
-   "asyncapi_events": false,
+   "event_surface_described": false,
    "agent_skills": false,
    "well_known_catalog": false,
    "consent_identity": false
@@ -109,7 +109,7 @@
    "error_semantics": false,
    "openapi_examples": false,
    "rate_limit_signal": false,
-   "asyncapi_events": false,
+   "event_surface_described": false,
    "agent_skills": false,
    "well_known_catalog": false,
    "consent_identity": false
@@ -138,7 +138,7 @@
    "error_semantics": false,
    "openapi_examples": false,
    "rate_limit_signal": false,
-   "asyncapi_events": true,
+   "event_surface_described": true,
    "agent_skills": true,
    "well_known_catalog": false,
    "consent_identity": false
