@@ -558,6 +558,14 @@ rather than zero.
 | OpenAPI `securitySchemes` | an `x402Payment` scheme (`X-Payment` header) declared alongside `apiKey` |
 | Operations | 6 of 18 declare `x402Payment` in their `security` |
 
+**The provider has committed to the shape.** Told on 2026-08-06 which part of their implementation
+the rubric would most likely read, IBANforge answered: *"the part you called load-bearing — the
+`x402Payment` securityScheme carried on the operations, so the price is readable from the contract —
+is the part we consider stable. If the check is built against that shape, it will keep holding."*
+That is a provider volunteering a stability guarantee for a check that does not exist yet, which is
+about as good as a design input gets. It does not bind them and it is n=1, but it removes the usual
+objection that building against one implementation risks building against a moving target.
+
 **The finding that matters for the rubric: x402 is readable from the contract, not only from a
 well-known.** That is the difference between a dimension that needs its own fetcher and one that
 falls out of spec parsing the rubric already does. A provider that prices per call in its OpenAPI has
