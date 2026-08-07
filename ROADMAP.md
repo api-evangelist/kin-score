@@ -588,6 +588,69 @@ commerce dimension, and it should be built first, before any protocol-presence c
 - **Do not let x402 stand in for the whole family.** UCP, ACP and AP2 remain unread. x402 is first
   here only because a provider shipped it into view.
 
+## Attention is a signal, and its absence arrives before the endpoint dies
+
+Two related items. The first is small and overdue; the second is the one worth building.
+
+### 1. `x-status` should diminish the score — it currently does nothing
+
+37 providers in the catalog carry `x-acquired-by`, 25 carry `x-status: defunct`, and the rubric
+reads none of it. So an acquired company whose endpoints have gone dark scores as a provider that
+let its API rot, and a defunct one scores as a neglectful one. Same number, opposite meaning.
+
+Diminish rather than zero. An acquired company's contract may still be live and still worth
+calling; what has ended is the *stewardship*, and that is what the score should say. The
+conventions and the observed vocabulary drift are documented in
+`api-search/network/CATALOG-RELATIONSHIPS.md` — including the company-versus-surface split, which
+matters here because `x-status: defunct` on the company and `x-api-status: dead` on the surface
+should move different facets.
+
+**This is a lagging, binary signal.** By the time a company is marked acquired the interesting
+part happened eighteen months earlier. Which is the second item.
+
+### 2. Communication cadence — the leading indicator nobody scores
+
+**You can tell an API is losing steam long before anything 404s, and the tell is that the
+provider stops talking about it.** Releases thin out. The changelog goes quiet. The blog moves on
+to the company's newer product. The press releases stop mentioning the API. None of that breaks
+a single endpoint, and all of it precedes the break by a year or more.
+
+Every facet in this rubric measures an artifact's *existence*. Not one measures whether anyone is
+still tending it. A spec published in 2019 and never touched scores identically to one revised
+last month.
+
+**The data is already here.** Across `all/*/blogs/`: **7,369 providers with at least one post,
+199,492 posts, and 195,874 of them — 98% — carrying a date in the filename.** Cadence is
+directly computable today, on a corpus that already exists for another purpose.
+
+What to measure, and what not to:
+
+- **Change in cadence, not volume.** A provider posting monthly for three years and then nothing
+  for nine months is the signal. Raw volume just re-measures company size, which the score
+  already leaks enough of.
+- **Recency against the provider's own baseline**, so a quarterly publisher is not punished for
+  being quarterly.
+- **Where the talk went, not just whether it stopped.** A company that shipped forty posts last
+  year and none of them mention the API is a different finding from one that stopped posting.
+  That distinction is the actual expert read and it is the harder half.
+- **Weight the API-adjacent surfaces above the corporate blog** — changelog and release notes
+  first, developer blog second, press releases last. A press release is marketing; a changelog is
+  maintenance.
+
+**The trap, and it is the same one this rubric keeps walking into.** *Absence in our corpus is
+not absence at the provider.* Blog harvest coverage is uneven — 15,223 `blogs/` directories exist
+and only 7,369 have a post in them — and a provider we never successfully pulled would score as
+one that went silent. That is roadmap#16's unfetched pointer and the shelled job corpora in a
+third costume. **This check must be able to say "we did not look" as distinctly as "they stopped
+talking", and must never convert the first into the second.** If the harvest state cannot be
+established for a provider, the dimension is `unmeasured`, not zero.
+
+Sequencing: land `x-status` first because it is a day of work and corrects a live wrong number.
+Cadence needs the harvest-coverage question answered before a single point rides on it — but the
+corpus is sitting there, and a *report* on cadence needs no rubric change at all. That is probably
+the honest first move: measure it, publish the finding, and only score it once the measure has
+survived contact with the catalog.
+
 ## A contract you cannot call — placeholder and template-only servers
 ### `SHIPPED IN 0.6 — `servers_resolvable`, 10,950 of 87,612 specs uncallable`
 
