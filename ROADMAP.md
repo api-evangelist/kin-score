@@ -730,6 +730,74 @@ programme 55.1, both above their sector's 41.6 average, while the AEMC — which
 initially recorded as having no API at all until an undocumented one was found in its own JavaScript.
 Three regulators, one market, three entirely different postures.
 
+## Header Literacy — does the contract describe the wire? (proposed for 1.0)
+
+The rubric knows about exactly two headers. `idempotency_key` and `rate_limit_headers` are the only
+checks in `scoring.yml` that read a header name, and both sit inside other facets. Meanwhile a header
+is the single most-used extension point in HTTP and the part of an API that a contract most often
+fails to describe — which means an agent reading the contract cannot construct a correct request.
+
+**The measurement that motivates it.** A pass over 119,030 specification files across all 26,641
+providers in `all/`, extracting every `in: header` parameter and every `headers:` mapping key, then
+case-folding per RFC 9110:
+
+| | |
+|---|---|
+| Distinct header names declared | **5,078** |
+| Declared by ≥25 providers | **69** |
+| Declared by ≥100 providers | **9** |
+
+Twenty-six thousand providers and a shared vocabulary sixty-nine headers wide. Four findings come
+straight out of that distribution, and each one is a candidate check:
+
+1. **Case fragmentation is rampant and nothing catches it.** Field names are case-insensitive
+   (RFC 9110 §5.1), and the catalog spells `x-api-key` **seven different ways across 667 providers**;
+   `apikey` six ways; `api-key` five; `Idempotency-Key` four. The rules catalog already
+   lints this — `openapi-headers-hyphenated-pascal-case-error` — and it is enforced nowhere. Cheap,
+   objective, and it moves real numbers.
+2. **Lifecycle headers do not exist in practice.** `Deprecation` appears in **3** providers and
+   `Sunset` in **6**, out of 26,641. The market's answer to "how will I know when this endpoint
+   dies" is a blog post. This is the same defect *Change on the Agent Surface* argues from the MCP
+   side, and it is measurable here at catalog scale.
+3. **The de facto beat the standard 3.5:1.** `X-RateLimit-*` is declared by 96 providers, the
+   RFC-track `RateLimit-*` by 27. A check that credits only the standard form would score the market
+   as worse than it is; a check that credits both, and reports the split, is the honest one.
+4. **Response headers are the blind spot.** Most contracts describe request headers and stop. What
+   an agent needs mid-run — the rate-limit state, the correlation id to quote in a ticket, the
+   deprecation warning — travels in the response, and `components.headers` is largely empty across
+   the corpus.
+
+**Proposed facet — `header_literacy`.** `headers_declared`, `headers_centralized` (uses
+`components.headers` rather than repeating inline), `response_headers_documented`,
+`correlation_header`, `deprecation_sunset_headers`, `conditional_request_headers` (`ETag`/`If-Match`
+on mutable resources), `consistent_header_casing` (the fragmentation check), and one negative:
+`auth_not_raw_parameter` — an `Authorization` header declared as an ordinary parameter instead of a
+`securityScheme`, which is common and which breaks every generated client. The two existing header
+checks move into this facet rather than being reinvented.
+
+**Into the conditional regulatory layer.** Where a regime mandates headers, check the contract
+declares them: open banking → the `x-fapi-*` family (95 providers declare `x-fapi-interaction-id`
+today, so the signal is live, not hypothetical); CDR → `x-v`/`x-min-v`/`x-cds-client-headers`;
+CMS/ONC → the FHIR async `Prefer`/`Content-Location` pair. This slots into the existing regime map
+with no new machinery.
+
+**The constraint that has to be written into the rubric text, not discovered later.** This facet
+scores what a contract **documents**, never what a deployment **does**. The regime-mandated headers
+are request headers that only a credentialed caller can observe. And the regulation-adjacent
+*response* headers score zero from the contract for a structural reason, not a market one:
+`Strict-Transport-Security` appears in 33 providers' specs, `Content-Security-Policy` in 4, and
+`Sec-GPC`, `DPoP`, `Permissions-Policy` and `Clear-Site-Data` in **none** — because those are set at
+the edge and nobody documents them in an OpenAPI. Scoring them from the contract would punish
+providers for a convention that does not exist. They belong to a **separate edge-probe check**,
+which is genuinely observable without credentials and which pairs naturally with the Security
+Posture layer proposed below. Conflating the two would be `soft-404`-shaped false credit in a new
+costume.
+
+**Dependency.** 0.9.1 is still dry-run and its `--write` is held for the next APIs.io rebuild. This
+lands after that, as 1.0, with bands recut afterwards. Backing catalog:
+[headers.apievangelist.com](https://headers.apievangelist.com) and the `/headers/` section on
+APIs.io.
+
 ## Standalone Security Posture layer (under consideration)
 
 Security signals currently live across two facets (operational_transparency, commercial_clarity) and
