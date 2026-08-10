@@ -743,11 +743,11 @@ case-folding per RFC 9110:
 
 | | |
 |---|---|
-| Distinct header names declared | **5,078** |
-| Declared by ≥25 providers | **69** |
+| Distinct header names declared | **5,074** |
+| Declared by ≥25 providers | **67** |
 | Declared by ≥100 providers | **9** |
 
-Twenty-six thousand providers and a shared vocabulary sixty-nine headers wide. Four findings come
+Twenty-six thousand providers and a shared vocabulary sixty-seven headers wide. Four findings come
 straight out of that distribution, and each one is a candidate check:
 
 1. **Case fragmentation is rampant and nothing catches it.** Field names are case-insensitive
