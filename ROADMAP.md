@@ -7,6 +7,98 @@ has shipped.
 
 ---
 
+## Status after 0.9.3 (2026-08-10)
+
+**0.9.3 closes the presence-vs-evidence sweep and makes the band gate disclose itself.**
+`conformance_declared` now reads the artifact for a real assertion (57 providers lose a credit they
+had not earned; reading both the `standards:` and `assertions:` spellings kept 30 others from being
+zeroed wrongly), `llms_txt_published` requires an actual `.txt`, and `band_gated_from` names the band
+a gate-demoted score would otherwise have earned. Full detail in the CHANGELOG.
+
+**⚠ NOT YET APPLIED TO PUBLISHED SCORES.** Published scores are **0.9.1**; the engine is now
+**0.9.3**, carrying the deferred 0.9.2 and 0.9.3 movement together. The `--write` rescore is still
+held for the next APIs.io rebuild. Combined pending movement: **4,396** providers lose the
+`.well-known` discoverability credit, **3,072** lose the agent `well_known_catalog` dimension, **57**
+lose the conformance credit, **1** loses the llms credit, and **1,024** gain a `band_gated_from`
+field without their score changing. **≥299 change band, every move downward, including 7 exemplar →
+strong.**
+
+### The presence-vs-evidence sweep is now CLOSED
+
+The 0.9.2 entry asked for a deliberate audit rather than a fourth accident. It ran, and the answer is
+that `well-known` was the outlier rather than the pattern:
+
+| check | credited | falsely credited | status |
+|---|---:|---:|---|
+| `well_known_published` | 5,743 | **4,396** | fixed 0.9.2 |
+| `conformance_declared` | 4,475 | **57** | fixed 0.9.3 |
+| `llms_txt_published` | 6,966 | **1** | fixed 0.9.3 |
+| `overlays_published` | 2,299 | **0** | clean, no change |
+
+`well-known` was different for a reason worth keeping: probe artifacts record negative results *by
+design*, so the directory exists whether or not anything was found. `conformance/`, `llms/` and
+`overlays/` are filled with real content, which is why directory-presence happened to be a fair proxy
+there. **The lesson generalises to "any artifact directory that can hold a recorded absence,"** not
+to artifact directories at large.
+
+### CLOSED — the published band contradicts the published range
+
+Raised against the travel quartet under 0.6. **Resolved for the composite:** zero of 26,381 scored
+providers carry a composite band that disagrees with its score, and the ranges quoted in the original
+entry (45–59.9, 15–29.9) are pre-recalibration. The live remnant was on the *agent* axis, where the
+gate legitimately demotes — and that is what `band_gated_from` fixes, by the same resolution the
+original entry proposed: emit the gate as its own field so a label can never silently disagree with
+the number beside it.
+
+### REJECTED — `x-status` should diminish the score
+
+The 0.6-era entry is right that `x-status` appears nowhere in `score.rb`, and **1,601 providers carry
+one**. It does not follow that scoring it would improve anything, and the data says it would not:
+
+- **681 of 706 `dead` providers already score `minimal`**; 37 of 38 `dormant` likewise.
+- **Zero dead or dormant providers sit at Strong or Exemplar.**
+
+A defunct company already scores at the floor, because it publishes nothing — the rubric reaches the
+right answer through evidence rather than through a label. And the largest class is `acquired` (678),
+where a penalty would be actively wrong: acquisition does not kill an API.
+
+**What the measurement did surface is a data-quality problem.** `x-status` is not a controlled
+vocabulary — roughly **100 distinct values** (`defunct`, `defunct-domain`, `defunct-brand`,
+`acquired-defunct`, `defunct-or-acquired`, `deadpooled`…), including two entries where an entire YAML
+mapping was stringified into the field: a Chapter 11 case record and an acquisition record. That is
+worth normalising, and worth using for **listing and visibility** decisions rather than for score.
+Carried forward as a catalog task, not a rubric one.
+
+### OPEN — the reader audit, now measured
+
+0.9.1 asked what else the reader cannot parse. Measured across the catalog:
+
+| format | files | providers | providers with NO OpenAPI/AsyncAPI |
+|---|---:|---:|---:|
+| Protobuf / gRPC | 374 | 74 | **41** |
+| Postman collection | — | — | **31** |
+| WSDL | 45 | 10 | — |
+| API Blueprint | 8 | 7 | — |
+| RAML | 2 | 1 | — |
+| GraphQL | 98 | 94 | 268 → **already read** |
+
+**GraphQL is the control case and it passes:** 268 providers publish a GraphQL schema and no
+OpenAPI, and not one scores zero contract quality — mean 46.8, max 74.1. The reader fix works when it
+is implemented.
+
+**The live population is 72 providers** — 41 gRPC-only and 31 Postman-only — scored at or near zero
+contract quality while publishing a machine-readable contract. Examples: `aalyria`, `agibot`,
+`celer-network` (`.proto`), and three Defense Department agencies whose only contract is a Postman
+collection. That is real but an order of magnitude smaller than Swagger 2.0's 90 providers and 5,800
+documents, so it is a fair next reader fix rather than an emergency. WSDL, RAML and API Blueprint are
+long-tail and can ride along.
+
+Still unmeasured from the 0.9.1 list: out-of-band auth schemes documented in prose
+(`security_schemes_defined`), provenance markers missed on large documents, and the
+capability-outside-the-contract cases in blockchain and data/analytics.
+
+---
+
 ## Status after 0.9.2 (2026-08-10)
 
 **0.9.2 — a well-known artifact is a probe result, not a publication.** A reader fix. The
