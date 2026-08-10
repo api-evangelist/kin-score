@@ -5,6 +5,59 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.9.2 — 2026-08-10
+
+**A file that documents an absence was being read as a presence.** The `well-known/` artifact in a
+provider repo is a *probe result*, not a publication: it records what a live GET returned on every
+host in `apis.yml`, including the entirely ordinary answer that every path 404s. The better-behaved
+harvests say so explicitly — Twilio's artifact ends *"no WellKnown rating pointer is emitted because
+no catalog was found."*
+
+The scorer never read any of it. `well_known_published` was `repo_has?(slug, "well-known")` — does
+the directory exist and contain a file — and `well_known_catalog` matched a `WellKnown` entry in the
+provider's `common:` block. Both credited the *existence of a record* rather than the *existence of
+a document*, which is the one distinction the artifact was written to capture.
+
+This is a reader fix, not a rubric change. No weight, point value, check, band or rule text moved.
+The rule for `well_known_published` has always read *"well-known/ carries an api-catalog,
+security.txt, or a protected-resource doc"*; the code now reads the artifact for one.
+
+**How much of the catalog it affected.** Measured 2026-08-10 across `all/*/well-known/`:
+
+| | providers |
+|---|---:|
+| carried a `well-known/` directory → **credited** | **5,875** |
+| actually serve a 2xx on a rubric-named `/.well-known/` document | **1,345** |
+| any 2xx on any `/.well-known/` path | 1,399 |
+| answered 200 with an HTML shell only (a soft 404) | 202 |
+| directory present but empty | 132 |
+| **credited without evidence** | **4,530** |
+
+On the agent side, **2,169 of the 3,265** providers emitting a `WellKnown`/`APICatalog` pointer in
+`common:` had no served document behind it, and each collected the 4-point `well_known_catalog`
+dimension for it.
+
+**How it surfaced.** Scoring Solo.io for v1.3 of *The State of API Management*. Solo.io moved from
+43.8 to 81.9 in a quarter on genuine first-party publishing — an MCP server and agent skills — but
+part of the jump was a `.well-known` credit awarded for an artifact whose own note reads *"No
+/.well-known/ discovery documents are served on any Solo.io host… Absence here is a valid, recorded
+result — nothing was fabricated."* It would also have broken that report's headline finding, which
+is that all five agentic primitives sit at absolute zero across the market. The report published
+Solo.io at 80.8 / 59.5 with the credit withheld and the adjustment recorded; **0.9.2 makes that the
+scorer's own answer** — a `--only=solo-io` run now returns exactly 80.8 composite, 81.5
+discoverability and 59.5 agent readiness.
+
+**What changed in `score.rb`.** A memoized `well_known_docs(slug)` walks the artifact's
+`hosts[].documents[]` and collects the paths that genuinely answered. Two traps it is written
+around: these artifacts also probe `/llms.txt`, `/openapi.json` and live API endpoints, so "has a
+200 somewhere" is not a discovery surface and the path must contain `/.well-known/`; and a 200 with
+no saved `file:` whose note describes an HTML or SPA shell is a soft 404 — Stripe's artifact records
+precisely that for `dashboard.stripe.com`. `well_known_real?` backs the discoverability check;
+`well_known_catalog?` backs the narrower agent dimension, which asks specifically for the RFC 9727
+`api-catalog` linkset. Both keep a declared-pointer fallback for providers we have **never probed**,
+so a company that genuinely serves a `security.txt` is not scored to zero for our own missing
+artifact; wherever a probe exists, the probe is the evidence.
+
 ## 0.9.1 — 2026-08-04
 
 **A contract the reader cannot parse is indistinguishable from a contract that does not exist.**
