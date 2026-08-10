@@ -7,6 +7,74 @@ has shipped.
 
 ---
 
+## Status after 0.9.2 (2026-08-10)
+
+**0.9.2 — a well-known artifact is a probe result, not a publication.** A reader fix. The
+`well-known/` artifact records what a live GET returned on every host in `apis.yml`, including the
+entirely ordinary answer that every path 404s — and the better-behaved harvests say so outright:
+Twilio's ends *"no WellKnown rating pointer is emitted because no catalog was found."*
+
+The scorer read none of it. `well_known_published` was `repo_has?(slug, "well-known")` — does the
+folder exist and hold a file — and `well_known_catalog` matched a `WellKnown` entry in `common:`.
+Both credited the **existence of a record** rather than the **existence of a document**, which is the
+one distinction the artifact was written to capture. No weight, point value, check, band or rule text
+moved; the rule has always read *"well-known/ carries an api-catalog, security.txt, or a
+protected-resource doc"*, and the code now reads the artifact for one.
+
+Measured across `all/*/well-known/`: **5,875** providers carried the directory and were credited;
+**1,345** actually serve a 2xx on a rubric-named `/.well-known/` path. **4,530** were credited
+without evidence, including 132 empty directories and 202 whose only 200 was an HTML shell. On the
+agent side, **2,169 of 3,265** `WellKnown` pointers had no served document behind them.
+
+Written around two traps worth remembering: these artifacts also probe `/llms.txt`, `/openapi.json`
+and live API endpoints, so "has a 200 somewhere" is not a discovery surface and the path must contain
+`/.well-known/`; and a 200 with no saved `file:` whose note describes an HTML or SPA shell is a soft
+404, which is exactly what Stripe's artifact records for `dashboard.stripe.com`. A declared pointer
+still counts for a provider we have **never probed**, so a company genuinely serving a `security.txt`
+is not scored to zero for our own missing artifact.
+
+Found while scoring Solo.io for v1.3 of *The State of API Management*, where it would have broken the
+report's headline finding that all five agentic primitives sit at absolute zero across the market.
+That report published Solo.io at 80.8 / 59.5 with the credit withheld by hand; 0.9.2 makes that the
+scorer's own answer — `--only=solo-io` returns exactly 80.8 composite, 81.5 discoverability, 59.5
+agent readiness.
+
+**⚠ NOT YET APPLIED TO PUBLISHED SCORES.** 0.9.2 is dry-run only. The `--write` rescore is held for
+the **next APIs.io rebuild** so the engine change, the mass re-score and the site deploy land
+together. **Published scores are currently 0.9.1** — the 2026-08-10 full refresh — while the engine
+is 0.9.2.
+
+When it runs, measured against the 26,381 stored score artifacts:
+
+| effect | providers |
+|---|---:|
+| lose the 6-pt `well_known_published` credit | **4,396** |
+| lose the 4-pt `well_known_catalog` dimension | **3,072** |
+| change band (of 3,718 modelled) | **≥299** |
+
+Composite falls **1.0–1.1** per affected provider, every delta negative and every band move downward:
+167 emerging → minimal, 44 strong → developing, 43 developing → thin, 38 thin → emerging, and **7
+exemplar → strong**. The Exemplar demotions are the ones to eyeball first — that band carries the
+most public weight. Re-cut the bands afterwards.
+
+**What this opens next.**
+
+- **Audit the other presence-vs-evidence checks.** This is the third defect of one shape, after the
+  soft-404 credit and the silent-zero paths: a check that asks whether a *file* exists where the
+  rubric asks whether a *capability* is served. `conformance_declared` and `overlays` are both still
+  `repo_has?` calls, and every artifact directory we fill by sweep rather than by harvest is a
+  candidate. Worth a deliberate sweep rather than a fourth accident.
+- **Emit no pointer when the probe finds nothing.** Twilio's harvest gets this right and Solo.io's
+  does not, which is why 2,169 pointers resolve to a 404. The scorer no longer trusts them, but the
+  `common:` block is still wrong as data — it advertises a surface the provider does not serve. Fix
+  it at the emitter, then the pointer and the probe agree again.
+- **A discoverability recalibration.** Removing 4,396 false credits pulls the facet's catalog mean
+  down. Discoverability was already the facet that flattered everyone — it averaged 84.6 across 252
+  organizations with not one provider at zero in eight markets. Once the rescore lands, that mean is
+  worth re-reading to see whether the facet now discriminates or still needs a harder bar.
+
+---
+
 ## Status after 0.9.1 (2026-08-04)
 
 **0.9.1 — Swagger 2.0 is a contract.** A reader fix. A 2.0 document was dropped from the spec index
@@ -33,12 +101,15 @@ or band moved:
    classifies in 38 ms, so the index stays fast. Column-zero matters: a `swagger:` nested in a
    description or an example is not a declaration.
 
-**⚠ NOT YET APPLIED TO PUBLISHED SCORES.** 0.9.1 is dry-run only. The `--write` rescore is
-deliberately held until the **next APIs.io rebuild**, so the engine change, the mass re-score and
-the site deploy land together rather than leaving published numbers disagreeing with the rubric that
-produced them. Until then every published score is 0.9. When it runs, expect movement concentrated
-in the ~203 providers who gained a readable corpus — Microsoft Azure (1,659 of 1,660 documents are
-2.0) and Mastercard (165 of 208) the largest — and re-cut the bands afterwards.
+**✅ APPLIED — the rescore ran in the 2026-08-10 full refresh** (`signals`: "Full refresh 2026-08-10
+— rebuilt from all/* (8 waves, 0 errors)"). Every published score now carries
+`schema_version: 0.9.1`, on the provider pages and in the `all/*/kin/` artifacts alike. Movement was
+concentrated in the ~203 providers who gained a readable corpus — Microsoft Azure (1,659 of 1,660
+documents are 2.0) and Mastercard (165 of 208) the largest.
+
+*Superseded note, kept for the record: this section previously read "NOT YET APPLIED — until then
+every published score is 0.9," which was true when written on 2026-08-04 and stopped being true when
+the refresh ran.*
 
 **What this opens next.**
 
