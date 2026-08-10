@@ -5,6 +5,50 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+## 0.9.3 — 2026-08-10
+
+**Finishing the sweep 0.9.2 started, and making the band gate say what it did.** Three fixes, all in
+the reader or the payload. No weight, point value, check, rule text or band moved.
+
+**1. `conformance_declared` reads the artifact.** The rule reads *"a conformance/ artifact declares
+conformance to named standards"*; the code read `repo_has?(slug, "conformance")`. **33** artifacts
+assert every standard false and **24** carry no assertion list at all — all 57 scored as declaring
+conformance.
+
+The interesting part is what nearly went wrong fixing it. The assertion list lives under `standards:`
+in most artifacts and under `assertions:` in 54 of them. A reader that knew only the first spelling
+would have zeroed **30 providers that genuinely do declare conformance** — trading a false positive
+for a false negative, which is not a fix. Both keys are read, and the corrected number is 57 rather
+than the 87 the first measurement suggested.
+
+**2. `llms_txt_published` requires an actual `llms.txt`.** Exactly one provider in the catalog is
+credited without one, so this is hygiene rather than a correction. It ships anyway: a check that
+reads the folder is the defect whatever its blast radius happens to be today, and leaving the last
+one behind is how there comes to be a fourth accident.
+
+**3. `band_gated_from` — the gate no longer demotes in silence.** Agent Readiness demotes a provider
+out of Agent-Native when idempotency and a stable error envelope are both missing. That gate is
+right, and **1,024 providers** carry a band one step below the band their score implies because of
+it. None of them said so. A provider page printing `score: 59.5` beside `band: agent-ready`, against
+a published table where Agent-Native starts at 46, hands the reader two contradictory facts from the
+same payload — which is precisely the defect the *composite* band carried before recalibration, just
+relocated one axis over.
+
+`band_gated_from` names the band the score alone would have earned. It is **absent when no gate
+fired**, so its presence is the disclosure. It reaches all three surfaces that publish the band: the
+`kin/` artifact, the provider-page frontmatter and the `--explain` payload.
+
+**Nothing moves except the 57 and the 1.** Verified against Solo.io, which returns 80.8 composite and
+59.5 agent readiness unchanged, now carrying `band_gated_from: agent-native`.
+
+**Also fixed, outside the scorer:** the enrichment pipeline emitted the `WellKnown` common-type
+pointer unconditionally, which is how **2,169** providers came to advertise a discovery surface their
+own probe records as 404 on every path. The generator now emits the pointer only on a real 200
+carrying a real document, and treats an HTML/SPA shell as a miss — the same rule the agent-card step
+has always had, for the same reason: the pointer asserts that the *provider* serves that surface.
+0.9.2 already stopped the scorer trusting those pointers, so no score depends on the sweep; the 2,169
+existing records still want one.
+
 ## 0.9.2 — 2026-08-10
 
 **A file that documents an absence was being read as a presence.** The `well-known/` artifact in a
