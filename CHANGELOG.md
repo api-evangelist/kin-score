@@ -5,6 +5,229 @@ Published rubric snapshots live in [`rubric/`](rubric/). The operational rubric 
 maintained in the `api-search` repository (`signals/_data/scoring.yml` + `signals/score.rb`); this
 changelog and the snapshots here are the canonical public record.
 
+> **Backfilled 2026-08-12.** Entries 0.9.4 through 0.11.0 were written after the fact, from the
+> commits in `api-search/signals`. The record had fallen seven versions behind while the work
+> itself was well documented in commit messages — and 0.11.0 in particular shipped inside an
+> unrelated delist commit (`a324bf8`) whose message never names it. The rule that every rubric
+> change is visible here and in the ROADMAP exists precisely so a published score can be traced
+> to a published rubric; these are reconstructed to close that gap.
+>
+> **All eight versions shipped 2026-08-11 and went live in one rebuild**, which took published
+> scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
+> older rubric.
+
+## 0.11.0 — 2026-08-11
+
+**A second conditional facet, and the math generalised to hold N of them.** Open-source
+providers were being measured against a surface they do not have, and the rubric had only one
+slot for "this facet applies to some providers."
+
+**1. `open_source` — Open Source Surface (weight 0.10, conditional).** Four checks read from a
+live GitHub API read of the provider's own product repository: a published
+vulnerability-disclosure path (`os_security_policy`, 14 pts, 35.0% coverage), a documented
+contribution route (`os_contribution_guide`, 10, 62.4%), a published release history
+(`os_releases`, 10, 76.0%), and a stated code of conduct (`os_code_of_conduct`, 6, 49.6%).
+
+**Additive, NOT an exemption** (roadmap#39). The obvious fix for an open-source provider scoring
+thin on `commercial_clarity` — no pricing page, no SLA — is to exempt it. That was measured and
+rejected: exemption shrinks the denominator and strips a provider of points it *does* earn,
+costing WSO2 a band. Exemption treats a difference as an absence. Nothing is removed; a facet is
+added, scoring what an open-source provider actually publishes on the same standard as everyone
+else.
+
+**Read from the harvest, never from `common[]` pointers.** Every other provider-level check reads
+the pointers. These deliberately do not: a pointer records that *we* wired something, the harvest
+records that the *provider* published something, and scoring the pointer docks a provider for
+catalog work we had not got to. Not theoretical — 647 of the first evidence file's 1,151 records
+had been reconstructed from pointers after a partial run clobbered the originals, and they
+disagreed with a live read systematically (CodeOfConduct +22.2 points, ContributionGuide +18.0,
+SecurityPolicy +13.9). All 647 were re-harvested live before the facet shipped, and reconstructed
+records are excluded by `score.rb` regardless.
+
+**`IssueTracker` is deliberately not a check.** It reads 100.0% across all 1,148 live-harvested
+repositories, because the harvester derives `/issues` from the repository URL and every GitHub
+repo has one. It observes the harvester, not the provider.
+
+**Unreadable is not missing.** A repository we could not read drops out of the facet entirely
+rather than scoring zero — so an `open_source` zero can only mean we looked and it was absent.
+
+**2. The conditional-facet math now takes N facets, not one.** Was a single hard-coded
+`regulatory` slice:
+
+    composite = (1 − 0.15) × base + 0.15 × facet[regulatory]
+
+Now:
+
+    base      = Σ(base_weight[f] × facet[f])      # 6 base facets, weights sum to 1.0
+    W         = Σ(weight[c]) over APPLICABLE conditional facets
+    composite = (1 − W) × base + Σ(weight[c] × facet[c])
+
+This reduces exactly to the previous form, so **no provider that is neither regulated nor open
+source moves at all**. A provider that is both carries 0.25 conditional and 0.75 base.
+
+**3. Attribution exception for the `os_*` checks.** They are classified `harvest`, whose zeros
+normally may not be stated as market findings without a live probe — because a harvest zero
+cannot distinguish "they never published it" from "we never fetched it." For these four the
+harvest *is* the probe: a direct read across the full set in one pass, with the read-success gate
+above. Their zeros are reportable.
+
+## 0.10.5 — 2026-08-11
+
+**Score the OpenAPI version the provider published, not the one we produced** (roadmap#45). Two
+defects in two lines.
+
+`start_with?` is not a version comparison. `refine-openapis` upgrades harvested documents to
+OpenAPI 3.2.0, and `"3.2.0"` begins with neither `"3.1"` nor `"3.0"`, so **6,861 specs across 339
+providers** fell through both checks and scored zero — read as publishing no recognisable version
+at all.
+
+The deeper defect: the version being read was **ours**. Of those 339 providers, 275 hold a 3.2
+document only because we upgraded it (154 from 3.1, 121 from 3.0) and exactly three publish 3.2
+themselves. Crediting the refined document rewards our transformation; scoring it zero penalises
+them for it. Neither says anything about the provider.
+
+The checks now read `openapi/_original/`, which refine writes before transforming and which 7,016
+providers carry, and test **membership of the set of versions published** rather than one
+collapsed value — these are any-match checks and a provider can ship several versions at once.
+Three intermediate fixes were wrong and are recorded because the failure mode repeats: reading
+only a same-named original left per-tag splits unmatched; requiring the originals to agree left
+Anaconda (three 3.0, two 3.1) scoring zero; taking the max made the checks mutually exclusive.
+
+## 0.10.4 — 2026-08-11
+
+**The weak regime tier stops matching word fragments** (roadmap#42) — a regression introduced by
+0.10.0. `tag_forms()` expands every tag into its words and the weak tier matched that word set, so
+a compound whose meaning lives in the qualifier matched on the head noun alone. **Message Broker,
+Microsoft Exchange, Ad Exchange, Freight Brokerage, Customs Brokerage, Trading Card** and a video
+game's **Grand Exchange** were all scored against MiFID II. 337 providers matched a weak securities
+tag on a fragment with no whole-tag match.
+
+Phrase-only in the weak tier alone would have been the wrong fix: it un-regulates Citadel
+Securities (Electronic Trading), Tradeweb, Trumid, Alpaca (FX Trading) and every Broker-Dealer and
+Prime Brokerage firm — and because the regulatory facet averages below the base, escaping it is a
+*reward*. That trades a visible error for a quieter, more generous one. So both halves shipped
+together: the securities compounds were promoted to the strong tier (broker-dealer, prime
+brokerage, algorithmic/electronic/proprietary/stock/spot/fx/copy/social/options/futures trading,
+exchange-traded fund, decentralized and crypto exchange, market maker, order book) as whole tags,
+and the weak tier went phrase-only.
+
+## 0.10.3 — 2026-08-11
+
+**Provenance grading wired for the derived tier — inert** (roadmap#35, remaining half). The
+instinct was to backfill `rules/`, `json-schema/`, `json-ld/` and `vocabulary/` for the thinner
+cohorts so all three match. That would have recreated the distortion 0.10.2 had just removed, in a
+larger place.
+
+`governance` rests 42 of its 48 points on artifacts API Evangelist writes — the Spectral ruleset
+alone is 33 — at weight 0.12, roughly **10.5% of every composite**. `contract_quality` carries
+another 21 points of json-schema and json-ld derived from the provider's own spec by our tooling.
+None of it was provenance-graded, so all of it credited at 1.00.
+
+Wired inert exactly as plans/rate-limits shipped: `unknown` credits 1.00, and unmarked is what
+these artifacts are. Of 5,785 rules files exactly **one** carries a `method:`; of 120,553
+json-schema files, **ten**. The tell is unusually clean for rules — 4,516 of 5,785 name their own
+generator in the header.
+
+## 0.10.2 — 2026-08-11
+
+**The prepared provenance grading now bites** (roadmap#35). No rubric edit; the data changed.
+**12,214 artifacts across 4,067 providers** were stamped `method: generated` on the evidence that
+they carry no `method:` and a `created:` of 2026-05-04 or 2026-05-08 — the two bulk sweep dates.
+
+These four checks are ~10.4% of every composite, and their coverage tracked which enrichment wave
+reached which roster: API Management 100%, US Payments 57%, US Banking 34%. **A report comparing
+those markets was partly comparing our own collection history.** The fix was not to scaffold the
+thinner cohorts up to match; it was to stop calling our sweep the provider's evidence.
+
+| cohort | before | after |
+|---|---|---|
+| API Management | 54.5 | 47.2 |
+| US Payments | 42.9 | 40.7 |
+| US Banking | 27.6 | 26.3 |
+| **cross-cohort spread** | **27.0** | **20.9** |
+
+~9,300 unmarked artifacts created on other dates were deliberately left alone and still credit 1.00.
+
+## 0.10.1 — 2026-08-11
+
+**Telecom regime drops `voice` and `messaging`.** rtcStats — a WebRTC observability tool — was
+scored against the FCC's CPNI rules, Ofcom, ACMA, the ITU Constitution and the ePrivacy Directive
+on the strength of a single tag: `voice`. It reported this itself
+(`api-evangelist/rtcstats#1`) while trying to reconcile its own score.
+
+The regime is drawn around carrier network capability — its own `basis` says "number verification,
+SIM swap, device location". `voice` and `messaging` are product words that mean something else
+almost everywhere they appear: `messaging` overwhelmingly means a message queue. Measured over all
+26,598 catalog `apis.yml` (17,792 carry top-level tags): telecom matches **639 → 303**; of the 336
+that leave, 315 become unregulated and 21 move to a better-fitting regime. What leaves includes
+Apache ActiveMQ, Apache RocketMQ, AMQP and Apache ServiceMix — message-queue middleware scored
+against CPNI.
+
+Nothing real is lost: every genuine carrier and CPaaS keeps the regime on a strong tag of its own,
+verified individually (Twilio `SMS`, Vonage `Telecommunications`, Bandwidth and Sinch `CPaaS`).
+`sms` is kept — it names telephone numbering, not a product category. This is the
+`broker`/`exchange` defect from 0.6 in a different regime.
+
+## 0.10.0 — 2026-08-11
+
+**The cohort release.** Everything here was found by running three published Market Report cohorts
+per-provider rather than in aggregate: API Management (36), US Payments (68), US Banking (113).
+
+**1. Regime matching is normalised** (roadmap#34). Regime tags were compared as exact lowercased
+strings, so `Credit Cards` never matched the payments regime's `cards` and Discover was scored with
+no regulatory facet at all. 11 of 68 payments providers matched no regime; Wells Fargo and State
+Street matched none inside a banking cohort. Because the facet averages below the base, **escaping
+it was a reward and thin tagging beat honest tagging**.
+
+The two failed passes are recorded because they are the interesting part. Normalising
+case/separator/plural alone still missed `Credit Cards`, so tags expand to their words — which
+over-matched twice: Bank of America moved to `payments` because the regime lists both `payments`
+and `payment`, which normalise to one string and double-counted a single provider tag; Alloy's
+`Credit Underwriting` matched `insurance` on the fragment `underwriting` at higher specificity.
+Fixed by deduping the regime list and ranking whole-tag matches above word fragments.
+
+Net across 206 providers: 6 gained a regime they should always have had, 0 lost one, 7 swapped
+banking → payments defensibly. Composite mean +0.51, range −3.70..+4.10.
+
+**2. `thresholds:` block** (roadmap#30). Sixteen checks pass on a count crossing a bar, not on one
+artifact appearing, and nothing in the rubric said so — the remediation math credited 12.2 points
+across one cohort that no amount of wiring can deliver. Declarative only; no math change.
+
+## 0.9.4 — 2026-08-11
+
+**Whose gap is it, plus four alias silent zeros.** Writing the first Area Market Report cohort
+per-provider rather than in aggregate exposed that the rubric could say a check was unearned and
+could not say *whose work would earn it*. For a score that measures a provider **as it exists in
+our index**, that is the difference between a market finding and a collection backlog reported as
+one.
+
+**1. The `attribution:` block.** All 120 checks classified `catalog` / `index` / `harvest` / `spec`
+/ `frontier`. No math changed. `score.rb --explain` carries an `actor` on every check row, so a
+cohort pass splits into two work queues without a human sorting it by hand. The rule it enforces:
+**only `spec` and `frontier` zeros may be stated as market findings without a live probe.**
+
+**2. Four alias silent zeros**, found by inventorying the `common[].type` vocabulary the enrichment
+pipeline *writes* against the vocabulary the checks *read*: `SignUp ← Signup|Sign Up|Register|
+Registration`, `LLMsTxt ← LlmsText|LLMsText|LlmsTxt`, `AgentSkill ← AgentSkills`, and
+`Community ← Forums|Forum|Discord|Discourse|Slack`. `LlmsText` is the expensive one: 15 of 36 API
+management providers carry the pointer, `llms_txt_published` credited 2, and live probes confirmed
+21 of 36 serve a real llms.txt.
+
+The MCP near-aliases (`ModelContextProtocol`, `MCPServers`, `MCPClient`, `MCPServerRegistry`,
+`ProxyExistingMCP`, `ExportRESTToMCP`, `MCPServerOverview`) were examined and **deliberately
+rejected** — every one points at a vendor page selling MCP to customers, and crediting the sales
+page would erase the sell-versus-publish finding the report series rests on.
+
+**Still open:** the `LlmsTxt` alias credits a *declared pointer* where we have never probed, which
+reopens the 0.9.2 false-credit hole. On the management cohort: 15 declared, 11 real, 2 soft 404s,
+1 hard 404, 1 pointing at Slack's own llms.txt — four false credits in fifteen. This was **not
+resolved before the 0.11.0 re-score**. Cite the probe, not a scored llms.txt number.
+
+**3. `--explain` is cohort-capable.** `--explain=a,b,c` / `--explain-file=`, with `--explain-out`
+as a directory for more than one slug. `build_spec_index` is paid once either way, so 36 providers
+take ~70s instead of ~41 minutes of looping. Single-slug output verified byte-identical to the
+prior build.
+
 ## 0.9.3 — 2026-08-10
 
 **Finishing the sweep 0.9.2 started, and making the band gate say what it did.** Three fixes, all in

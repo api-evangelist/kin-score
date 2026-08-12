@@ -7,6 +7,65 @@ has shipped.
 
 ---
 
+## Status after 0.11.0 (2026-08-11) — SHIPPED AND PUBLISHED
+
+**0.11.0 is live.** The weekly APIs.io rebuild on 2026-08-11 ran the held `--write` rescore and
+published it across the catalog, so **published scores went from 0.9.1 straight to 0.11.0** — ten
+rubric versions in one step. The "not yet applied" warning carried in every status block below is
+now discharged.
+
+**Band re-cut — anything quoted before 2026-08-11 is on the old rubric.**
+
+| band | before (0.9.x) | after (0.11.0) |
+|---|---|---|
+| exemplar | 341 | **194** |
+| strong | 1,207 | **902** |
+| developing | 3,610 | **3,377** |
+| thin | 3,843 | **4,151** |
+| emerging | — | **6,148** |
+| minimal | 11,100 | **11,628** |
+
+Exemplar nearly halved and strong fell by roughly a quarter. Re-derive rather than reuse: any
+paper, report or cohort figure produced before this date is on a different rubric.
+
+**What 0.11.0 itself added:** a second conditional facet, `open_source` (weight 0.10), scoring the
+maintainership surface an open-source product publishes on its own repository — read from a live
+GitHub harvest, never from `common[]` pointers — and a generalisation of the conditional-facet math
+from one hard-coded slice to N. It is **additive, not an exemption** (roadmap#39): exemption was
+measured, shrinks the denominator, and cost WSO2 a band. Full detail in the CHANGELOG.
+
+### Process failure worth recording
+
+**0.11.0 shipped inside an unrelated commit and named itself nowhere.** The rubric bump, the new
+facet, the generalised math and the scorer changes all rode in `a324bf8` — *"Delist Medidata
+Solutions at the company's request"* — whose message does not mention 0.11.0. There was no
+CHANGELOG entry and no ROADMAP entry, and the same was true of 0.9.4 through 0.10.5: **the public
+record sat seven versions behind the engine while the rebuild published those numbers.**
+
+That is the exact failure the standing rule exists to prevent — a published score must be traceable
+to a published rubric. Entries for 0.9.4 → 0.11.0 and their rubric snapshots were backfilled
+2026-08-12 from the commits, which were themselves well documented. The gap was in the public
+record, not in the thinking.
+
+**Guard for next time:** a rubric version that reaches `signals/_data/scoring.yml` without a
+matching `## <version>` heading in CHANGELOG.md and a `rubric/scoring-<version>.yml` snapshot should
+fail the pre-rebuild gate, the same way a build that would delete live pages does. Cheap to check,
+and it is only ever noticed after the numbers are already public.
+
+### Still open, carried forward
+
+**The `LlmsTxt` alias false-credit was NOT resolved before the re-score.** 0.9.4 made
+`LlmsText|LLMsText|LlmsTxt` readable, which credits a *declared pointer* where we have never
+probed — reopening the 0.9.2 hole. Measured on the management cohort: 15 declared, 11 real, 2 soft
+404s, 1 hard 404, 1 pointing at Slack's own llms.txt. **Four false credits in fifteen, now live in
+published scores.** Two ways to close it, still Kin's call: harvest `llms/` artifacts so the probe
+overrides the pointer (preferred, and it is the collection work the attribution block says is
+ours), or drop the unprobed-pointer fallback entirely — honest, but it re-zeroes every unprobed
+provider catalog-wide and that swing is unmeasured. Until one lands, **cite the probe, not a scored
+llms.txt number.**
+
+---
+
 ## Status after 0.9.3 (2026-08-10)
 
 **0.9.3 closes the presence-vs-evidence sweep and makes the band gate disclose itself.**
