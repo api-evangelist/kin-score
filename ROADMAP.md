@@ -1958,6 +1958,65 @@ zero.
 more scopes" is not a line. The OAuth-granularity-versus-method-mix question needs its own measurement
 before it becomes a rule.
 
+## Authorship has three values, and the score has been reporting two
+
+The provenance layer models authorship as `first-party` or `derived`. A provider reading the rubric
+closely found the consequence before we did: for much of the catalog the **governance facet scores a
+Spectral ruleset API Evangelist generated**, and reports it as the provider's governance.
+
+Kin, 2026-08-14: there are three dimensions to any artifact in a provider repo — **created by them**,
+**created by them but using a vendor**, and **created by us** — and the top layer is very often ours
+regardless, because we take their OpenAPI and add a layer of our own on top of it.
+
+**Six of 32 artifact classes carry an authorship marker.**
+
+| marked | AE-authored | first-party | AE share |
+|---|---|---|---|
+| agentic-access | 6,508 | 18 | **99.7%** |
+| skills | 2,360 | 316 | 88.2% |
+| openapi | 2,618 | 1,254 | 67.6% |
+| mcp | 2,045 | 1,408 | 59.2% |
+| conformance | 2,177 | 2,300 | 48.6% |
+| asyncapi | 732 | 1,135 | 39.2% |
+
+Unmarked: `collections` (7,544 providers), `rules` (3,599), `authentication` (8,786), `security`
+(23,403), `plans` (8,220), `rate-limits` (8,559), `finops` (7,147), `scopes` (2,419), and fifteen more.
+**`collections` and `rules` are the two classes most often ours**, and they are the two with no signal
+at all — which is precisely how AE-generated rulesets came to be scored as provider governance.
+
+**The vendor dimension is real and currently invisible.** A first pass for tooling signatures inside
+`openapi/` — `x-generator`, `x-origin`, Stoplight, Speakeasy, Fern, Scalar, ReadMe, APIMatic, Redocly,
+codegen markers — finds **670 of 7,790 providers (8.6%)**, a floor from one heuristic over one class.
+The distinction matters in both directions: a Stoplight-hosted contract says a provider invested in a
+docs platform; a site-builder `apis.json` says the opposite. Collapsing both into `first-party` loses
+the signal that matters most. The Add-API queue keeps producing the second case — five Mountary-built
+framing shops submitted an auto-generated `apis.json` in a single week.
+
+**The case the binary cannot express at all is the common one.** We take a provider's contract, refine
+it, split it per tag, normalise it to 3.2, register it in an `apis.yml` we author, and lay out the repo
+around it. The substance is theirs; the artifact is ours. That needs two fields —
+**`source_authorship`** (whose substance) and **`artifact_authorship`** (who produced the file) — not
+one.
+
+**What this changes about the claim the score makes.** The Kin Score measures *the completeness of what
+is on the table about a provider* — theirs and ours together. That is a defensible thing for a
+discovery catalog to measure and it is **not** "this company did or did not do the work." Where the
+rubric implies the latter it overclaims, and providers who read it carefully will keep catching that.
+The Market Reports already run this discipline through `attribution:` — what is recoverable by us
+versus what is the vendor's. This is the same argument applied one layer down, to the artifacts
+themselves.
+
+**Direction.** Extend authorship to all 32 classes with evidence and a date; detect the vendor
+dimension during enrichment rather than retroactively; backfill `collections` and `rules` first because
+they are actively distorting a facet; keep crediting an absent marker in full, since unmarked is not
+evidence of derivation. Then decide per facet what it is actually asking — governance scoring our own
+ruleset is not measuring the provider, while contract quality scoring a refined split of their spec
+largely is. Worth considering publishing the split on the rating page: what share of a score rests on
+what they published versus what we produced. Nobody else can publish that number.
+
+Sequenced after the read-only conditional and lifecycle work above, which share the same extraction
+pass. Tracked as roadmap#64; the exchange that surfaced it is roadmap#62.
+
 ## Documenting the whole lifecycle of what you let people create
 
 The read-only conditional stops punishing providers for hazards they cannot have. Its complement is to
