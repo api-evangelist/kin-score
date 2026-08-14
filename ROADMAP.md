@@ -1904,6 +1904,102 @@ the reader-gap class in the 0.9.1 note rather than a market failure. Worth decid
 documented simulation endpoint outside the spec should satisfy the dimension, or whether the honest
 answer stays zero and the prose carries the nuance.
 
+### Measured catalog-wide, and requested by a provider (2026-08-14)
+
+The proposal above was argued from sector zeros. It is now measured across the whole catalog, and a
+provider asked for it independently, which is the strongest form the argument comes in.
+
+**We > Ultrarich** (`wegtultrarich`) wrote in on 2026-08-12: their surface is entirely `GET`, holds no
+state and accepts no credential, and they score 0/4 dry-run, 0/6 typed events and 0/5 self-service
+sign-up. Their framing is the one to keep — *"as it stands a read-only API and an API whose author
+never considered agent safety are indistinguishable in the scoring"* — and they pointed at the 0.7
+OAuth checks as the precedent already in the rubric: vacuously satisfied when the contract declares no
+OAuth, read from the contract, no self-declaration.
+
+**The shape of the catalog.** 553,510 operations across 7,326 providers with a refined OpenAPI. GET
+47.6%, POST 31.5%, DELETE 8.9%, PUT 6.9%, PATCH 4.4%.
+
+| shape | providers | share |
+|---|---|---|
+| mixed | 4,450 | 60.7% |
+| write-heavy (>60% writes) | 1,330 | 18.2% |
+| **read-only (100% GET/HEAD/OPTIONS)** | **943** | **12.9%** |
+| write-only | 426 | 5.8% |
+| read-dominant (<10% writes) | 177 | 2.4% |
+
+**One provider in eight is entirely read-only**, so this is a cohort, not an exception to waive.
+
+**The penalty, joined against current scores:**
+
+| shape | n | agent readiness | Kin Score | dry-run | idempotency | events | error semantics | rate-limit |
+|---|---|---|---|---|---|---|---|---|
+| read-only | 938 | **32.6** | **40.2** | **0.0%** | 1.5% | 5.4% | 29.0% | **82.0%** |
+| mixed | 4,613 | 38.6 | 46.2 | 1.4% | 6.7% | 24.5% | 47.4% | 76.2% |
+| write-heavy | 1,750 | 38.6 | 46.5 | 0.6% | 7.8% | 26.4% | 46.4% | 73.8% |
+
+Six points on both scores, concentrated in the three hazard dimensions. **Not one of the 938 read-only
+providers publishes a dry-run mode** — zero, because there is nothing to preview.
+
+**The control is the last column, and it is what makes this conclusive.** On rate-limit signalling —
+which applies to a read-only API exactly as much as to any other — read-only providers are *better*
+than everyone else, **82.0% against 76.2% and 73.8%**. This is not a weak cohort scoring badly across
+the board and looking for relief. They are ahead where the dimension applies and at zero where it
+cannot.
+
+**Where the exemption must stop.** Read-only providers sit at **29.0% on error semantics against ~47%**.
+That dimension applies to them in full — a GET still fails, and an agent still needs to read the
+failure. Excusing it would convert a fair correction into a blanket waiver and hide a real gap.
+Self-service sign-up is also held back: "no accounts by design" and "never built onboarding" are not
+distinguishable from a contract, and inventing a predicate that cannot be checked is worse than the
+zero.
+
+**Auth does not track write share cleanly enough to build on yet.** Scopes: read-only 10.5%, mixed
+26.5%, write-heavy 16.7% — it is *mixed* providers that publish the most, so "more writes therefore
+more scopes" is not a line. The OAuth-granularity-versus-method-mix question needs its own measurement
+before it becomes a rule.
+
+## Documenting the whole lifecycle of what you let people create
+
+The read-only conditional stops punishing providers for hazards they cannot have. Its complement is to
+start rewarding providers for describing the hazards they *do* have — and almost nobody does.
+
+Grouping the corpus by **resource** rather than path (REST splits one resource across `POST /things`
+and `GET|PUT|DELETE /things/{id}`, so a path-level view scores that as two incomplete resources), then
+asking of every resource you can create: does the provider also document how to read it back, change
+it, and remove it?
+
+**143,877 creatable resources across 7,300 providers.**
+
+| For a resource you can CREATE | resources | share |
+|---|---|---|
+| create only — no read, no update, no delete | **91,437** | **63.6%** |
+| create + 1 of 3 | 18,829 | 13.1% |
+| create + 2 of 3 | 12,732 | 8.8% |
+| **create + all three** | **20,879** | **14.5%** |
+
+Per provider: mean **12.4%** of creatable resources expose the full lifecycle, **median 0.0%**, and
+**3,609 of 6,245 providers (57.8%) do not document a single fully round-trippable resource.**
+
+Nearly two thirds of everything you can create in this catalog is documented as create-and-forget. An
+agent that creates something and cannot read it back cannot confirm the write landed, cannot correct
+it, and cannot clean up after itself. That is a property of the contract, visible in the contract, and
+it is invisible to contract quality today — the facet rewards having a spec, tagging it, describing
+schemas and shipping examples, all of which a create-only surface scores full marks on.
+
+**The check must reward completeness, never penalise incompleteness.** Three honest reasons a creatable
+resource has no round trip: it is genuinely append-only (events, logs, audit records); the capability
+exists and is undocumented; or the resource is managed elsewhere. Only the second is a deficiency and
+none of the three is distinguishable from the spec. Cap the credit rather than scaling it linearly, or
+the rubric starts rewarding CRUD-for-its-own-sake and marking down a well-designed API that
+deliberately exposes no DELETE.
+
+Both this and the read-only conditional derive from one `write_surface` extraction over
+`openapi/`, so it is a single new fact feeding two changes. **Baseline for the band re-cut: 14.5% of
+resources and a 0.0% median means this reads near-zero on day one**, which by the rule already recorded
+above moves the whole catalog through the denominator. The re-cut is part of the change.
+
+Tracked as roadmap#63; the governance defect the same provider found is roadmap#62.
+
 ## A contract that describes the platform is not a contract that describes the product
 
 The rubric asks whether a machine-readable contract exists, whether it is complete, whether it is
