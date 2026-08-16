@@ -2176,6 +2176,90 @@ score block. Compute it as the share of a cohort's resource names appearing in t
 reported with the standard named. It would let a Sector Report state *"this market converged and that one
 did not"* as a measured figure instead of an observation.
 
+## The conformance vocabulary has no domain layer, and whole industries fall through it
+
+Biotechnology, 2026-08-15. The structured `conformance` blocks across 999 companies assert against
+**generic web and API standards only** — RFC 8288 web linking (42 companies), OpenAPI 3.1 (35), CORS
+(30), OAuth2 (27), pagination (26), SPF (23), TLS 1.3 (19), oEmbed (19), DMARC (18). Not one
+life-science standard appears anywhere in the assessed vocabulary.
+
+That means the rubric can tell you a genomics platform sets a correct `Link` header and publishes an
+SPF record, and cannot tell you whether it speaks **htsget, refget, DRS, WES, CDISC SDTM, OMOP or
+Phenopackets** — the specifications that decide whether its data is actually reachable by anyone else.
+A company implementing the full GA4GH stack and a company implementing none of it score identically.
+
+The generic layer is not wrong; it is the portable floor, and it is why cross-market comparison works
+at all. But it is a floor, and above it every industry has a domain layer that carries the real
+interoperability question. The catalog now holds the entries — GA4GH, CDISC, OMOP CDM, Phenopackets,
+Nextflow, CWL, WDL — so the vocabulary exists; nothing consumes it.
+
+**The fix is not a new dimension.** Adding domain standards to the composite would rescale the whole
+catalog for a signal 3% of one industry participates in — the `agent_card` denominator lesson. It
+belongs where vocabulary convergence belongs: a **cohort-level conformance profile**, computed per
+section against a domain standards list, reported in the section data and the report bundles. It would
+let a report state *"3 of 999 name GA4GH"* as a measured figure rather than a hand count, and it would
+generalise — FHIR in health, STAC in earth observation, Sparkplug in industrial IoT, SWIM in aviation
+are all the same shape.
+
+## "Has no API" and "has a bad API" are the same band, and it distorts every population figure
+
+Biotechnology is the case that makes this unavoidable. **889 of 1,000 providers hold no
+machine-readable contract of any kind** — the lowest share of the twelve sections tested, against
+37.1% for creator economy and 31.9% for space. The section's population median Kin Score is **9.0**,
+also the lowest measured.
+
+Read plainly, "biotechnology's median Kin Score is 9.0" says the industry's APIs are bad. What the
+number actually says is that most of these organizations are **therapeutics and diagnostics developers
+that have no API and will never have one** — a cell-therapy company is not a failing API provider, it
+is not an API provider. The `minimal` band, and every average computed over it, silently merges two
+populations that mean opposite things.
+
+This is the same family as the silent-zero paths: an absent thing and a bad thing arriving at the same
+number. It matters more here than elsewhere because section membership comes from an industry tag,
+which describes what a company *does*, not whether it *exposes* anything.
+
+**Cheap fix, no rescale.** Carry a `has_contract` boolean already derivable from the repo, and have
+section rollups report both figures: the industry population, and the population that publishes
+anything at all. Biotechnology then reads *"111 of 1,108 are API providers; among those the median is
+X"* — which is a true sentence, where the current one is not. Every report in the series gains the
+same disclosure, and the markets where the two numbers nearly agree are exactly the mature ones.
+
+## The data bundles counted directory presence where the papers counted provenance
+
+Not a rubric defect. A tooling one, recorded here because it shipped inside sold products and
+because it is the exact failure the provenance gate exists to prevent.
+
+Found 2026-08-15 while building the biotechnology bundle. `build_bundle.py` derived
+`mcp_adoption_pct` from `count_dir(slug, "mcp") > 0` — **any non-empty directory counted**, including
+artifacts this research generated or derived. The papers derive the same figure from the spine, which
+gates on `method: searched|probed`. The two numbers were computed from the same providers and
+disagreed in every bundle built on the planning path.
+
+**Twenty-nine of thirty sold bundles contradicted their own paper, by 26 to 57 points:**
+
+| paper | bundle said | paper said |
+| --- | ---: | ---: |
+| US Healthcare | 85% | 28% |
+| Retention and Expansion | 85% | 35% |
+| Quote to Cash | 83% | 43% |
+| Climate, Energy and Sustainability | 55% | 14% |
+| Space and Aerospace | 40% | 10% |
+
+A buyer reading `market-stats.json` — the file the bundle's own `AI-START-HERE.md` points an agent at
+first — was told the market was three to five times more agent-ready than the report they paid for
+said it was. `published_scopes_pct` and `security_artifact_pct` carried the same defect.
+
+The fix carries the spine's gated per-provider flags into the bundle and takes the aggregate from the
+spine's gated totals, falling back to directory counts only for sector and portfolio bundles that have
+no spine to rule. All thirty-nine bundles were rebuilt and verified against their spines: zero
+contradictions, zero score mismatches.
+
+**The generalisable lesson is the one already on this roadmap under a different name.** Presence is
+not provenance, and every place a number is computed twice from different sources is a place they will
+eventually disagree. The report and its data bundle should not both derive a figure — one should
+derive it and the other should read it. A cheap standing check is worth more than the fix: assert
+bundle-versus-spine agreement at build time, and fail the build rather than the buyer.
+
 ## Reports drift from the catalog, and nothing was watching
 
 A Sector Report is a snapshot. The catalog is continuous — enrichment, reprofiling and rescoring move
