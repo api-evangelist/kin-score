@@ -2342,6 +2342,63 @@ agreeing is a precondition for any comparison it makes.
 Until then the figure gate's output on a section-model report is advisory, and the section file plus
 the durable store are the authority.
 
+## Enrichment recency moves the score, and the reports have been saying it does not
+
+Found 2026-08-16 while building Data and Analytics v2.0. That market reported an upper-band median
+of **54.0** — the highest ever recorded, and the first to fall outside the 48.6–52.8 band twelve
+markets had held. It is not a market result.
+
+**63% of that upper band had been re-harvested in the three weeks before publication.** Split on the
+date, with every provider on the same rubric version:
+
+| | n | upper-band median |
+| --- | ---: | ---: |
+| Enriched since 2026-08-01 | 471 | **56.1** |
+| Enriched earlier | 271 | **51.7** |
+
+**A gap of 4.4 points**, and 51.7 is exactly what developer tools posts — inside the band.
+
+The effect is visible across the whole series. **corr(enrichment currency, upper-band Kin) = +0.74
+across fifteen markets.** The two most recently harvested — creator economy at 36% currency and data
+and analytics at 32% — are the two highest scoring at 52.8 and 54.0. The two least — space at 2% and
+financial services at 0% — sit at 49.2 and 47.7.
+
+A longitudinal read of the same 254 providers before and after re-harvest gives **+11.2**, but that
+window also spans the 0.11.0 rescore and cannot separate enrichment from the rubric change. The
+cross-sectional figure is the defensible one and it is what the report published.
+
+**The mechanism is mechanical rather than mysterious.** Enrichment harvests artifacts; the rubric
+counts artifacts; a provider re-harvested last week has more of them found than the identical
+provider harvested in June. This is measurement, not the market moving.
+
+### What this invalidates, precisely
+
+Every report in this series has carried a version of: *"a score read from older artifacts
+understates, and it understates **consistently** across the catalog, which is what makes relative
+placement inside this market meaningful."*
+
+The first half is right. **The second half is wrong and it is the half that licensed cross-market
+comparison.** Understatement tracks harvest date, harvest date tracks which report was produced
+when, and that varies from 0% to 36% across published markets.
+
+- **Rankings inside a single report are unaffected.** Every provider in a cohort was harvested under
+  the same campaign; that is why the ranking is still the product.
+- **Headline medians between reports are not comparable** without controlling for currency, and this
+  research has been comparing them freely — including in the convergence finding, which now needs
+  re-testing against currency rather than being quoted as though every market were measured the same
+  day.
+
+### The fix, in order
+
+1. **Disclose it.** Every report already computes `coverage.pct_current`. Print it beside the rubric
+   version in §12b, in the teaser, and in `market-stats.json`, so the number travels with the claim.
+2. **Publish the controlled figure** wherever a cross-market comparison is made — the median over
+   providers outside the recent-enrichment window, as Data and Analytics v2.0 does.
+3. **Re-test the convergence finding** with currency as a covariate before quoting it again.
+4. Longer term, either normalise for currency in the composite or bring currency up uniformly. The
+   second is expensive and the first is a rubric change; the disclosure in 1–2 is free and should
+   not wait for either.
+
 ## Reports drift from the catalog, and nothing was watching
 
 A Sector Report is a snapshot. The catalog is continuous — enrichment, reprofiling and rescoring move
