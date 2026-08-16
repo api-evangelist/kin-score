@@ -5,10 +5,10 @@ document records the other half: **what applying one instrument consistently acr
 revealed that no single measurement could.**
 
 That distinction matters. A score applied to one provider is a scorecard. The same score applied to
-2,272 companies across ten markets, on the same rubric, in the same month, is a comparison — and
+2,322 companies across eleven markets, on the same rubric, in the same month, is a comparison — and
 almost everything below exists only because the comparison is possible.
 
-Written 2026-08-15 from the ten market reports listed at the end. Every figure is reproducible from
+Written 2026-08-15 from the eleven market reports listed at the end, and updated as each new one lands. Every figure is reproducible from
 the artifacts those companies publish themselves.
 
 ---
@@ -27,6 +27,9 @@ the artifacts those companies publish themselves.
 | Gaming | 66 | 50.5 | 37.0 | 86% | 12% | 14% | **0** |
 | Weather and geospatial | 115 | 49.5 | 36.9 | 97% | 11% | 10% | **0** |
 | IoT | 165 | 51.0 | 40.3 | 87% | 10% | 23% | **0** |
+| Space and aerospace | 50 | 49.2 | 39.3 | 94% | 10% | 10% | **0** |
+
+**Eleven markets, 2,322 companies, one rubric, one month. Zero workflows.**
 
 Two production models are mixed here and the difference matters when comparing. Revenue, marketing
 and healthcare are **cohorts** — hand-built rosters, every company re-profiled to current before
@@ -55,6 +58,25 @@ publication and got the best publication rate measured. It did not ask for opera
 **This is only visible with one rubric across many markets.** Any single report reads as a story
 about that industry.
 
+### The sharpest instance: one industry, two standards philosophies
+
+**Space and aerospace contains a controlled comparison**, because two adjacent sub-markets with the
+same engineering culture, the same certification regimes and overlapping customers took opposite
+approaches to the same problem.
+
+| | standard | shape | agent readiness |
+| --- | --- | --- | ---: |
+| Space infrastructure | CCSDS, since **1982** | machine-to-machine link — telemetry framing, file delivery, Space Link Extension | 37.7 |
+| Aviation | SWIM, since 2008 | **a service and registry architecture** with governance | **44.1** |
+
+CCSDS genuinely works: a ground station operated by one agency communicates with a spacecraft built
+by another. Forty years of interoperability standards — **written downward into the radio link and
+never upward into the product.** SWIM was built as a discoverable service catalog by regulators, and
+the sub-market carrying it is the most regulated, most safety-critical part of the cohort and scores
+highest on agent readiness.
+
+Same industry. Different standards philosophy. Measurably different outcome.
+
 ### The corollary: the accessibility layer is where programmability lives
 
 Every mandate produced a second class of vendor whose product is the mandate's own accessibility, and
@@ -67,9 +89,9 @@ in every case that layer outscores the incumbents it sits in front of.
 The control case is **creator economy**: no mandate at all, and the highest programmability of any
 industry section measured. Nothing to comply with, only customers to serve.
 
-## 2. Zero of 2,272 companies describe a workflow
+## 2. Zero of 2,322 companies describe a workflow
 
-Across ten markets, every production model, every level of regulation and every degree of maturity:
+Across eleven markets, every production model, every level of regulation and every degree of maturity:
 **not one Arazzo workflow.** Against 51–98% publishing a machine-readable contract.
 
 The rubric can measure this because it looks for the artifact rather than for intent. A market that
@@ -85,12 +107,13 @@ implementation guides. None exists as an executable artifact.**
 
 ## 3. The upper band converges, and the composite is not where markets differ
 
-The seven industry sections measured like-for-like span **48.6 to 52.8** on the Kin median — a
-4.2-point spread across government, gaming, IoT, HR, climate, weather and creator economy.
+The **eight** industry sections measured like-for-like span **48.6 to 52.8** on the Kin median — a
+4.2-point spread across government, gaming, IoT, HR, climate, weather, space and creator economy. It
+held when an eighth market was added, which is the first real test it has passed.
 
 That is the more useful result than any single median. **Industries do not differ much in how good
 their best companies are. They differ enormously in which dimensions those companies satisfy.** MCP
-adoption across the same seven markets ranges 10% to 27% — a 17-point spread on a 4-point composite
+adoption across the same eight markets ranges 10% to 27% — a 17-point spread on a 4-point composite
 spread.
 
 The practical consequence: a composite alone tells a buyer very little across industries. The facet
@@ -111,11 +134,57 @@ The rubric reads resource names off refined contracts, which makes an unplanned 
 Three markets, no coordination, identical outcome: **the industry converges on a shared vocabulary
 and nobody governs it, so migration cost lives exactly where no specification reaches.**
 
-## 5. Contract quality and agent adoption may move in opposite directions
+## 5. Standards succeed when the scope is narrow and the pain is concrete
 
-Across the seven section-model markets, **corr(contract quality, MCP adoption) = −0.74**.
+Eleven markets produced dozens of standards and a handful of adoptions. The ones that took have a
+shape in common, and it is not the shape the standards bodies expected.
 
-**This is a hypothesis, not a finding.** n = 7, and the contract-quality range is only 3.6 points
+| market | the standard that worked | scope | the pain it removed |
+| --- | --- | --- | --- |
+| Space / earth observation | **STAC** | describing a geospatial asset so it can be found | archives searchable only within one provider — **7 of 8 companies in that area tag it**, the highest concentration measured anywhere |
+| HR and workforce | **SCIM** | provisioning a user between two systems | creating and deactivating accounts by hand |
+| IoT | **Sparkplug** | what is *inside* an MQTT message | vendor-specific payloads on an otherwise standard transport |
+| Gaming | **OpenXR** | one interface across XR runtimes | writing a title per headset |
+| Aviation | **SWIM** | discoverable services with a registry | point-to-point integration between ATM systems |
+
+Every one is **narrow**. None attempts to describe a whole domain. Each removes a pain the
+implementers were already paying for in labour, which meant nobody had to be persuaded.
+
+Set against the ones that did not take, the contrast is sharp. **HR Open Standards** has published
+schemas for recruiting, payroll, benefits and time since 1999, and an entire unified-API industry
+formed to work around its absence. **oneM2M** defines exactly the IoT service layer that market
+lacks and is essentially absent from it. **ActivityPub** is a complete federated social protocol and
+a rounding error against the platforms the creator economy actually integrates with. All three are
+technically sound, broad in scope, and solve a problem no individual implementer felt acutely enough
+to act on alone.
+
+**The lesson for anyone writing a specification: solve one expensive thing completely rather than
+one domain approximately.**
+
+## 6. Closure is sometimes rational, and twice it is legal
+
+Two markets in this research have a defensible reason to expose less, and the rubric currently cannot
+see the difference between that and neglect.
+
+- **Gaming** — publishing a complete documented interface to a live game is publishing a botting
+  manual. Grey-market trading and competitive scraping are quantified costs. Take-Two scores 7.1 and
+  is not a company that failed to build an API practice.
+- **Space and aerospace** — ITAR, EAR and equivalent regimes make some capabilities **statutorily**
+  restricted, with criminal exposure attached. That is a stronger version of the same argument:
+  gaming's closure is a business decision, this one is a legal obligation.
+
+Both are filed as [roadmap#70](https://github.com/api-evangelist/roadmap/issues/70), and the proposed
+answer is the same for both: **measure the stated position rather than the inferred one.** A company
+that has decided against programmatic access can publish that decision. One that never considered it
+cannot. `agentic_access` is missing at 98–100% in both markets, which suggests almost nobody is
+making the decision explicitly even where they have made it implicitly.
+
+## 7. Contract quality and agent adoption may move in opposite directions
+
+Across the eight section-model markets, **corr(contract quality, MCP adoption) = −0.68** — it was
+−0.74 at n=7 and held direction when space was added.
+
+**This is a hypothesis, not a finding.** n = 8, and the contract-quality range is only 3.6 points
 (60.1–63.7) against a 17-point MCP range, so the correlation is carried by a narrow spread. It is
 recorded here because it is testable and because the mechanism is plausible: the markets with the
 best contracts are the oldest ones, and age produces good documentation habits *and* a large
@@ -126,7 +195,7 @@ seven and by far the highest MCP.
 If it holds as more markets are measured, it inverts a natural assumption — that mature API
 practice predicts agent readiness. **Add markets before believing it.**
 
-## 6. What the rubric surfaced about itself
+## 8. What the rubric surfaced about itself
 
 Every market has been a test of the instrument, and each produced a defect the rubric could not have
 found by inspection. These are filed in the public
@@ -150,7 +219,7 @@ re-labelled REST API.
 
 **A market report that produces no instrument finding was probably not read closely enough.**
 
-## 7. Presence is not provenance — the discipline the measurement forced
+## 9. Presence is not provenance — the discipline the measurement forced
 
 The most consequential correction was not to a facet but to what counts as evidence. Six times, a
 number about to be published turned out to be API Evangelist's own generated work reported back as
@@ -184,7 +253,8 @@ Cohort model, fully re-profiled: **Revenue** (517) · **Marketing** (814) · **U
 
 Industry sections, catalog as-is, upper three bands: **Government** (63 of 850) · **IoT** (165 of
 861) · **HR and workforce** (170 of 869) · **Climate and energy** (96 of 1,002) · **Gaming** (66 of
-679) · **Creator economy** (191 of 843) · **Weather and geospatial** (115 of 495).
+679) · **Creator economy** (191 of 843) · **Weather and geospatial** (115 of 495) · **Space and
+aerospace** (50 of 329).
 
 All are published at [papers.apievangelist.com](https://papers.apievangelist.com), and each ships a
 machine-readable data bundle so the research can be interrogated directly rather than taken on

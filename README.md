@@ -334,12 +334,14 @@ operable, and — where a regime applies — compliant.
 A score applied to one provider is a scorecard. The same score applied across many markets is a
 comparison — and the comparison is where the instrument earns its keep.
 
-[**FINDINGS.md**](FINDINGS.md) records what applying this rubric consistently across 2,272 companies
-in ten markets revealed that no single measurement could: that a mandate produces exactly what it
-names and nothing adjacent; that **zero of those 2,272 companies describe a multi-step workflow**
+[**FINDINGS.md**](FINDINGS.md) records what applying this rubric consistently across 2,322 companies
+in eleven markets revealed that no single measurement could: that a mandate produces exactly what it
+names and nothing adjacent; that **zero of those 2,322 companies describe a multi-step workflow**
 against 51–98% publishing a contract; that three unrelated markets converged on a shared vocabulary
-nobody governs; and that the upper band of every industry measured sits within four points of every
-other, so the composite is not where markets actually differ.
+nobody governs; that the standards which actually got adopted are the narrow ones that removed a
+concrete cost, while the broad well-designed ones did not; and that the upper band of every industry
+measured sits within four points of every other, so the composite is not where markets actually
+differ.
 
 It also records what each market taught the rubric about itself — every one produced a defect that
 inspection alone would not have found, and those are queued in [`ROADMAP.md`](ROADMAP.md).
