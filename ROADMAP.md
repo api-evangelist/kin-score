@@ -2260,6 +2260,51 @@ eventually disagree. The report and its data bundle should not both derive a fig
 derive it and the other should read it. A cheap standing check is worth more than the fix: assert
 bundle-versus-spine agreement at build time, and fail the build rather than the buyer.
 
+## Not every tag is a market, and the section model has no test for which is which
+
+Surveying the remaining industry sections on 2026-08-16, after ten section-model reports, turned up
+three that would have produced the best numbers in the series and should never be published as
+markets.
+
+| tag | population | population median Kin | upper share | who is in it |
+| --- | ---: | ---: | ---: | --- |
+| `enterprise-software` | 67 | **43.7** | **55%** | Adobe, Salesforce, ServiceNow, Workday, Okta, Snowflake, Atlassian |
+| `financial-technology` | 54 | **39.0** | 41% | Stripe, PayPal, Block, Coinbase, Mastercard, CME, Bloomberg |
+| `technology` | 133 | **33.5** | 38% | Stripe, Twilio, Postman, Cloudflare, Splunk, Apple, Meta |
+
+Set against the ten genuine industry sections, whose population medians run **9.0 to 20.6** and whose
+upper-band shares run **1.8% to 23.2%**, the separation is not subtle. A real industry tag collects
+mostly organisations that are not API providers, which is why its population median sits in single
+digits. **These three collect almost nothing but API providers**, because the tag describes a
+company's prominence rather than what it does.
+
+Reported as markets they would have produced upper-band medians of **56.0 and 59.3** — far outside
+the 48.6–52.8 band that has now held across ten sections — and would have read as a genuine
+refutation of the convergence finding rather than as the selection artifact it is.
+
+**This is the mirror of the biotechnology defect and belongs with it.** There, an industry tag
+over-collected organisations with no API and dragged the population median to 9.0. Here, a prominence
+tag over-collects organisations famous for their APIs and drags it to 43.7. Both are the same missing
+test: **the section model assumes a tag denotes a market, and nothing checks that assumption.**
+
+The check is cheap and uses a figure the spine already computes. **Population median Kin above roughly
+25, or an upper-band share above roughly 30%, means the tag is selecting on API quality rather than on
+industry** — publish it as a list, a leaderboard or a cohort, not as a market. Wire it into
+`section_spine.py` as a refusal with an override, the same shape as the truncation guard.
+
+### The country sections fail a different way, and are not publishable either
+
+The 27 `country-*` sections total 2,777 providers against a catalog of roughly 26,500 — **about a
+tenth carry a country tag at all.** The distribution gives the game away: **the United Kingdom holds
+334 and the United States 310.** There is no reading of the API economy in which the UK has more
+providers than the US, so the tag is tracking which harvest campaigns ran rather than where companies
+are. Germany at 199 against India at 318 and China at 316 is the same artifact.
+
+Country reports are a legitimate and valuable format — the banking, payments, insurance and energy
+quartets are exactly that — but they were built as **cohorts with a hand-checked roster**, not read
+off this tag. Until country coverage is a deliberate pass rather than a by-product, a
+`State of <country> APIs` built on the section is a report about the harvest schedule.
+
 ## Reports drift from the catalog, and nothing was watching
 
 A Sector Report is a snapshot. The catalog is continuous — enrichment, reprofiling and rescoring move

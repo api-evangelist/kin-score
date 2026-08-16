@@ -319,6 +319,30 @@ population statistic, so a report can say *"111 of 1,108 are API providers, and 
 median is X."* Filed on the roadmap. The markets where the two figures nearly agree are, usefully,
 exactly the mature ones.
 
+### The same defect runs the other way, and it nearly broke finding 3
+
+Surveying the remaining sections turned up three tags that would have produced the best numbers in
+the series: `enterprise-software` (population median Kin **43.7**, upper share **55%**),
+`financial-technology` (**39.0**, 41%) and `technology` (**33.5**, 38%). Against the ten genuine
+industry sections — population medians **9.0 to 20.6**, upper shares **1.8% to 23.2%** — the
+separation is not subtle.
+
+The rosters explain it immediately. `enterprise-software` is Adobe, Salesforce, ServiceNow, Workday,
+Okta, Snowflake, Atlassian. `technology` is Stripe, Twilio, Postman, Cloudflare, Apple. **These tags
+describe how well known a company is, not what it does**, so they collect almost nothing but API
+providers, and the population median rises to meet the upper band.
+
+Published as markets they would have reported upper-band medians of **56.0 and 59.3** — well outside
+the 48.6–52.8 band that has held across ten sections — and would have read as a refutation of finding
+3 rather than as the artifact they are. **A tag that over-collects non-providers drags a population
+median to 9.0; a tag that over-collects famous providers drags it to 43.7. Both are the same missing
+test.** The section model assumed a tag denotes a market and nothing checked it; `section_spine.py`
+now refuses above either cut, with an override for a roster somebody has read.
+
+The country sections fail differently and are also unpublishable as they stand: 2,777 providers carry
+a country tag out of roughly 26,500, and **the United Kingdom holds 334 against the United States'
+310**. The tag records which harvest campaigns ran, not where companies are.
+
 ## 11. Biotechnology solved workflow description and never pointed it at an interface
 
 Finding 2 records that zero of 2,342 companies describe a workflow. Biotechnology is the market that
