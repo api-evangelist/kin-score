@@ -5,7 +5,7 @@ document records the other half: **what applying one instrument consistently acr
 revealed that no single measurement could.**
 
 That distinction matters. A score applied to one provider is a scorecard. The same score applied to
-2,342 companies across twelve markets, on the same rubric, in the same month, is a comparison — and
+2,435 companies across thirteen markets, on the same rubric, in the same month, is a comparison — and
 almost everything below exists only because the comparison is possible.
 
 Written 2026-08-15 from the eleven market reports listed at the end, and updated as each new one lands. Every figure is reproducible from
@@ -29,7 +29,7 @@ the artifacts those companies publish themselves.
 | IoT | 165 | 51.0 | 40.3 | 87% | 10% | 23% | **0** |
 | Space and aerospace | 50 | 49.2 | 39.3 | 94% | 10% | 10% | **0** |
 
-**Twelve markets, 2,342 companies, one rubric, one month. Zero workflows.**
+**Thirteen markets, 2,435 companies, one rubric, one month. Zero workflows.**
 
 Two production models are mixed here and the difference matters when comparing. Revenue, marketing
 and healthcare are **cohorts** — hand-built rosters, every company re-profiled to current before
@@ -89,9 +89,9 @@ in every case that layer outscores the incumbents it sits in front of.
 The control case is **creator economy**: no mandate at all, and the highest programmability of any
 industry section measured. Nothing to comply with, only customers to serve.
 
-## 2. Zero of 2,342 companies describe a workflow
+## 2. Zero of 2,435 companies describe a workflow
 
-Across twelve markets, every production model, every level of regulation and every degree of maturity:
+Across thirteen markets, every production model, every level of regulation and every degree of maturity:
 **not one Arazzo workflow.** Against 51–98% publishing a machine-readable contract.
 
 The rubric can measure this because it looks for the artifact rather than for intent. A market that
@@ -109,7 +109,8 @@ implementation guides. None exists as an executable artifact.**
 
 The **eight** industry sections measured like-for-like span **48.6 to 52.8** on the Kin median — a
 4.2-point spread across government, gaming, IoT, HR, climate, weather, space, creator economy and
-biotechnology — nine sections, and the ninth landed at 48.9, inside a band already four points wide. It
+biotechnology and mobility — ten sections, and the tenth landed at 49.4, inside a band already four
+points wide. It
 held when an eighth market was added, which is the first real test it has passed.
 
 That is the more useful result than any single median. **Industries do not differ much in how good
@@ -137,7 +138,7 @@ and nobody governs it, so migration cost lives exactly where no specification re
 
 ## 5. Standards succeed when the scope is narrow and the pain is concrete
 
-Twelve markets produced dozens of standards and a handful of adoptions. The ones that took have a
+Thirteen markets produced dozens of standards and a handful of adoptions. The ones that took have a
 shape in common, and it is not the shape the standards bodies expected.
 
 | market | the standard that worked | scope | the pain it removed |
@@ -147,6 +148,7 @@ shape in common, and it is not the shape the standards bodies expected.
 | IoT | **Sparkplug** | what is *inside* an MQTT message | vendor-specific payloads on an otherwise standard transport |
 | Gaming | **OpenXR** | one interface across XR runtimes | writing a title per headset |
 | Aviation | **SWIM** | discoverable services with a registry | point-to-point integration between ATM systems |
+| Mobility / EV charging | **OCPI** | roaming between charging networks | a driver with one account could not charge on another operator's network — **9 of 93 companies, the most-adopted interoperability standard in that market** |
 
 Every one is **narrow**. None attempts to describe a whole domain. Each removes a pain the
 implementers were already paying for in labour, which meant nobody had to be persuaded.
@@ -201,13 +203,31 @@ making the decision explicitly even where they have made it implicitly.
 
 ## 7. Contract quality and agent adoption may move in opposite directions
 
-Across the nine section-model markets, **corr(contract quality, MCP adoption) = −0.57** — it was
-−0.74 at n=7, −0.68 at n=8, and **weakened again when biotechnology was added**.
+Across the ten section-model markets, **corr(contract quality, MCP adoption) = −0.66** — it has moved
+−0.74 at n=7, −0.68 at n=8, −0.57 when biotechnology weakened it, and **back to −0.66 when mobility
+supplied the strongest single case yet**.
 
-**This is a hypothesis, not a finding, and it is getting weaker rather than stronger.** Biotechnology
-has the lowest contract quality measured (59.0) *and* mid-table MCP adoption (15%), which is the
-combination the hypothesis says should not occur. n = 9, and the contract-quality range is only 4.7
-points (59.0–63.7) against a 17-point MCP range, so the correlation is carried by a narrow spread. It is
+**Mobility is the extreme point at both ends.** It posts the highest contract quality recorded in any
+market in this research (64.6) and the lowest MCP adoption of ten sections (7.5%), in the same 93
+companies. And the ordering is close to monotonic: **the six markets with the best contracts are
+exactly the six with the lowest MCP adoption.**
+
+| | contract quality | MCP |
+| --- | ---: | ---: |
+| Mobility | **64.6** | **7.5%** |
+| Weather and geospatial | 63.7 | 11.3% |
+| Climate and energy | 62.5 | 13.5% |
+| IoT | 62.2 | 10.3% |
+| Gaming | 62.1 | 12.1% |
+| Space | 61.5 | 10.0% |
+| HR and workforce | 60.6 | 16.5% |
+| Creator economy | 60.2 | **27.2%** |
+| Government | 60.1 | 17.5% |
+| Biotechnology | **59.0** | 15.0% |
+
+**This is still a hypothesis, not a finding.** n = 10, and the contract-quality range is only 5.6
+points (59.0–64.6) against a 20-point MCP range, so the correlation is carried by a narrow spread —
+and biotechnology at the bottom of both columns is the case that does not fit. It is
 recorded here because it is testable and because the mechanism is plausible: the markets with the
 best contracts are the oldest ones, and age produces good documentation habits *and* a large
 installed base with no reason to adopt a new interface layer. Weather and geospatial has the best
@@ -325,6 +345,47 @@ tracking accessioning, waiting on sequencing and retrieving variants crosses bet
 where only an HTTP interface exists. The distance between an nf-core pipeline and a published API
 workflow is shorter for this industry than for any other measured, and nobody has walked it.
 
+## 12. A controlled comparison inside one market: standards and programmability travel together
+
+Every cross-market claim in this document has the same weakness — the markets differ in age,
+regulation, capital intensity and customer, so any two of them differ in a hundred ways before the
+standards question is asked. **Mobility supplied the first comparison that holds most of that
+constant.** Four areas inside one section, scored on one rubric, in one month, from one catalog,
+selling in large part to the same operations buyer.
+
+| area | companies | standards adopted | Kin | Agent Readiness | contract | MCP |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| **EV charging and grid** | 20 | **OCPI (9), OCPP (8), OpenADR (7), IEEE 2030.5 (7)** | **51.1** | **43.9** | **100%** | **15%** |
+| Logistics and last-mile | 39 | **none** | 49.4 | 40.3 | 87% | 5% |
+| Transit and ride-hailing | 7 | GTFS (3), GBFS (1), MDS (1) | 47.8 | 34.9 | 100% | 14% |
+| Fleet and telematics | 26 | OBD-II (2), SAE J1939 (1) | 47.6 | 33.2 | 96% | 4% |
+
+**The one area that agreed on interoperability standards is the strongest on every measure.** The
+largest area, logistics, agreed on nothing — not EDIFACT, which has carried freight messaging since
+1987, not GS1, not EPCIS, not DCSA — and sits four points of Agent Readiness below it despite having
+the highest event-surface adoption anywhere in this research.
+
+**This is not proof of causation and the direction is genuinely ambiguous.** Companies that publish
+well may simply be the sort that also turn up to standards bodies. EV charging is younger than
+freight, and a young market agrees more cheaply than one with thirty years of bilateral EDI
+integrations to protect. Transit's numbers show the limit plainly: GTFS is one of the most successful
+open standards in existence and its area is the second weakest here, because the standard succeeded
+and a commercial API market never formed around it.
+
+What the comparison does establish is that **the two travel together closely enough that the absence
+of a shared vocabulary is a reliable signal about a market**, and it does so with far fewer competing
+explanations than any cross-market claim in this document. The mechanism finding 5 proposes fits: OCPI
+exists because a driver with one account could not charge on another operator's network — narrow
+scope, concrete pain, one decision. Logistics' pain from not agreeing is **spread across its
+customers rather than concentrated on its vendors**, which is exactly the condition under which this
+research finds standards fail.
+
+**The same section also produced the cleanest small instance of finding 1.** The FMCSA electronic
+logging device mandate named a recording obligation and an inspection interface, and eleven years on
+fleet and telematics has certified devices, 4% MCP adoption and the lowest Agent Readiness in the
+market. A mandate produces exactly what it names. EV charging had no mandate, agreed anyway because
+roaming was worth more than exclusivity, and is the most programmable segment in the section.
+
 ## The reports behind this
 
 Cohort model, fully re-profiled: **Revenue** (517) · **Marketing** (814) · **US healthcare** (75).
@@ -332,7 +393,7 @@ Cohort model, fully re-profiled: **Revenue** (517) · **Marketing** (814) · **U
 Industry sections, catalog as-is, upper three bands: **Government** (63 of 850) · **IoT** (165 of
 861) · **HR and workforce** (170 of 869) · **Climate and energy** (96 of 1,002) · **Gaming** (66 of
 679) · **Creator economy** (191 of 843) · **Weather and geospatial** (115 of 495) · **Space and
-aerospace** (50 of 329) · **Biotechnology** (20 of 1,108).
+aerospace** (50 of 329) · **Biotechnology** (20 of 1,108) · **Mobility** (93 of 625).
 
 All are published at [papers.apievangelist.com](https://papers.apievangelist.com), and each ships a
 machine-readable data bundle so the research can be interrogated directly rather than taken on
