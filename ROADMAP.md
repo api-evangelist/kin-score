@@ -7,6 +7,14 @@ has shipped.
 
 ---
 
+> **The other half of this document is [`FINDINGS.md`](FINDINGS.md).** This roadmap records what the
+> rubric gets wrong and what it should do next. FINDINGS records what applying it across ten markets
+> and 2,272 companies revealed — and where each item below came from. Every entry between #63 and
+> #70 in the public road map was surfaced by a market report rather than by inspection, which is the
+> argument for continuing to apply the rubric widely rather than perfecting it narrowly.
+
+---
+
 ## Status after 0.11.0 (2026-08-11) — SHIPPED AND PUBLISHED
 
 **0.11.0 is live.** The weekly APIs.io rebuild on 2026-08-11 ran the held `--write` rescore and
