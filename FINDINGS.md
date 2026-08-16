@@ -5,7 +5,7 @@ document records the other half: **what applying one instrument consistently acr
 revealed that no single measurement could.**
 
 That distinction matters. A score applied to one provider is a scorecard. The same score applied to
-2,322 companies across eleven markets, on the same rubric, in the same month, is a comparison — and
+2,342 companies across twelve markets, on the same rubric, in the same month, is a comparison — and
 almost everything below exists only because the comparison is possible.
 
 Written 2026-08-15 from the eleven market reports listed at the end, and updated as each new one lands. Every figure is reproducible from
@@ -29,7 +29,7 @@ the artifacts those companies publish themselves.
 | IoT | 165 | 51.0 | 40.3 | 87% | 10% | 23% | **0** |
 | Space and aerospace | 50 | 49.2 | 39.3 | 94% | 10% | 10% | **0** |
 
-**Eleven markets, 2,322 companies, one rubric, one month. Zero workflows.**
+**Twelve markets, 2,342 companies, one rubric, one month. Zero workflows.**
 
 Two production models are mixed here and the difference matters when comparing. Revenue, marketing
 and healthcare are **cohorts** — hand-built rosters, every company re-profiled to current before
@@ -89,9 +89,9 @@ in every case that layer outscores the incumbents it sits in front of.
 The control case is **creator economy**: no mandate at all, and the highest programmability of any
 industry section measured. Nothing to comply with, only customers to serve.
 
-## 2. Zero of 2,322 companies describe a workflow
+## 2. Zero of 2,342 companies describe a workflow
 
-Across eleven markets, every production model, every level of regulation and every degree of maturity:
+Across twelve markets, every production model, every level of regulation and every degree of maturity:
 **not one Arazzo workflow.** Against 51–98% publishing a machine-readable contract.
 
 The rubric can measure this because it looks for the artifact rather than for intent. A market that
@@ -108,7 +108,8 @@ implementation guides. None exists as an executable artifact.**
 ## 3. The upper band converges, and the composite is not where markets differ
 
 The **eight** industry sections measured like-for-like span **48.6 to 52.8** on the Kin median — a
-4.2-point spread across government, gaming, IoT, HR, climate, weather, space and creator economy. It
+4.2-point spread across government, gaming, IoT, HR, climate, weather, space, creator economy and
+biotechnology — nine sections, and the ninth landed at 48.9, inside a band already four points wide. It
 held when an eighth market was added, which is the first real test it has passed.
 
 That is the more useful result than any single median. **Industries do not differ much in how good
@@ -136,7 +137,7 @@ and nobody governs it, so migration cost lives exactly where no specification re
 
 ## 5. Standards succeed when the scope is narrow and the pain is concrete
 
-Eleven markets produced dozens of standards and a handful of adoptions. The ones that took have a
+Twelve markets produced dozens of standards and a handful of adoptions. The ones that took have a
 shape in common, and it is not the shape the standards bodies expected.
 
 | market | the standard that worked | scope | the pain it removed |
@@ -161,6 +162,25 @@ to act on alone.
 **The lesson for anyone writing a specification: solve one expensive thing completely rather than
 one domain approximately.**
 
+### GA4GH is the case that sharpens the rule
+
+Biotechnology supplied the cleanest counter-example yet, because on first inspection it looks like it
+should have worked. The **Global Alliance for Genomics and Health** was formed in 2013 by hundreds of
+institutions, is purpose-built for exactly this market's problem, and publishes genuine HTTP API
+specifications rather than file formats. **Three organisations of 999 name it, and not one names
+htsget or refget specifically.**
+
+The difference from STAC is not quality and not age — GA4GH is *older* than STAC. It is that STAC is
+**one** thing and GA4GH is **eight**: htsget, refget, DRS, WES, TES, Beacon, Passports and
+Phenopackets. A specification family assembled by accretion is broad in scope even when each member
+is narrow, because an implementer still has to decide which subset to adopt and still cannot assume a
+counterparty made the same choice. **Narrow means one decision, not one document.**
+
+And the same market shows what does carry a broad standard: **CDISC**, at 8 companies, is adopted
+because the FDA refuses a submission without it, and **FHIR**, at 46, appears only where
+biotechnology touches clinical care and US regulation reaches it. Both are broad. Both are mandated.
+That is finding 1 arriving from a third direction.
+
 ## 6. Closure is sometimes rational, and twice it is legal
 
 Two markets in this research have a defensible reason to expose less, and the rubric currently cannot
@@ -181,11 +201,13 @@ making the decision explicitly even where they have made it implicitly.
 
 ## 7. Contract quality and agent adoption may move in opposite directions
 
-Across the eight section-model markets, **corr(contract quality, MCP adoption) = −0.68** — it was
-−0.74 at n=7 and held direction when space was added.
+Across the nine section-model markets, **corr(contract quality, MCP adoption) = −0.57** — it was
+−0.74 at n=7, −0.68 at n=8, and **weakened again when biotechnology was added**.
 
-**This is a hypothesis, not a finding.** n = 8, and the contract-quality range is only 3.6 points
-(60.1–63.7) against a 17-point MCP range, so the correlation is carried by a narrow spread. It is
+**This is a hypothesis, not a finding, and it is getting weaker rather than stronger.** Biotechnology
+has the lowest contract quality measured (59.0) *and* mid-table MCP adoption (15%), which is the
+combination the hypothesis says should not occur. n = 9, and the contract-quality range is only 4.7
+points (59.0–63.7) against a 17-point MCP range, so the correlation is carried by a narrow spread. It is
 recorded here because it is testable and because the mechanism is plausible: the markets with the
 best contracts are the oldest ones, and age produces good documentation habits *and* a large
 installed base with no reason to adopt a new interface layer. Weather and geospatial has the best
@@ -247,6 +269,62 @@ companies being told they had shipped something the pipeline shipped for them.
 
 ---
 
+## 10. An industry classification is not an API market, and the rubric cannot tell them apart
+
+Biotechnology forced a distinction the first eleven markets never had to make. **1,108 organisations
+carry the tag and 20 reach the upper three bands — 1.8%, four times lower than the next lowest
+market. 889 of the first thousand hold no machine-readable contract of any kind**, an 11.1% contract
+share against 37.1% in creator economy and 31.9% in space, the lowest of the nine sections tested.
+
+The section's population median Kin Score is **9.0**, the lowest recorded. Read plainly, that says
+biotechnology's APIs are bad. What it actually says is that most organisations carrying the tag are
+therapeutics and diagnostics developers — Vestaron, Wugen, Abcuro, Alzheon, Colossal Biosciences.
+**A cell-therapy company is not a failing API provider. It is not an API provider.**
+
+| | contract share | upper band | population median Kin |
+| --- | ---: | ---: | ---: |
+| Creator economy | 37.1% | 22.7% | 16.0 |
+| Space | 31.9% | 15.2% | 13.1 |
+| Government | 27.1% | 7.4% | 16.2 |
+| **Biotechnology** | **11.1%** | **1.8%** | **9.0** |
+
+Section membership comes from an industry tag, which describes what a company *does*, not whether it
+*exposes* anything. The `minimal` band, and every average computed over it, silently merges two
+populations that mean opposite things. **This is the same family as the silent-zero paths — an absent
+thing and a bad thing arriving at the same number** — and it matters most in exactly the markets
+where the science, not the software, is the product.
+
+The correction is cheap and needs no rescale: carry a published `has_contract` figure alongside every
+population statistic, so a report can say *"111 of 1,108 are API providers, and among those the
+median is X."* Filed on the roadmap. The markets where the two figures nearly agree are, usefully,
+exactly the mature ones.
+
+## 11. Biotechnology solved workflow description and never pointed it at an interface
+
+Finding 2 records that zero of 2,342 companies describe a workflow. Biotechnology is the market that
+shows this is not a failure of understanding.
+
+This industry spent two decades building workflow description languages. **Nextflow** is named by 7
+companies here — more than twice GA4GH's reach — with **WDL** at 4 and **CWL** at 2. These are mature
+specifications with portable execution, container pinning, explicit input and output typing, and
+community-curated pipeline libraries. They are, in every respect that matters, machine-readable
+descriptions of typed multi-step processes with real failure modes.
+
+**And `workflow` and `pipeline` are the second and third most common resource names in this market's
+API contracts.** Arazzo adoption is zero.
+
+No other market has produced that combination. Elsewhere the workflow gap is an inference — the
+product is obviously sequential and nobody wrote the sequence down. Here the industry *named the
+resource in its own APIs*, already owns the vocabulary, and still publishes nothing an agent could
+execute.
+
+The reason is precise and worth generalising: **the workflow languages describe compute the caller
+runs, and they stop at the organisational boundary — which is exactly where the API begins.** A
+Nextflow pipeline chains tools over files inside one operator's infrastructure. Submitting a sample,
+tracking accessioning, waiting on sequencing and retrieving variants crosses between organisations,
+where only an HTTP interface exists. The distance between an nf-core pipeline and a published API
+workflow is shorter for this industry than for any other measured, and nobody has walked it.
+
 ## The reports behind this
 
 Cohort model, fully re-profiled: **Revenue** (517) · **Marketing** (814) · **US healthcare** (75).
@@ -254,7 +332,7 @@ Cohort model, fully re-profiled: **Revenue** (517) · **Marketing** (814) · **U
 Industry sections, catalog as-is, upper three bands: **Government** (63 of 850) · **IoT** (165 of
 861) · **HR and workforce** (170 of 869) · **Climate and energy** (96 of 1,002) · **Gaming** (66 of
 679) · **Creator economy** (191 of 843) · **Weather and geospatial** (115 of 495) · **Space and
-aerospace** (50 of 329).
+aerospace** (50 of 329) · **Biotechnology** (20 of 1,108).
 
 All are published at [papers.apievangelist.com](https://papers.apievangelist.com), and each ships a
 machine-readable data bundle so the research can be interrogated directly rather than taken on
