@@ -2305,6 +2305,43 @@ quartets are exactly that — but they were built as **cohorts with a hand-check
 off this tag. Until country coverage is a deliberate pass rather than a by-product, a
 `State of <country> APIs` built on the section is a report about the harvest schedule.
 
+## The rescore snapshot and the section file disagree on band counts, and the snapshot is wrong
+
+Found 2026-08-16 while bringing the artificial-intelligence report to v2.0. `verify_report_figures.py`
+flagged the new edition's figures as disagreeing with live data. They were not.
+
+For the same section, the same population of 5,095 scored providers and the same rubric 0.11.0:
+
+| | exemplar | strong | developing | upper band |
+| --- | ---: | ---: | ---: | ---: |
+| Section file (working tree) | **105** | 262 | 633* | — |
+| Section file at HEAD | **105** | 262 | 633* | — |
+| Durable kin store, checked per provider | **104 of 104** | — | — | — |
+| **`rescore_reports.py` snapshot** | **53** | 232 | 688 | **973** |
+
+<sub>*capped file shows the top 1,000 by rank, so its `developing` count is truncated; the uncapped
+build gives 696 and an upper band of 1,062.</sub>
+
+Three independent sources agree on 105 — 104 after the retired `modal` is dropped — and the snapshot
+alone says 53. The individual composites match exactly between the section file and the durable store
+for every exemplar checked, so this is not a scoring divergence: the snapshot is assigning bands to a
+different or partial member set while reporting the full `provider_count`.
+
+**The failure mode is the dangerous one.** The gate exists to stop a report drifting from the catalog,
+and here it told a correct report to adopt stale figures — 1,062 companies "should be" 973, 104
+exemplars "should be" 53. Following it would have published numbers that contradict both the section
+file and the score store. A gate that can be wrong in the direction of *more confident* is worse than
+no gate, because its output looks like an instruction.
+
+Two things to fix, in order. **The snapshot's band accumulation needs to derive from the composite
+against the published thresholds rather than from whatever `band` string it has in hand** — the same
+discipline the reports use, and cheap to assert. And **the verifier should refuse rather than advise
+when its own snapshot disagrees with the section file it names as its source**, because those two
+agreeing is a precondition for any comparison it makes.
+
+Until then the figure gate's output on a section-model report is advisory, and the section file plus
+the durable store are the authority.
+
 ## Reports drift from the catalog, and nothing was watching
 
 A Sector Report is a snapshot. The catalog is continuous — enrichment, reprofiling and rescoring move
