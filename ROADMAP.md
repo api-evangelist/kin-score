@@ -2618,3 +2618,101 @@ used by exactly two checks, `sdk_count_1` and `sdk_count_3`, both on `SDK`. Ever
 provider-level check is a membership test, so duplicate `common[]` entries cannot inflate a
 score outside `SDK`. WunderGraph's duplicated `Blog` was cosmetic. Their duplicated
 `DomainSecurity` is not a duplicate at all — two different artifact files for two surfaces.
+
+## The 0.12 batch — what lands together, and in what order
+
+Written 2026-08-17. The last batch plan in this file is the **0.6** sequence, and the rubric shipped
+0.11.0 on 2026-08-11, so there has been no live grouping for five releases. Thirty-three `area:scoring`
+issues are open in `api-evangelist/roadmap` with nothing sequencing them. This is that sequence.
+
+The 0.6 discipline still applies and is the reason to batch at all: **several of these move the same
+providers at once**, so shipping them check by check would mean three separate band recalibrations and
+three rounds of headline-number churn. And per the standing rule, **any new dimension moves the whole
+catalog through the denominator whether or not anyone scores on it** — so the re-cut is part of the
+release, not a follow-up.
+
+### (0) The probe pass, first, because it guards every number after it
+
+Six issues are **one piece of work**: fetch every declared URL and interpret the response honestly.
+They are filed separately because they were found separately, but they share a single pass and none of
+them should be attempted alone.
+
+- **#16** scored pointers are never fetched — three of Avalara's 404s were worth 8 points
+- **#27** the 0.9.4 llms.txt alias credits a pointer a live probe refutes
+- **#37** an error response is only evidence if the host discriminates — 46 of 51 "gated MCP servers" proved nothing
+- **#28** "refused" is not "absent" — a 403 to an identified crawler needs its own verdict
+- **#29** a provider with no usable host cannot be probed, and its score is not a measurement
+- **#56** a secondary-market listing page wired as the company Website
+
+The through-line: **presence of a pointer is not resolution of a pointer**, and the rubric currently
+scores the former while its text promises the latter. Every other item in this batch inherits its
+credibility from this one, which is why it goes first — the same reasoning that put the detector sanity
+pass first in 0.6.
+
+Two of today's findings belong to this family and are already fixed in the pipeline rather than the
+rubric, so they are calibration input rather than batch work: the soft-200 catch-all
+(`api.secton.org` 200s every path; declared paths must be probed against a control) and the gate
+fabricating a hosted MCP endpoint (`mcp.sifting.io` NXDOMAIN, invented with plausible auth detail).
+
+### (1) Vocabulary and rubric consistency — cheap, and it is the same bug twice
+
+- **#71** two wired pointer types (`Examples`, `GitHubRepository`) are read by no check
+- **#12** the APIs.json 0.21 property enum and the rubric disagree
+
+These are **one class of defect in two directions**: the vocabulary and the rubric drift apart, and
+nothing tests the join. A single test over `properties.yml` × `score.rb` × `scoring.yml aliases`,
+asserting that every published type is read by at least one check and every type a check reads exists in
+the vocabulary, closes both. It is a day's work and it prevents the specific waste #71 documents — a
+provider wiring a pointer in good faith, earning nothing, with no way to tell from outside.
+
+Ship the `examples_published` check with it, since the test is what proves it landed.
+
+### (2) The extraction pass — three issues, one parse of the contract corpus
+
+- **#63** score the HTTP method mix; make dry-run, idempotency and typed events conditional on a write surface
+- **#64** artifact authorship has three dimensions, not two — 26 of 32 classes record none
+- **#59** "has an MCP server" counts a directory, not a server
+
+#63 and #64 were both named as sharing an extraction pass when they were filed, and #59 reads the same
+artifacts to answer "is this thing real and whose is it". Doing them together means walking the corpus
+once. **#64 also unblocks the honest version of the score** — until authorship is recorded, the rating
+page cannot show what share of a provider's number rests on artifacts they published versus ones we
+generated, and `provenance` is still `null` on every scored record.
+
+### (3) New facets and weighting, after the base is trustworthy
+
+- **#69** domain-standard conformance is unscored
+- **#68** weight agent-readiness dimensions by consequence
+- **#67** a public-sector conditional facet
+- **#70** deliberate closure is not neglect
+- **#39** the rubric reads nothing that open source is good at
+- **#38** AI Claim Index — read the claim off the website, not the blog
+
+These add or reweight dimensions, so every one of them moves the denominator. They go last, before the
+single recalibration.
+
+### (4) Then one recalibration, one full re-score, one page and paper refresh
+
+Per `scoring-waits-for-apisio-rebuild`: never `score.rb --write` as its own event. Bump
+`schema_version`, snapshot the rubric into `kin-score/rubric/`, write CHANGELOG and ROADMAP entries
+carrying an explicit "NOT YET APPLIED TO PUBLISHED SCORES" note naming what will move, and let the
+rebuild land engine, re-score and deploy together. Papers whose numbers depend on the change are parked
+until then.
+
+### Deliberately NOT in 0.12
+
+- **The catalog-data items** — #58 (503 untriaged prefix pairs), #53 (191 duplicates scored twice),
+  #54 (14 providers with a score no band file publishes), #52 (competitor spec contamination). These are
+  data-quality work, not rubric work. They should ship *before* the recalibration so it reads a clean
+  catalog, but they are not rubric changes and should not wait on one.
+- **#13 harden against self-optimization.** A whole lens with its own adversarial design work, and the
+  provider it names is actively probing the rubric. It follows the base corrections rather than riding
+  with them — the same call 0.6 made on Switchability. Note #30 (count-based checks) and the `count_type`
+  finding in #71 are both inputs to it: `SDK` is the only counted type in the rubric, which is a small
+  and currently unexploited surface, and worth closing deliberately rather than accidentally.
+- **#19 WSDL and #11 gRPC/Protobuf.** New contract-type readers, each a parser of its own. Real gaps
+  — MISO alone ships 13 WSDLs — but they widen what the rubric can read rather than correcting what it
+  already reads, and they will not be ready with the rest.
+- **#41 publish the delivery model** and **#35 / #34 cohort-depth and regime-assignment comparability**.
+  These are reporting and disclosure changes on how numbers are presented, and they ship on the papers
+  and section pages independently of any rubric release.
