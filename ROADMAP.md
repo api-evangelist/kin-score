@@ -2572,3 +2572,49 @@ be re-verified after the batch rather than assumed to survive it.
 
 <sub>Have a signal the score should measure — or shouldn't? The productive contribution is a public,
 machine-checkable signal it missed. Open an issue on this repo.</sub>
+
+## Two wired pointer types have no check behind them, found by the provider who wired them
+
+Raised 2026-08-17 by **Ahmet Soormally at WunderGraph**, via a pull request on
+`api-evangelist/wundergraph` (#7) that he opened unprompted after Paul Cooper showed him
+the Kin Score. He added nine `common[]` pointers and removed a genuine duplicate. Seven of
+the nine score. **Two are read by no check at all:**
+
+| type | in `score.rb` |
+|---|---|
+| `GitHubRepository` | 0 references |
+| `Examples` | 0 references |
+
+`Examples` is the one that matters. Examples are a real quality signal, the catalog has an
+`examples/` artifact class and a whole `api-search/examples` site, and `contract_quality`
+already rewards `openapi_examples` — but that check reads examples *inside the OpenAPI*, so
+a provider who publishes a separate examples repository gets nothing for it. WunderGraph
+publishes `cosmo-federation-demos`; the pointer is wired, the artifact class exists, and the
+rubric cannot see it.
+
+`GitHubRepository` is weaker as a scoring signal on its own, but note the `open_source`
+facet already harvests the GitHub org live (roadmap#39) — so there is an existing consumer
+that could read it instead of re-deriving the org from scratch.
+
+**Proposed**
+
+1. Add an `examples_published` check to `contract_quality`, reading `common[].type` for
+   `Examples` (alias `Samples`, `Demos`, `CodeExamples`). Distinct from `openapi_examples`,
+   which stays as-is — one measures examples inside the contract, the other measures a
+   published example corpus, and a provider can reasonably have either.
+2. Decide whether `GitHubRepository` should feed `open_source` as a declared pointer rather
+   than being ignored while the facet harvests the same fact independently.
+3. **Audit the whole pointer vocabulary for orphans.** These two were found by accident,
+   because a provider happened to wire them. There is no test asserting that every type in
+   `properties.yml` is read by at least one check, or that every type a check reads exists in
+   the vocabulary. Both directions can drift silently, and both directions waste provider
+   effort — someone wires a pointer in good faith and it earns nothing, with no way to tell
+   from the outside.
+
+Item 3 is the real finding. The other two are instances of it.
+
+**Also confirmed while checking this, and worth recording as NOT a bug:** `count_type` is
+used by exactly two checks, `sdk_count_1` and `sdk_count_3`, both on `SDK`. Every other
+provider-level check is a membership test, so duplicate `common[]` entries cannot inflate a
+score outside `SDK`. WunderGraph's duplicated `Blog` was cosmetic. Their duplicated
+`DomainSecurity` is not a duplicate at all — two different artifact files for two surfaces.
