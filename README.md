@@ -282,6 +282,21 @@ shapes, the parameters, the freshness guarantee, and what may and may not be don
 The badge is also how the score travels: each embed is a plain, followed link from the provider's own
 site back to the profile the number came from.
 
+### Sharing it
+
+Every scored provider also has a **card** — a 1200×630 share image carrying the sun, the name, the
+composite and its band, agent readiness, and all six facet values. It is the `og:image` on that
+provider's detail page on both apis.io and providers.apievangelist.com, so sharing the page anywhere
+shows the score rather than a cropped logo or a generic site card.
+
+```
+https://kinlane-images.s3.amazonaws.com/shared/kin-score/cards/<slug>.png
+```
+
+Built by [`cards/`](cards/) from provider frontmatter, drawing the sun from `glyph/` like everything
+else. One card serves both sites, so it names no domain. [`cards/README.md`](cards/README.md) has the
+URL contract, the refresh procedure after a rescore, and the caching trade-off behind the stable URL.
+
 ## Versioning
 
 The rubric is a living argument and is versioned (`schema_version`). Published snapshots live in

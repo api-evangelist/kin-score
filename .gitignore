@@ -1,3 +1,8 @@
 .DS_Store
 _site/
 node_modules/
+
+# Kin Score cards: ~4 GB of generated PNGs, published to S3, never committed.
+# manifest.json IS committed — it is what makes a re-run after a rescore render
+# only what moved.
+cards/dist/
