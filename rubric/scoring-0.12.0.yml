@@ -11,6 +11,53 @@ schema_version: 0.12.0
 last_updated: '2026-08-18'
 maintainer: kin@apievangelist.com
 
+# The public "what changed" note. The apis.io /rating/ page renders this rather than
+# carrying its own copy, because the copy it carried was v0.6's — and it sat under a
+# heading that read "What changed in v{{ schema_version }}", so it re-badged itself as
+# current through ten rubric versions while describing none of them. `version` below is
+# checked against schema_version by test_rubric_record.py: a rubric cannot reach a
+# rebuild carrying the previous release's story.
+release_note:
+  version: 0.12.0
+  body: |
+    Two facets were renamed. `governance` is now **Contract Governance** — it scores
+    rulesets, vocabulary, conformance and overlays, all of them artifacts describing a
+    contract, and it never measured how an organisation governs itself. `commercial_clarity`
+    is now **Access Clarity**: for a free statutory interface, or a provider whose own
+    OpenAPI says no authentication and no quota, the word *commercial* described nothing,
+    and 14 of that facet's 38 points were never commercial in the first place. Both keys
+    are emitted side by side through 0.12.x, because these names are schema and appear in
+    roughly 27,300 files.
+
+    **A check that cannot apply now leaves the denominator instead of scoring zero.**
+    1,008 of the 7,579 providers holding a contract are entirely read-only; for them
+    `dry_run_mode` and `idempotency` are `na`, since every request to a read API already is
+    a dry run and a GET is idempotent by definition. 212 providers have no commercial
+    surface by design, so 24 of Access Clarity's 38 points are `na` for them. Applicability
+    is keyed on published evidence, never on sector.
+
+    **Being correctly identified as regulated used to cost a provider points.** The
+    regulatory facet was scored against the provider's own base, which dragged every
+    regulated provider down by a mean of 1.06 and rewarded thin tagging. It is now scored
+    relative to the mean of its own regime, frozen per rubric version, so it is zero at the
+    peer mean and the incentive points the right way.
+
+    **A pointer is no longer proof.** Across the 33 checks a pointer alone used to satisfy,
+    a live URL now scores 1.00, an unverified one 0.50, and a dead one nothing. `mcp_server`
+    reads deployment truth rather than a link and sheds 72.6% of the points it was awarding;
+    2,503 derived candidates lose it outright. Protobuf/gRPC and WSDL now count as contracts,
+    which restores 45 providers scored as publishing nothing while holding 5,526 RPCs or
+    1,363 SOAP operations.
+
+    Three checks are new — `lifecycle_documented`, `domain_standard_conformance` and
+    `reversibility_documented`, the fifteenth agent dimension. Two were removed:
+    `zero_errors` and `low_error_density` read declared severities while promising lint
+    outcomes, which made the scoring-optimal ruleset one that could never fail a build.
+
+    Both band ladders were re-cut against the new distribution. The cut points move with the
+    scores on purpose: a band is meant to keep meaning the same thing from one release to
+    the next, and the providers who change band should be the ones whose evidence changed.
+
 # ---------------------------------------------------------------------------
 # CHANGELOG
 #   0.10.5 (2026-08-11) — SCORE THE VERSION THE PROVIDER PUBLISHED, AND COMPARE
@@ -2636,8 +2683,8 @@ bands:
   - id: exemplar
     label: Exemplar
     min: 66.5
-    range: 66+
-    share: 1.2%
+    range: 66.5+
+    share: 1.0%
     description: >
       Reference-quality API operations across every facet — a rich contract, published
       governance, transparent operations, and machine-readable commercial terms. The
@@ -2645,8 +2692,8 @@ bands:
   - id: strong
     label: Strong
     min: 54.3
-    range: 56 – 65.9
-    share: 4.3%
+    range: 54.3 – 66.4
+    share: 3.8%
     description: >
       Solid contracts, transparent operations, and an easy start. Typically complete on
       four or five facets with one clear soft spot — most often governance or a missing
@@ -2654,8 +2701,8 @@ bands:
   - id: developing
     label: Developing
     min: 39.3
-    range: 42 – 55.9
-    share: 13.7%
+    range: 39.3 – 54.2
+    share: 13.3%
     description: >
       Real signal across most facets with visible, nameable gaps. The contract exists
       but is thin on descriptions or examples, or the portal is good while governance
@@ -2663,8 +2710,8 @@ bands:
   - id: thin
     label: Thin
     min: 26.2
-    range: 28 – 41.9
-    share: 14.6%
+    range: 26.2 – 39.2
+    share: 15.9%
     description: >
       Limited machine-readable signal and partial portal coverage. Usually a provider
       with documentation a human can read but little a machine or agent can consume
@@ -2672,8 +2719,8 @@ bands:
   - id: emerging
     label: Emerging
     min: 11.0
-    range: 13 – 27.9
-    share: 23.5%
+    range: 11 – 26.1
+    share: 24.0%
     description: >
       More than an index entry, but the surface is still mostly links rather than
       artifacts. These providers have started publishing — a portal, a few common
@@ -2682,8 +2729,8 @@ bands:
   - id: minimal
     label: Minimal
     min: 0
-    range: 0 – 12.9
-    share: 42.7%
+    range: 0 – 10.9
+    share: 41.9%
     description: >
       Index entry only; little beyond a description and a link. Nothing here is
       machine-readable enough for an agent to act on without a human first reading
@@ -3238,7 +3285,8 @@ agent_readiness:
     - id: agent-native
       label: Agent-Native
       min: 46
-      share: 1.2%
+      range: 46+
+      share: 1.7%
       description: >
         Built to be driven by agents, and the provider built it — a contract, a
         real agent surface the provider itself publishes, and the safety rails
@@ -3248,7 +3296,8 @@ agent_readiness:
     - id: agent-ready
       label: Agent-Ready
       min: 34
-      share: 13.2%
+      range: 34 – 45.9
+      share: 15.2%
       description: >
         An agent can drive the core surface. A machine-readable contract and
         documented auth are in place, and there is real agent-facing work beyond
@@ -3263,7 +3312,8 @@ agent_readiness:
     - id: agent-aware
       label: Agent-Aware
       min: 6
-      share: 24.1%
+      range: 6 – 33.9
+      share: 22.3%
       description: >
         Partial machine-readable surface. An agent can read some of the API but
         would hit implicit conventions a human silently absorbs — the gaps where it
@@ -3271,7 +3321,8 @@ agent_readiness:
     - id: human-only
       label: Human-Only
       min: 0
-      share: 61.4%
+      range: 0 – 5.9
+      share: 60.8%
       description: >
         Little an agent can consume without a human first reading the site. A
         developer can integrate it; their agent cannot yet.

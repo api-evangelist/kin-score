@@ -28,6 +28,20 @@ const shard = JSON.parse(fs.readFileSync(BADGES, 'utf8'));
 console.log(`badges.json: ${shard.count} providers, built ${shard.generated_at}, ` +
   `rubric ${shard.schema_version}`);
 
+/* badges.json is rebuilt by apis-io-aws/index-builder during `deploy:index`, which runs
+   at the END of a rebuild — after the rescore and after the cards. So immediately after a
+   rescore this shard is one rubric version behind BY DESIGN, and comparing against it
+   would report every provider in the catalog as a disagreement.
+   That is not drift, and reporting it as drift trains everyone to ignore this check. Say
+   so and stop; re-run after `rebuild.sh index` for a conclusive answer. */
+const RUBRIC = path.join(GH, 'api-search/signals/_data/scoring.yml');
+const liveRubric = (fs.readFileSync(RUBRIC, 'utf8').match(/^schema_version:\s*(\S+)/m) || [])[1];
+if (liveRubric && shard.schema_version && String(shard.schema_version) !== liveRubric) {
+  console.log(`SKIPPED — badges.json is on rubric ${shard.schema_version}, the engine is on ` +
+    `${liveRubric}. The badge shard is rebuilt by \`rebuild.sh index\`; verify after that.`);
+  process.exit(0);
+}
+
 let slugs = Object.keys(shard.providers);
 if (!all) {
   // Evenly spaced rather than the first N, so the sample isn't all "0"-prefixed.

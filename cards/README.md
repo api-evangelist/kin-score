@@ -28,9 +28,22 @@ the URL, so a rescore will *not* refresh cards already scraped by those platform
 URLs would fix that and break every link ever shared, which is worse. A stale card in
 someone's old LinkedIn post is a smaller problem than a dead one.
 
-Only **scored** providers get a card. Both sites guard on `page.score` before emitting the
-URL, so an unscored provider falls back to the site card instead of advertising a 404 as its
-share image.
+Only **scored** providers get a card, and nothing advertises a card it does not have.
+
+| Page | Guard |
+|---|---|
+| Provider detail (both networks) | `page.score` — the page holds its own score |
+| API detail (both networks) | `site.data.kin_cards[page.provider_slug]` |
+
+An API detail page carries `provider_slug` and no score of its own, so it cannot guard on
+itself. `emit-index.mjs` writes that index from the PNGs that actually exist and copies it
+into `api-search/apis/_data/` and `api-evangelist/apis/_data/`. Unindexed provider, or
+unscored provider: the site card, because an `og:image` at a 404 is worse than a generic one.
+
+**apis.io was not wired until 2026-08-19.** This file claimed both sites emitted the URL
+while only providers.apievangelist.com did; every apis.io provider page still shared one
+generic site card. The wiring lives in `api-search/network/_shared/_layouts/default.html`
+(copied to all 36 sites) and `api-evangelist/apis/_includes/head.html`.
 
 ## Where the numbers come from
 
@@ -62,9 +75,18 @@ Cards land in `dist/cards/` (gitignored — ~4 GB). `manifest.json` records a fi
 each provider's scored inputs, so a re-run after a rescore renders only what moved rather
 than all 26.5k.
 
-**Refresh procedure after a rescore:** `node build-cards.mjs` → `node verify-cards.mjs --all`
-→ `./upload-cards.sh`. Nothing on either site needs rebuilding — the URL is stable, so the
-new bytes are live as soon as they are uploaded.
+**A rescore refreshes the cards on its own.** `api-search/network/scripts/rebuild.sh cards`
+runs render → verify → index → upload, and it is a step of `rebuild.sh all` and of
+`apis-io-aws/scripts/refresh-all.sh` (phase 1b), placed straight after the data build because
+it reads the frontmatter `score.rb` just wrote — not the built site. `SKIP_CARDS=1` skips it.
+
+Both gates check the result: `pre-sync-gate.sh` check 10 and `ae-gate.sh` check 7 fail a
+deploy whose card index is missing, and warn when it holds under 90% of the catalog.
+
+Run it by hand only for a partial refresh — `./rebuild.sh cards --only stripe,twilio`, or the
+three commands directly. Nothing on either site needs rebuilding for new BYTES to go live:
+the URL is stable, so an upload is the publish. A site rebuild is needed only when the SET of
+carded providers changes, since that moves the index the API pages read.
 
 ## Things that will bite
 
