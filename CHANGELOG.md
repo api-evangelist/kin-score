@@ -16,6 +16,181 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.12.0 — 2026-08-18
+
+**NOT YET APPLIED TO PUBLISHED SCORES.** Engine is 0.12.0; published scores are 0.11.0.
+The `--write` rescore is held for the band re-cut and the next APIs.io rebuild.
+
+The release that stopped the rubric answering questions the provider's own contract had
+already answered — and stopped it crediting our work to them.
+
+### Renamed, dual-emitted for one release
+
+- `governance` -> **`contract_governance`**. It scores rulesets, vocabulary, conformance and
+  overlays: artifacts describing a CONTRACT. It never measured how an organisation governs
+  itself, and the new standalone `accountability` layer does — one word could not carry both.
+- `commercial_clarity` -> **`access_clarity`**. For a free statutory interface or a provider
+  whose own OpenAPI says "No authentication, no registration, no rate limit, no quota", the
+  word *commercial* describes nothing. 14 of the facet's 38 points were never commercial.
+
+Both keys are emitted **side by side** for 0.12.x. These names are schema, not labels: they
+appear in ~27,300 files including 669 data-bundle files across 118 SOLD reports. Old keys drop
+at 1.0, which resets every `kin/score` artifact anyway.
+
+### Applicability — `na`, and it leaves the denominator
+
+Derived per provider into `all/0-working/applicability.json`.
+
+- **`write_surface`** — 1,008 of 7,579 providers with a contract are entirely read-only
+  (13.3%, independently reproducing roadmap#63's 12.9%). `dry_run_mode` and `idempotency` are
+  now `na` for them: every request to a read API already IS a dry run, and a GET is idempotent
+  by definition. **`event_surface_described` is deliberately NOT gated** — a read API can
+  publish webhooks, 5.4% already do, and excusing it would be the blanket excuse #63 warned
+  its own proposal could become.
+- **`commercial_surface`** — 212 providers have none by design. Five signals, all required.
+  Keyed on evidence, never on sector: i6eal is a German UG, not a public body.
+
+**Our own artifacts were suppressing this detector 2.75x.** Of 1,008 read-only providers, 142
+failed only on `plans/` or `rate-limits/` — and 135 of those artifacts are marked `generated`.
+An artifact we wrote cannot be evidence that the provider has a commercial model.
+
+### Regulatory — regime-relative (roadmap#34 pt 4)
+
+    0.11:  composite = base + w*(reg - base)          <- drags every regulated provider down
+    0.12:  composite = base + w*(reg - regime_mean)   <- zero at the peer mean
+
+Being correctly identified as regulated was a PENALTY (mean -1.06; Plaid -4.9) and thin tagging
+was a reward. Regime means are frozen per rubric version in `regime_means:`, measured over 8,327
+providers — not computed live, because a live percentile would move a provider's score when
+someone else joined the catalog.
+
+**Composite is now clamped to [0, 100].** Re-centring subtracts a constant, so a near-zero base
+in a regime with a mean of 30.8 could go NEGATIVE. The full-catalog run crashed on exactly that;
+a 250-provider model never saw it.
+
+### Checks and dimensions
+
+- **`contract_governance` 48 -> 33 pts.** Dropped `zero_errors` and `low_error_density`: both read
+  DECLARED severities while promising lint outcomes, and contradicted each other — the
+  scoring-optimal ruleset was one that could never fail a build. `rules_substantial` now counts
+  `extends:`, so a ruleset extending `spectral:oas` is measured on what it ENFORCES.
+- **`lifecycle_documented`** (+5, capped 0.33, reward-only) — of the resources you can create,
+  the share documenting read, update and delete. 15.5% catalog-wide, **median 0.0%**.
+- **`domain_standard_conformance`** (+4, reward-only) — 164 providers ship a detectable domain
+  standard. Proposed as a conditional facet and REJECTED: a facet triggered by conformance can
+  only ever be passed, which is the `zero_errors` pathology under a new name.
+- **`reversibility_documented`** (+6, graded, gated on writes) — the 15th agent dimension.
+- **`mcp_server`** now reads `deployment.mode` + probe verdict, not the pointer. **2,503 derived
+  candidates lose it; the dimension sheds 72.6% of the points it awarded.** `claimed` scores 0.4
+  rather than zero — unprobed is not absent.
+- **Protobuf/gRPC and WSDL now count as contracts.** 45 providers were scored as publishing
+  nothing while holding 5,526 RPCs or 1,363 SOAP operations.
+
+### Recorded, not scored
+
+`operator` (578 vendor-produced OpenAPIs, ReadMe alone 211) · `interface_styles` (442 rpc-http vs
+5,551 rest) · `needs_work` (3,659 records, **every one owner=catalog**) · `disclosure_states`
+(published / refused / authwalled / language / js_challenge / unpublished — four of them OURS) ·
+`accountability` (schema only, `scored: false`).
+
+### New regime
+
+`education`, specificity 3 so it beats `government` on a multi-tag match. 119 of 300 universities
+were being scored against Government & Public Sector because a tag brushed it.
+
+### Defects found in the engine while building this
+
+- **`CONFORMANCE_CACHE` served two types.** A boolean cache and a hash cache shared one key, so
+  whichever ran first won — and `conformance_doc(slug)[:text]` raised on `false`, was rescued, and
+  silently scored regime checks FALSE for health and payments providers.
+- **Truncated `source_yaml`** produced nil entries; `json_schema_present` raised, was rescued, and
+  silently scored false for providers with long pages.
+- **`YAML.load_file` without `permitted_classes`** discarded any well-known or conformance artifact
+  carrying a bare date literal.
+- **`components_reuse` could never fire — not once, for any provider, ever.** The check tested
+  `s.to_yaml.scan('$ref:')`, and Psych quotes any key beginning with `$`, so `to_yaml` emits
+  `"$ref": "#/…"`. A quote character sits between the `f` and the colon, and the scan matched
+  zero occurrences in every document ever scored. Measured over a random 400-spec sample: **144
+  eligible (>= 5 schemas), 0 passing, and 144 passing once the colon is dropped.** Every eligible
+  provider was losing the full 3 points in `contract_quality`. Found while a provider's refined
+  specs reported `0 of 12 openapi documents pass` against documents plainly carrying 11-69 refs
+  each; the same provider now reads `7 of 12`.
+
+The first three were **rescued into a plausible-looking zero** — no crash, no log a human reads,
+just a lower score that looked like a finding. The fourth needed no rescue at all: it was a string
+that could not match, returning a legitimate-looking `false` on a healthy document.
+
+**The tell, and it generalises:** a spec-scoped check reporting `0 of N pass` against documents you
+can see satisfy it by eye is a serialization bug, not a data finding. Same family as reading the
+built page instead of the source — the scorer was looking at a different rendering of the thing
+than the one being inspected.
+
+### Pointers are now graded by whether they resolve (roadmap#16, #37)
+
+**33 checks were satisfied by the PRESENCE of a pointer.** The scorer never fetched the URL, so a
+pointer to a deleted page scored exactly the same as one that works.
+
+Probed all **117,876 distinct scored pointer URLs** across 38,195 hosts:
+
+| verdict | n | share |
+|---|---:|---:|
+| published | 92,816 | 78.7% |
+| **soft-404** | **9,039** | **7.7%** |
+| **dead** | **5,055** | **4.3%** |
+| error-429 (host throttles) | 4,484 | 3.8% |
+| unreachable | 1,947 | 1.7% |
+| **refused** | **1,885** | **1.6%** |
+| js_challenge | 1,385 | 1.2% |
+
+Graded **live 1.00 / unverified 0.50 / confirmed dead 0.00**. At instance level: **74.5% live, 20.0%
+unverified, 5.5% dead — 73,343 pointer instances were being credited for URLs that do not resolve.**
+
+**`refused` and `js_challenge` grade LIVE, not dead.** The probe re-fetches a 403 with a browser UA
+and downgrades to `dead` only if the browser also fails — so a surviving `refused` means the page
+demonstrably exists and only our crawler was turned away. Without that split, **1,885 providers**
+would have been marked down for an ordinary edge policy. TIBCO and SAP are the named cases.
+
+**The shared control is a MODULE, not a convention** (`all/0-working/probe_control.py`). roadmap#37's
+finding was that the lesson *failed to transfer twice inside one file* — once from
+`probe-contract-truth.py` into a probe that quoted it in its own docstring without implementing it,
+then from that probe's MCP branch into its GraphQL branch fifteen minutes later, voiding all 36
+GraphQL verdicts. A module makes the reviewer question *"does this import the control"*.
+
+**A control match does NOT mean "no information" — and getting that backwards mislabels both
+canonical cases.** Only `200/200` means nothing. `404/404` means the host discriminates correctly and
+your page is genuinely gone (roadmap#16 confirmed Avalara's three 404s exactly this way).
+`403/403` means the host refuses this crawler everywhere. `401/401` is opaque, which is roadmap#37's
+actual finding. The first implementation filed TIBCO as soft-404 and Avalara's dead links as
+"no information"; caught by smoke-testing against the two providers the issues name.
+
+### `components_reuse` had never fired, for any provider, in any release
+
+Found in a parallel session. The check tested `s.to_yaml.scan('$ref:')` — and Psych quotes any key
+beginning with `$`, so `to_yaml` renders `"$ref":` with a quote between the `f` and the colon. The
+pattern matched **zero occurrences in every document in every shipped version**. Of 400 sampled
+refined specs, 144 were eligible and **0 passed; all 144 pass with `scan('$ref')`.** Every eligible
+provider has been losing 3 points of `contract_quality` for the life of the check.
+
+It is a harder failure than the three rescued-exception bugs above: it raised nothing and rescued
+nothing. A string comparison that could not match, returning a legitimate-looking `false` on a
+healthy document. **The generalisable tell: a spec-scoped check reporting `0 of N pass` against
+documents that visibly satisfy it is a serialization bug, not a data finding.**
+
+### Regime means recomputed from a clean snapshot
+
+The 0.11.0 means were measured from scores carrying the `CONFORMANCE_CACHE` collision. Corrected:
+**banking_open_finance +2.8, payments +1.7** — the two regimes whose checks read `conformance_text`,
+which is what the collision was corrupting. Re-centring against the dirty means would have
+over-rewarded exactly those providers. `government` fell 978 -> 836 providers as `education` took the
+universities that were only matching it on a tag brush; education now carries its own mean (n=834).
+
+### Also
+
+`#70` shipped smaller than designed. Its kill gate ran: `agentic_access` is **99.6% AE-generated**
+(18 of 6,654 artifacts are provider-authored), so the in-contract tier was killed on evidence. Only
+the `robots.txt` tier survives, at 11.6% — where the artifact IS the policy rather than a claim
+about it.
+
 ## 0.11.0 — 2026-08-11
 
 **A second conditional facet, and the math generalised to hold N of them.** Open-source

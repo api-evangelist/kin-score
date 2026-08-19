@@ -15,6 +15,102 @@ has shipped.
 
 ---
 
+## Status after 0.12.0 (2026-08-18) — BUILT, VALIDATED, NOT YET WRITTEN
+
+Engine is **0.12.0**; published scores are **0.11.0**. The `--write` is held for the next apis.io
+rebuild per the standing rule. `rubric/scoring-0.12.0.yml` is frozen and the pre-rebuild guard
+passes.
+
+**Nineteen roadmap items shipped in one release** — the batch plan above, executed. What follows is
+what the work found that the issues did not say.
+
+### Four issues were materially wrong, and measuring first is why
+
+- **#12** — the recommended fix would have REGRESSED the rubric. Schema **0.22** (2026-08-11) already
+  absorbed all six named inversions; flipping canonical spellings toward 0.21 would have moved the
+  rubric away from the current schema. Cancelled. The real defect is that **17,122 providers declare
+  `specificationVersion: 0.20`**, which fails 63 of 80 canonical types.
+- **#71** — `Examples` and `GitHubRepository` are not orphans. `Examples` is read at the
+  `openapi_examples` documented tier; `License`/`GitHubRepository` are unread **by design**, because
+  `open_source` harvests the repo live and reading the pointer would score our wiring. Direction A is
+  gated on #64, not on the test.
+- **#56** — **`Website` is read by ZERO checks.** 23,093 providers wire it. The venue-listing problem
+  is real data hygiene and costs **nothing**. Reclassified from rubric defect to catalog defect.
+- **#69** — its table is wrong: FHIR and DCAT/CKAN ARE scored, through the `health` and `government`
+  regimes. The rows it gets right (SCIM, Sparkplug, OpenRTB) share one property — **markets with no
+  regulatory regime**. A standard is reachable only through a regime, and that coupling is the bug.
+
+### Two proposals were rejected on their own evidence
+
+- **A `standards_conformance` conditional facet.** A facet triggered by CONFORMANCE can only ever be
+  passed by the providers it applies to — it could never subtract. That is the `zero_errors`
+  pathology removed three items earlier in the same release, under a new name. Shipped as a 4-point
+  reward-only check instead. The evidence base is also ~2%: OData 89, SCIM 60, ActivityPub 10,
+  OpenRTB 4, Sparkplug 2, and **zero** for Web of Things, oneM2M and HR Open.
+- **#70's in-contract tier (D2).** Killed by its own gate: `agentic_access` is **99.6% AE-generated**
+  — 18 of 6,654 artifacts are provider-authored. Only the `robots.txt` tier survives, at 11.6%, where
+  the artifact IS the policy rather than a claim about it.
+
+### Five engine defects found while building, none of them in the issues
+
+| defect | how it failed |
+|---|---|
+| `CONFORMANCE_CACHE` served a boolean and a hash on one key | regime checks silently FALSE for health and payments |
+| truncated `source_yaml` produced nils | `json_schema_*` silently false on long provider pages |
+| `YAML.load_file` without `permitted_classes` | any well-known/conformance artifact with a bare date discarded |
+| **regime re-centring could emit a NEGATIVE composite** | crashed band assignment on the full catalog; a 250-provider model never saw it |
+| the band gate passed `na` only because a String is truthy | one refactor from demoting 1,000 read-only providers for a rail they cannot have |
+
+The first three were **rescued into a plausible-looking zero** — no crash, no log a human reads, just
+a lower score that looked like a finding. Same family as `components_reuse`, which raised nothing at
+all and never fired in any shipped release.
+
+**The generalisable tells, worth carrying forward:**
+1. A spec-scoped check reporting `0 of N pass` against documents that visibly satisfy it is a
+   serialization bug, not a data finding.
+2. A `rescue` that swallows into a falsy default is where a defect hides behind a defensible number.
+3. A control status matching the target does NOT mean "no information" — only `200/200` does.
+   `404/404` means the page is genuinely gone; `403/403` means the crawler was refused.
+4. **THERE IS ALMOST ALWAYS A SECOND CODE PATH. Grep for it before changing how anything is read
+   or written.** This bit four separate times in one release, and each time the defect was in the
+   copy nobody remembered:
+
+   | concept | path 1 | path 2 — where the defect was |
+   |---|---|---|
+   | conformance artifacts | `conformance_declared?` (boolean cache) | `conformance_doc` (hash cache) — SAME KEY |
+   | the provider's API list | `apis.yml` on disk | `source_yaml` in page frontmatter, truncated |
+   | a scored pointer type | `has_type` on `common[]` | `canon(pr["type"])` on `apis[].properties[]` |
+   | the score record | `render_score_block` (provider page) | `render_kin_artifact` (durable artifact) |
+
+   The last one shipped: 26,566 artifacts were written without the dual-emitted facet names,
+   `needs_work` or `regulatory.undetermined`, while the pages had all three. Caught on verification,
+   fixed, rewritten. **A change that looks complete because the thing you inspected is correct is the
+   most expensive kind**, and this codebase has enough paired implementations that "I checked the
+   output" is not evidence the change landed everywhere.
+
+### Three detectors were too narrow, each caught by spot-checking a provider we could reason about
+
+`dry_run_mode` missed request bodies (2.1x). `lifecycle_documented` scored **Stripe 0.000** on 189
+resources by requiring PUT/PATCH when Stripe uses POST-on-instance, then **Shopify 0.000** by not
+stripping `.json` from path keys. All three would have published a confident wrong number about a
+well-known provider, and none was caught by an aggregate.
+
+### What the release actually did to scores
+
+**#16 is 84% of it.** Pointer liveness alone: mean **−1.091** of the **−1.30** total composite
+movement, **13,056 providers down, zero up**, worst −24.4. Everything else nets to about −0.2.
+
+**73,343 pointer instances (5.5%) are confirmed dead** and were being credited. **5,214 are OURS**
+— refused, JS-challenged or unreachable — and grade live or unverified, never dead. Without that
+split, 1,885 providers would have been marked down for an ordinary edge policy.
+
+Bands re-cut to hold the documented distribution (every band within 0.1pp). **Agent bands left
+alone** — the 1.8% vs 1.2% overshoot on `agent-native` is the applicability layer correctly raising
+1,000 read-only providers out of hazards they cannot carry, not drift.
+
+
+---
+
 ## Status after 0.11.0 (2026-08-11) — SHIPPED AND PUBLISHED
 
 **0.11.0 is live.** The weekly APIs.io rebuild on 2026-08-11 ran the held `--write` rescore and
@@ -2618,6 +2714,53 @@ used by exactly two checks, `sdk_count_1` and `sdk_count_3`, both on `SDK`. Ever
 provider-level check is a membership test, so duplicate `common[]` entries cannot inflate a
 score outside `SDK`. WunderGraph's duplicated `Blog` was cosmetic. Their duplicated
 `DomainSecurity` is not a duplicate at all — two different artifact files for two surfaces.
+
+## A check that could never fire, for any provider, in any release
+
+Found 2026-08-18 while remediating a provider whose refined specs reported
+`components_reuse: 0 of 12 openapi documents pass` — against documents plainly carrying five to
+ten component schemas and 11 to 69 `$ref`s each. Either the split had broken every document or the
+check had never worked.
+
+The check had never worked. It tested:
+
+```ruby
+s.to_yaml.scan('$ref:').length >= 5
+```
+
+Psych quotes any key beginning with `$`, so `to_yaml` renders the key as `"$ref":` — a quote sits
+between the `f` and the colon, and `scan('$ref:')` matches zero occurrences. Not rarely. Never, in
+any document, in any version of the rubric that has shipped.
+
+Measured over a random sample of 400 refined specs in `all/*/openapi/`:
+
+| | count |
+|---|---|
+| sampled | 400 |
+| eligible (>= 5 component schemas) | 144 |
+| passing with `scan('$ref:')` | **0** |
+| passing with `scan('$ref')` | **144** |
+
+Every eligible provider in the catalog has been losing the full **3 points** in `contract_quality`
+for as long as the check has existed. Fixed in 0.12 by dropping the colon; `$ref` does not
+otherwise occur in these documents. The provider that surfaced it now reads `7 of 12`.
+
+**Why it matters beyond the 3 points.** The three defects already recorded in the 0.12 changelog
+were all *rescued exceptions* — a raise, a rescue, a plausible zero. This one raised nothing and
+rescued nothing. It was a string comparison that could not match, returning a legitimate-looking
+`false` on a perfectly healthy document, which is a harder failure to find and one no error log
+would ever surface.
+
+**The generalisable tell:** a spec-scoped check reporting `0 of N pass` against documents that
+visibly satisfy it is a serialization bug, not a data finding. The same family as scoring the built
+provider page instead of the source — in both cases the scorer is reading a different rendering of
+the artifact than the one being inspected.
+
+**Worth auditing the rest.** This was found by accident. Any other check that round-trips through
+`to_yaml` or `to_json` and then string-matches is exposed to the same class of bug, and a check
+that silently never fires is indistinguishable from a catalog where nobody qualifies.
+
+---
 
 ## The 0.12 batch — what lands together, and in what order
 

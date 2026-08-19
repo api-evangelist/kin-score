@@ -1415,6 +1415,528 @@ The venue-listing problem is real data hygiene worth fixing, but it **costs zero
 **#56 should be reclassified from a scoring defect to a catalog defect, and it does not gate the
 re-cut.**
 
+### The pre-rebuild guard is built and negative-tested
+
+`api-search/signals/test_rubric_record.py`. Asserts three things agree before a rebuild may
+publish: `scoring.yml`'s `schema_version`, a `## <version>` CHANGELOG heading, and a
+`rubric/scoring-<version>.yml` snapshot **that matches the live file**.
+
+The second half of the third check is deliberate. **A snapshot that exists but has drifted is worse
+than a missing one — it looks like provenance and is not.** That is the presence-is-not-evidence
+rule the rubric applies to everyone else, turned on us.
+
+**Negative-tested**, because a gate nobody has seen fail is the `zero_errors` pathology this release
+is fixing. Snapshot removed → exit 1 with the right message; restored → exit 0.
+
+Current state passes: engine 0.11.0, CHANGELOG entry present, snapshot matches. **The 0.11.0
+backfill genuinely worked** — snapshots run complete from 0.5 through 0.11.0, contrary to a first
+impression that they stopped at 0.9.4.
+
+### #27 — the swing is measured, and it is ~8% of what the issue feared
+
+#27 and the ROADMAP both record option 2 as blocked because *"it re-zeroes every unprobed provider
+catalog-wide and that swing has not been measured."* Measured 2026-08-17:
+
+| | providers |
+|---|---:|
+| catalog | 26,861 |
+| **earn `llms_txt_published` via a real harvested artifact** | **7,988** |
+| **earn it via the unprobed-pointer FALLBACK** | **1,046** |
+| total earning the check | 9,034 |
+
+**The fallback is 11.6% of earners and 3.9% of the catalog — not "every unprobed provider."** The
+harvest is already 88% done. That changes the decision entirely:
+
+- **Option 1 (harvest) is now a bounded job of ~1,000 providers, not 26,861.** It was never the
+  catalog-scale campaign it looked like.
+- **Option 2 (drop the fallback) would strip a credit from 1,046 providers, and on #27's own sample
+  rate (4 false in 15) roughly three-quarters of them are serving a real llms.txt we simply never
+  fetched.** That is the collection failure the attribution block exists to prevent us publishing as
+  a provider failure.
+
+**Option 1, and it is running.** `harvest_llms.py` fetches each of the 1,033 declared pointers and
+applies four rejections, each from a rule already paid for elsewhere:
+
+| verdict | rule it comes from |
+|---|---|
+| `soft-404` — a 200 serving `text/html` | `soft-404-false-credit`; 2 of #27's 15 |
+| `thin` — under the 50-byte floor | `llms_txt_present?` already applies it |
+| `not-llms` — no `#`/`>` structure | a page, not a file |
+| `foreign-host` — not on the provider's own registrable domain | #16's "own registrable domain only"; #52 STEP 0c. This is #27's Envoy Gateway → `envoyproxy.slack.com` case |
+
+A pass writes the verbatim artifact. **A rejection writes nothing and is recorded** — an honest
+absence is a valid measurement, and it converts a false credit into a true zero with a fetched URL
+and a status code behind it.
+
+#### Result — #27 is CLOSED
+
+1,033 pointers fetched:
+
+| verdict | n | share |
+|---|---:|---:|
+| **`ok`** — real llms.txt, artifact written | **782** | **75.7%** |
+| `soft-404` — 200 serving HTML | **185** | 17.9% |
+| `unreachable` | 55 | 5.3% |
+| `not-llms` | 7 | 0.7% |
+| `http-error` | 3 | 0.3% |
+| `thin` | 1 | 0.1% |
+| **false credits confirmed** | **251** | **24.3%** |
+
+**24.3% against #27's hand-sample of 4-in-15 (26.7%).** The sample was accurate; the issue's estimate
+of the rate was right and only its estimate of the *population* was wrong.
+
+`foreign-host` returned **zero**. #27's Envoy Gateway → `envoyproxy.slack.com` case did not recur at
+scale, so that failure mode is real but rare. Recorded so nobody over-builds for it.
+
+**Writing the artifacts alone would NOT have closed the bug**, and this is the part worth keeping.
+The check is:
+
+```ruby
+llms_txt_present?(slug) || (!repo_has?(slug, "llms") && has_type(p, "LLMsTxt"))
+```
+
+For a rejected provider nothing was written, so `!repo_has?` stayed **true** and the fallback kept
+firing. **A harvest that only records successes cannot close a false-credit bug** — the absence has
+to be written down too.
+
+So each of the 251 got `all/<slug>/llms/<slug>-llms-probe.yml` carrying the fetched URL, status,
+content-type and verdict. That makes `repo_has?` true (fallback suppressed) while carrying no `.txt`
+(so `llms_txt_present?` stays false) — **a true zero with evidence behind it.** Same posture as the
+`well-known` probe artifacts, which record negative results by design.
+
+| | before | after |
+|---|---:|---:|
+| earn via a real artifact | 7,988 | **8,770** |
+| earn via the unprobed fallback | 1,046 | **16** |
+| total earning `llms_txt_published` | 9,034 | **8,786** |
+| **net credit change** | | **−248** |
+
+**248 providers lose a credit they were not entitled to; 782 now hold evidence instead of an
+assumption.** The residual 16 are pointers whose `type:`/`url:` pairing the harvester's regex did not
+match — a known, bounded remainder, not an unknown.
+
+**This is the first score-moving change of 0.12.0 and it moves scores DOWN.** It joins #59's MCP
+correction as the second downward pressure landing in the same band re-cut.
+
+### #54 — ROOT CAUSE FOUND, and it is three mechanisms, not one
+
+#54 asked whether it shares a root cause with #47 (a helper broke 19 `apis.yml` files and `build.py`
+silently dropped a provider) and recorded it as *"not established."* **Established: it does not.**
+
+**All 28 unbanded providers' `apis.yml` parse cleanly.** #47's mechanism is absent. The symptom has
+three separate causes:
+
+#### 1 · Twenty-five providers have no `.git` directory — this is the main one
+
+`providers/scripts/build-listing.py`, `company_slugs()`:
+
+```python
+if not os.path.isdir(os.path.join(path, ".git")):
+    continue          # <- silent, no bucket, no count
+```
+
+A directory with an `apis.yml` but no `.git` is **scored by `score.rb`**, gets a
+`_providers/<slug>.md` page **with a correct band in its frontmatter**, and is then dropped here
+without a word. 26 of the 28 had a correct band sitting in the page all along.
+
+**The check contradicts the function's own docstring**, which says exactly two things disqualify a
+repo — delisted, or no `apis.yml` — and then explains that *"keying on `apis.yml` is what
+`build-providers.py` and `build-sections.py` already do; this makes the listing agree with them."*
+The `.git` requirement is what makes it **dis**agree.
+
+Catalog-wide: **26,861 directories carry an `apis.yml`; 26,836 also carry `.git`; 25 do not.** Those
+25 are the drop, and they include **`gs1` (23.9)** — a named headline in the published Supply Chain
+report — alongside Alphabet, AMD, Toyota, UnitedHealth, Cigna, Centene, TJX, CSX and Altria.
+
+It also connects a condition already recorded and never linked to scoring: the git-state inventory's
+**"31 non-git"** repos. The inventory knew; nothing joined it to the band files.
+
+**Fixed so it can never be silent again.** `company_slugs()` now collects the non-git drops and
+prints a boxed warning naming every one. Verified firing: `WARNING: 25 SCORED providers excluded for
+having no .git directory.`
+
+**Left for Kin, deliberately:** whether to `git init` the 25 (they should be real repos anyway, for
+recoverability) or to keep the `.git` requirement as a deliberate rule. **Not done unasked, because
+25 fresh repos with no remote would land in tonight's `all/*` commit and push.**
+
+#### 2 · `spot-ai` — scored, has `.git`, has `apis.yml`, and has no provider page at all
+
+The only one of the 28 with no `_providers/spot-ai.md`. A different failure, one step earlier in the
+chain, and plausibly a remnant of the `flexera`/`spot` repo-rename collision.
+
+#### 3 · Three never rescored at 0.11.0 — and the fourth is a false alarm
+
+| provider | composite | rubric | last scored |
+|---|---:|---|---|
+| `modal` | **67.0** | 0.9.1 | 2026-08-06 |
+| `deel` | 60.8 | 0.9.1 | 2026-08-06 |
+| `factorial` | 30.8 | 0.9.1 | 2026-08-06 |
+
+**A 67.0 Exemplar is still absent**, unchanged since #54's comment. But #54's comment names a
+**fourth**, `tronald-dump` — and it is in `network/_data/delisted.yml`. **Its absence is the
+delisting guard working correctly, not a defect.** Three, not four.
+
+#### The timing proof that rules out simple build lag
+
+26,567 providers scored at **06:45** today. Band files rebuilt at **10:08**, three hours later, with
+26,541. The build ran *after* the scoring and still dropped them — so this was never staleness.
+
+### #61 — the detector IS too narrow, but only 2.1×. The finding survives.
+
+#61 asked for a verdict between three outcomes before 0.27% gets quoted again. Measured across
+**95,117 specs in 7,581 providers** with an `openapi/` directory.
+
+The check, verbatim (`score.rb:544`, `:637`): at least one **mutating** operation carrying a
+**parameter whose name matches exactly**:
+
+```ruby
+DRY_RUN_PARAM_RE = /\A(dry[_-]?run|simulate|preview|validate[_-]?only|test[_-]?mode)\z/i
+```
+
+That is the right semantics — a request-level flag, not a sandbox environment. **#61's outcome 3
+(detector too loose) is ruled out.**
+
+| widening | providers | share |
+|---|---:|---:|
+| **live detector as written** | **80** | 1.06% |
+| + vendor-prefixed param (`X-Dry-Run`) | **0** | 0.00% |
+| + unanchored param (`dryRunMode`, `previewOnly`) | +27 | 0.36% |
+| + `requestBody` property, exact match | +36 | 0.47% |
+| + `requestBody` property, loose | +37 | 0.49% |
+| **union of all widenings** | **171** | **2.26%** |
+| | **2.1×** | |
+
+**Verdict: outcome 1, modestly.** The detector is too narrow and the true figure is roughly double —
+not the 30× the 9.2% keyword sample raised as a possibility. #61 predicted that itself: *"most of
+those hits will be a sandbox environment… `sandbox` in particular is a near-certain false friend."*
+Confirmed.
+
+**A hypothesis of mine that the data killed.** I flagged that `RATELIMIT_HEADER_RE` anticipates the
+`x-` vendor prefix one line above while `DRY_RUN_PARAM_RE` does not, and predicted that asymmetry was
+costing detections. **It costs exactly zero — not one provider names the parameter `X-Dry-Run`.** The
+asymmetry is real and harmless. Recorded so nobody re-derives it.
+
+**The real gap is the request body.** The detector scans `parameters` only, and the dominant modern
+pattern is `{"dryRun": true}` in the JSON body — worth +36 on its own, the largest single widening.
+
+#### What this means for the release
+
+1. **The published finding stands.** *"Anything which constrains or accounts for what an agent may
+   actually do falls off a cliff"* survives at 2× the original number. Quote **~0.5%** rather than
+   0.27%, and say the detector reads request-level flags.
+2. **The applicability layer can proceed.** `dry_run_mode` is genuinely rare, not an artifact — so
+   making it `na` for read-only providers is measuring a real absence of hazard, not papering over a
+   blind detector. **This was the gate on §4 and it is now cleared.**
+3. **Widen the detector in this release** — add `requestBody` schema properties and drop the anchors.
+   It is additive, it moves ~91 providers up, and per §7's rule a score-moving change is cheaper
+   before the band re-cut than after.
+
+Sibling check worth doing in the same pass: `idempotency` reads `IDEMPOTENCY_PARAM_RE = /idempoten/i`
+against **parameters only** too, so it has the identical request-body blind spot, and it is one of the
+three dimensions §4 is about to gate.
+
+### #62 — CLOSED. The facet is 48 -> 33 points and the reporter's case now passes.
+
+A provider read the Governance facet closely enough to find that its checks measure a ruleset's
+**declarations** while the facet text describes lint **outcomes**. They ran the lint themselves and
+mutated their spec once per rule to prove the pass was not vacuous. They were right.
+
+**Dropped `low_error_density` (10 pts) and `zero_errors` (5 pts).** Both read declared severities.
+Spectral is never executed against the provider's spec, so neither could measure what its own text
+promised. As declarations they were incoherent and mutually contradictory: `zero_errors` was
+unearnable by any ruleset declaring an error-severity rule -- every ruleset with teeth -- while
+`balanced_severities` paid 3 points for declaring warn and info. **The scoring-optimal ruleset was
+one that could never fail a build.**
+
+`balanced_severities` is KEPT. With `zero_errors` gone it no longer contradicts anything, and as a
+statement about ruleset design it is coherent: a ruleset where everything is an error can express
+refusal but not guidance.
+
+**`rules_substantial` now counts what the ruleset ENFORCES.** `build.py` never captured `extends:`,
+so a ruleset doing `extends: [spectral:oas]` plus a focused handful was measured on the handful.
+It now records `extends`, `inherited_rule_count` and `effective_rule_count`, against a table of what
+each base actually executes (`spectral:oas` 41, `spectral:asyncapi` 27, `spectral:arazzo` 15). An
+unrecognised base contributes **0**, so the count can understate a ruleset but never inflate one.
+
+The reporter's own ruleset, measured:
+
+| | |
+|---|---:|
+| authored rules | 9 |
+| inherited from `spectral:oas` | 41 |
+| **effective** | **50** |
+| `rules_substantial` (>=20) | **FAIL -> PASS** |
+
+Which is exactly their argument: *"inlining 41 rules I didn't write in order to be measured on the 9
+I did."*
+
+**Facet total: 48 -> 33 points, weight held at 0.12** per the decision. As predicted in section 1,
+`rules_present` goes from 20.8% to 30.3% of the facet.
+
+**Scale, and the honest caveat.** 2,234 rulesets in the catalog use `extends`. In a 2,000-file
+sample, **557 would newly pass `rules_substantial`** -- a large upward move. But most of those
+rulesets are **ours**: 4,516 of 5,785 name their own generator. `rules_substantial` is already wired
+into `provenance.applies_to` for the `rules` class, so AE-generated rulesets grade down and the
+composite effect is damped well below the raw count. **Verified still wired after the edit.** The
+per-change modelling step must report this one net of provenance, or it will read as a much bigger
+gift than it is.
+
+**Still open, deliberately:** outcome-based linting. Running Spectral across ~26k providers' own
+specs is a real build cost and wants its own artifact class. Until it exists the facet measures
+declaration -- and now its description says so, which was the reporter's actual ask: *"I'd rather not
+restructure ours until I know which model I'm optimizing against."*
+
+### Applicability layer — derived, wired, and it found our own artifacts suppressing it
+
+`all/0-working/applicability.json`, one derived file following the `open-source-surface.json`
+precedent so a computed observation never lands inside `all/<slug>/` looking like provider work.
+
+**write_surface, across 26,861 providers:**
+
+| shape | n | share of the 7,579 with a readable contract |
+|---|---:|---:|
+| no-contract | 19,285 | — |
+| mixed | 4,594 | 60.6% |
+| write-heavy | 1,377 | 18.2% |
+| **read-only** | **1,008** | **13.3%** |
+| write-only | 440 | 5.8% |
+| read-dominant | 157 | 2.1% |
+
+**13.3% against roadmap#63's 12.9%** — independently reproduced on a fresh derivation.
+
+**The finding: our own artifacts were suppressing the commercial-surface detector by 2.75x.**
+
+First run flagged **77** providers as having no commercial surface by design. Checking why the
+obvious cases were missing turned up this: of the 1,008 read-only providers, **142 failed on
+`plans/` or `rate-limits/` alone — and 135 of those 142 artifacts are marked `generated` or
+`derived`. Ours.**
+
+`plans/`, `rate-limits/` and `finops/` are catalog-authored at scale — one cohort sits at 100%
+coverage from a single bulk sweep. **An artifact we wrote cannot be evidence that the provider has a
+commercial model**, and counting it suppressed the exact finding the fact exists to make. Same class
+as the governance facet scoring AE-written rulesets as provider governance.
+
+Corrected: **77 -> 212**, 2.8% of providers with a contract. Unmarked artifacts still count as the
+provider's, matching the standing rule that absence of a marker is credited in full — conservative in
+the right direction, since it can only *understate* how many providers have no commercial surface.
+
+**Validated against the cases that motivated it:**
+
+| provider | shape | commercial | verdict |
+|---|---|---|---|
+| **i6eal** | read-only, 83 ops | **absent-by-design** | the motivating case, caught |
+| Open-Meteo | read-only | present-or-unknown | correct — its `plans/` is unmarked and names real Standard/Professional/Enterprise tiers |
+| We > Ultrarich | read-only | present-or-unknown | gets the hazard `na`, not the commercial substitution |
+| Stripe | mixed | present-or-unknown | correct |
+
+#### What is gated, and what deliberately is not
+
+**Hazard dimensions — `na` for read-only, leaving the denominator** per the decision.
+`dry_run_mode` (every request to a read API already is a dry run) and `idempotency` (a GET is
+idempotent by definition — the guarantee is in the method).
+
+**`event_surface_described` is NOT gated, against roadmap#63's own proposal.** A read-only API can
+legitimately publish webhooks — "new data is available" is a normal thing for a read surface to
+announce, and 5.4% of read-only providers already do. Excusing it would be the blanket excuse the
+issue warned its own proposal could become.
+
+**Commercial checks — `na` where all five signals hold.** `plans_present`, `plans_multiple`,
+`pricing_link`, `sign_up_present`, `finops_mapped` — **24 of `access_clarity`'s 38 points.** The
+remaining 14 — terms of service, privacy policy, compliance, trust centre — stay, because they ask
+what you are PERMITTED to do and who is accountable, which applies to a free statutory interface
+exactly as much as to a SaaS product. **That split is the whole argument for the rename.**
+
+Both gates fail **closed**: no derivation, or no readable contract, and the check scores normally.
+Inapplicability is never inferred from missing evidence.
+
+#### A bug caught before it shipped
+
+The first implementation of roadmap#34's `undetermined` state returned a new hash shape from
+`regulatory_regime_for`. **Eight call sites treat `nil` as "not regulated" and one derives `applies:`
+from it — so that would have switched the regulatory facet ON for every untagged provider in the
+catalog.** Reverted to a separate `regime_undetermined?` predicate; the return contract is untouched.
+
+### standards_conformance — the measurement kills the facet. It ships as a CHECK.
+
+Section 6c C recommended a new conditional facet. **Measuring the evidence base killed it, on two
+independent grounds.**
+
+#### 1 · A conditional facet triggered by conformance CAN ONLY EVER BE PASSED
+
+This is the decisive one and it is a design error, not a data problem.
+
+A conditional facet applies only where its trigger fires. If the trigger is *"this provider ships a
+recognised domain standard"*, then every provider the facet applies to **passes it by construction**.
+It could never subtract. That is a pure bonus facet — **the exact `zero_errors` pathology removed
+from governance three items ago in this same release**, reintroduced under a new name.
+
+A facet has to be able to cost something, or it is a participation award. The applicability question
+that WOULD make it a real facet — *"does this provider's market have a domain standard it is not
+implementing?"* — needs an industry→standards map with real coverage, and that map does not exist.
+
+#### 2 · The evidence base is ~2%, not the market-wide signal roadmap#69 assumed
+
+Document-level signatures across every OpenAPI in the catalog — schema URNs and protocol markers,
+never prose mentions:
+
+| standard | providers |
+|---|---:|
+| OData | 89 |
+| **SCIM** | **60** |
+| ActivityPub | 10 |
+| OpenRTB | 4 |
+| Sparkplug | 2 |
+| oneM2M · Web of Things · HR Open | **0** |
+
+**~165 providers of the 7,579 holding a contract — about 2%.** roadmap#69 called domain-standard
+conformance *"the single most useful interoperability signal in the market"*, and in principle it is
+right. In this catalog, today, almost nobody ships one detectably.
+
+Three of the standards the issue names have **zero** detectable adoption. Weighting a facet at 0.10
+on that would be building instrument for evidence that is not there.
+
+#### 3 · And FHIR was already covered — twice
+
+Section 6a established this and it survives: FHIR is scored through the `health` regime's standards
+list AND through dedicated `fhir_capability_statement` / `fhir_resource_coverage` checks in
+contract_quality. **The plan's "seed with SCIM and FHIR" would have made FHIR a third scoring path
+for the same fact.** The genuinely uncovered standard was only ever SCIM.
+
+#### What ships instead
+
+A **reward-only check in `contract_quality`**, small points, no `na` gating — the same posture as
+`lifecycle_documented`: credit documented conformance, never penalise its absence. Detection is
+document-level evidence, inheriting `reg_mandate_verified`'s rule that a claim with nothing callable
+behind it earns nothing. A provider naming SCIM in marketing copy gets nothing; one declaring
+`urn:ietf:params:scim:schemas:...` in its contract earns.
+
+Verified real before building on it: ActivTrak declares
+`urn:ietf:params:scim:schemas:extension:activtrak:2.0:Group`, which is conformance evidence rather
+than a mention.
+
+**The industry→standards map is still the right long-term shape** — section 6a's finding that a
+standard is reachable only through a regulatory regime stands, and it is why SCIM was invisible to a
+non-education provider. But it becomes a facet when the adoption exists to measure, not before.
+Recorded as deferred with the reason, so the next pass does not re-litigate it from the issue text.
+
+### Interface styles — a new axis, raised mid-build and worth having
+
+**Kin, 2026-08-18:** *"We probably should start identifying API patterns like RPC somewhere. REST.
+We do GraphQL. We do MCP. These are all patterns and we should probably be identifying everything a
+provider offers and consider in rubric."*
+
+Raised out of the `lifecycle_documented` work, and it is the same class of fact as `write_surface`:
+**something the contract already answers that the rubric was inferring.**
+
+**It gives an existing roadmap finding somewhere to live.** roadmap#70's second-order note has been
+sitting unactionable since it was filed: *"gaming's taxonomy puts `rpc` in the top resources... the
+rubric is shaped by HTTP request/response, so a market with a legitimate architectural reason to use
+something else is being measured partly on the wrong axis."* Slack is that finding in a different
+market, found from the other end.
+
+#### Two layers, and the second is the one nothing had
+
+**1 · Declared surfaces** — which contract classes exist at all. Already on disk:
+
+| surface | providers |
+|---|---:|
+| openapi | 7,674 |
+| **mcp** | **4,170** |
+| asyncapi | 2,247 |
+| graphql | 1,120 |
+| grpc | 124 |
+| wsdl | 11 |
+
+**2 · HTTP style INSIDE the OpenAPI — `rest` vs `rpc-http`.** This is the new layer, and *"has an
+`openapi/`"* tells you nothing about it. Slack and Stripe both have one; only one is
+resource-oriented. Derived from path SHAPE — share of paths carrying a parameter segment, share
+answering only POST, share whose last segment is a dotted method name (`/chat.postMessage`).
+
+#### RECORDED, NOT SCORED in 0.12 — and that is deliberate
+
+Same posture as `operator`. **A provider is not better for being REST.** An RPC, event-driven or
+streaming surface can be exactly right for its market, and scoring style would repeat the mistake
+this exists to fix. What it unlocks is knowing WHICH CHECKS APPLY — which is the applicability
+layer's entire job.
+
+It is also a new axis surfaced mid-build, and 0.12 already carries a band re-cut. Deriving it now and
+scoring it in 0.13 keeps an unmeasured scoring change out of a release that has enough of them.
+
+#### What it would unlock once scored
+
+| today | with `interface_style` |
+|---|---|
+| `lifecycle_documented` counts Slack's 121 RPC methods as creatable resources | RPC providers leave the denominator; the catalog percentages stop understating REST coverage |
+| roadmap#70's gaming/RPC finding is prose in an issue | a fact on the record, per provider |
+| roadmap#11 (gRPC) and #19 (WSDL) are "formats we cannot read" | **`grpc/` 124 and `wsdl/` 11 providers are already on disk** — the readers have a measured population to justify them |
+| `contract_quality` assumes request/response | checks can be gated by style the way hazard dimensions are gated by `write_surface` |
+| a multi-surface provider looks the same as a single-surface one | breadth of interface styles becomes reportable in its own right |
+
+**The gRPC and WSDL counts are the immediately useful part.** roadmap#19's own first step is *"count
+first — Swagger 2.0 went from 'one provider looked odd' to 203 providers; do the counting before the
+weighting."* That count now exists: **124 providers hold a `grpc/` artifact and 11 hold WSDL.** Small,
+but no longer unknown — and it sizes the reader work honestly rather than on an anecdote.
+
+### #70 — the kill gate RAN. D2 is dead, D1 survives, and the check ships smaller.
+
+Decision 2 approved a declared posture scoring above silence **conditional on section 3a.5
+clearing**. It ran. The condition did its job.
+
+#### D2 — FAILED. There is nothing provider-authored to score.
+
+`agentic_access` was #70's own preferred vehicle: *"promote it to carry a stated-closure value
+rather than being binary present/absent."* Census of all **6,654** artifacts:
+
+| `method:` | n | |
+|---|---:|---:|
+| **generated** | **6,627** | **99.6%** |
+| searched | 17 | 0.3% |
+| derived | 5 | 0.1% |
+| probed | 4 | 0.1% |
+| declared | 1 | 0.0% |
+
+**Eighteen artifacts in the entire catalog are provider-authored.** And posture-shaped keys are
+almost non-existent — 8 artifacts carry anything resembling one.
+
+Section 3a.5's kill condition for D2 was stated in advance: *"if provider-authored is ~0, there is
+nothing to score yet."* It is 0.3%. **D2 does not ship.**
+
+This is 0.6's finding recurring exactly — that release found `agentic_access` at 99.9% generated —
+and it is the trap roadmap#38 named: scoring prose we wrote measures our writing, not theirs.
+
+#### D3 — moot. With no declarations, there is nothing to fingerprint.
+
+#### D1 — SURVIVES, and it is the tier that was always strongest.
+
+`robots.txt` directives naming AI user-agents. Sampled 400 providers, 337 with a usable host:
+
+| verdict | n | |
+|---|---:|---:|
+| robots.txt exists, no AI directive | 226 | 67.1% |
+| unreachable | 62 | 18.4% |
+| **names an AI user-agent** | **39** | **11.6%** |
+| no robots.txt | 10 | 3.0% |
+
+Agents named: GPTBot 34 · Google-Extended 33 · CCBot 32 · Applebot-Extended 30 · Bytespider 30 ·
+ClaudeBot 29 · Meta-ExternalAgent 26 · anthropic-ai 20 · PerplexityBot 16 · cohere-ai 15.
+
+**11.6% discriminates.** It is not near-universal and not near-absent, which were the two ways
+section 3a.5 said D1 could fail. Extrapolated, roughly **2,600 providers** in the catalog have made a
+machine-readable, ENFORCED decision about agent access.
+
+D1 is also the tier with the strongest epistemics, and this measurement confirms why: **a robots.txt
+directive is not a claim about policy, it is the policy.** It cannot be written without being
+enforced, which is exactly what the other three tiers could not guarantee.
+
+#### What #70 ships as
+
+**D1 only.** A provider whose `robots.txt` names AI user-agents has stated a position — whether that
+position is allow or disallow — and a stated position scores above silence. Take-Two at 7.1 and a
+company that never thought about it stop being the same number.
+
+Smaller than the four-tier design in section 3a. That is the kill gate working as intended: it was
+written to shrink or stop the check on evidence, and it did both.
+
 ---
 
 ## 9a. Gaps — what this plan was not considering (found 2026-08-17)
