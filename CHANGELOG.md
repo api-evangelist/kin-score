@@ -16,6 +16,75 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.12.1 — 2026-08-23
+
+**ROADMAP ONLY. NO SCORING CHANGE.** No check, weight, band, credit table or applicability rule
+moved. `score.rb` never reads `planned_dimensions`, so **no provider's points change**; the only
+value a rescore rewrites is the `schema_version` stamp in the score block. `agent_readiness`
+stays at its own `schema_version: 0.2`. This release exists so the rubric's own planning surface
+carries the work, and so that work is traceable to the document that prompted it.
+
+**NOT YET APPLIED TO PUBLISHED SCORES.** Like 0.12.0, this ships inert — published scores are
+still 0.11.0, and both versions go live together at the next APIs.io rebuild.
+
+### Five planned dimensions, from an IETF draft
+
+[`draft-klrc-aiagent-auth-00`](https://datatracker.ietf.org/doc/draft-klrc-aiagent-auth/) —
+"AI Agent Authentication and Authorization", by Pieter Kasselman (Defakto Security),
+Jean-François Lombardo (AWS), Yaroslav Rosomakho (Zscaler) and Brian Campbell (Ping Identity).
+Informational, filed 2 March 2026, expires 3 September 2026, **not working-group adopted**.
+
+The draft defines no new protocol, no header, no claim and no well-known path. It argues a
+composition: an agent is a workload, so it gets one WIMSE identifier (which MAY be a SPIFFE ID),
+a short-lived credential cryptographically bound to it and issued off attestation, mTLS or WIMSE
+Proof Tokens / HTTP Message Signatures for authentication, and OAuth 2.0 for delegation.
+
+**There is therefore nothing to scan for named "draft-klrc-aiagent-auth", and no dimension in
+this rubric will ever claim to measure conformance to it.** Each entry below measures one
+constituent the draft names, from evidence that already exists or a probe already understood.
+
+| planned dimension | measures | blocked on |
+|---|---|---|
+| `auth_scheme_strength` | bound vs bearer authentication; regrades `auth_clarity` | rubric |
+| `delegated_identity` | can a token carry the user the agent acts for | parser |
+| `protected_resource_metadata` | RFC 9728 served at the API host | probe |
+| `dynamic_client_registration` | RFC 7591 / Client ID Metadata Documents | probe |
+| `agent_identity_declared` | WIMSE/SPIFFE identity at a public API edge | collection |
+
+### The pressure it puts on an existing dimension
+
+The draft's sharpest sentence for this rubric is that static API keys are an antipattern for
+agent identity — bearer artifacts, not cryptographically bound, conveying no identity, typically
+long-lived, hard to rotate. `auth_clarity` pays its full 10 points when `common[].type` includes
+API Keys, which means **the antipattern scores identically to OIDC discovery**. Fixing that is a
+regrade of an existing dimension, not a new one, which is why `auth_scheme_strength` is filed as
+`supersedes: auth_clarity`.
+
+### Baseline, measured 2026-08-23
+
+Across `all/*/openapi` — 96,612 specs, 6,265 providers declaring any `securityScheme`:
+
+| declared | providers | share |
+|---|---|---|
+| `apiKey` **only** | 2,209 | 35.3% |
+| any `oauth2` | 1,142 | 18.2% |
+| any `openIdConnect` | 37 | 0.6% |
+| any `mutualTLS` | 13 | 0.2% |
+
+That distribution is why the cluster stays **out of the composite** for now, why
+`auth_scheme_strength` proposes a 0.35 floor rather than a zero — zeroing 2,209 providers would
+measure the market rather than them — and why `agent_identity_declared` is parked pending
+re-measurement rather than built.
+
+### A probe note paid for in advance
+
+`protected_resource_metadata` MUST parse the response body, never the status code. Sampled
+2026-08-23: `api.slack.com` returns **HTTP 200 `text/html`** for
+`/.well-known/oauth-protected-resource`, `/.well-known/oauth-authorization-server` **and**
+`/.well-known/openid-configuration` — a docs-site catch-all that would earn full credit three
+times over from a status-code probe. Credit only `application/json` parsing to an object
+carrying `resource` and a non-empty `authorization_servers`.
+
 ## 0.12.0 — 2026-08-18
 
 **NOT YET APPLIED TO PUBLISHED SCORES.** Engine is 0.12.0; published scores are 0.11.0.
