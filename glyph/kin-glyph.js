@@ -110,6 +110,12 @@ export const DIMENSIONS = [
 export const PARTIAL_GRADES = new Set([
   'documented', 'partial', 'derived', 'mixed', 'conformance',
   'near-conformant', 'flavored',
+  // 0.12.2 (roadmap#97) — auth_clarity grades: bound 1.00 / negotiable 0.75 / bearer 0.35.
+  // `bound` is deliberately absent: full credit draws a full ray. Without the other two,
+  // rayState() falls through to its `return 'full'` default and an apiKey-only provider
+  // earning 3.5 of 10 draws a ray identical to a mutualTLS provider earning all ten --
+  // the exact thing partial grading exists to prevent.
+  'negotiable', 'bearer',
 ]);
 
 /* off | partial | full — from a bool, a grade string, or a trit char. */

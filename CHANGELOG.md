@@ -16,6 +16,81 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.12.2 — 2026-08-24
+
+**THE FIRST 0.12.x THAT MOVES POINTS.** 0.12.0 and 0.12.1 shipped inert — planning surface only,
+no check or credit table touched. This one changes what providers earn, in two places, and both
+reduce credit. Published scores are still 0.11.0; 0.12.0, 0.12.1 and 0.12.2 all go live together
+at the next rebuild, so the jump a provider sees is measured from 0.11.0.
+
+### `auth_clarity` is graded by scheme class instead of crediting presence (roadmap#97)
+
+The dimension paid its full ten points for `apiKey` at the same rate as OIDC.
+[`draft-klrc-aiagent-auth-00`](https://datatracker.ietf.org/doc/draft-klrc-aiagent-auth/) calls
+that artifact an antipattern for agent identity — "bearer artifacts that are not
+cryptographically bound, do not convey identity, are typically long-lived and are operationally
+difficult to rotate, making them unsuitable for secure agent authentication or authorization". A
+dimension named **Machine-Readable Auth** was paying top price for the thing the field is
+converging on calling unsuitable.
+
+| grade | credit | qualifies |
+|---|---|---|
+| `bound` | 1.00 | `mutualTLS`, or an `http` scheme naming DPoP / Signature |
+| `negotiable` | 0.75 | `oauth2` with an `authorizationCode` or `clientCredentials` flow, or `openIdConnect` |
+| `bearer` | 0.35 | `http` bearer, `apiKey` |
+
+**The floor is 0.35 and not zero, deliberately.** A documented API key is still machine-readable
+auth. Zeroing it would measure the market rather than the provider.
+
+Read from the refined per-tag OpenAPIs, which already carry `securitySchemes` — no probe and no
+new artifact. The `apis.yml` pointer remains a fallback grading `bearer`, so a provider whose
+specs are not indexed is not zeroed for a gap that is ours.
+
+**The dimension id stays `auth_clarity`.** `auth_scheme_strength` in `planned_dimensions`
+describes this change, but a dimension id is positional — `DIM_ORDER` in `build_listings.py` and
+`DIMENSIONS` in the glyph both encode by slot — so renaming is a coordinated four-place change
+that re-encodes every badge. The regrade is the value; the rename is cosmetic.
+
+### The well-known soft-200 filter reads every miss the harvest recorded (roadmap#101, step 1)
+
+`well_known_docs` rejected a soft 200 by substring-matching the `note:` prose. The enrichment
+pipeline records that judgement **seven** ways across its generations — `real_document: false`,
+`real: false`, `document: false`, `result: html-catchall|spa-shell|miss|absent`,
+`reason: html-spa-shell`, `content_type`/`type: text/html`, and the note — and the scorer read
+one. An entry the harvest had already marked an SPA shell earned full credit anywhere it used a
+different key.
+
+Both affected checks are **frontier** checks — the ones only a provider can satisfy — which is
+the worst place in the rubric to credit a catch-all. Measured across 7,226 providers and 79,681
+document entries:
+
+| target | credited before | after | lost |
+|---|---:|---:|---:|
+| `api-catalog` | 641 | 290 | −351 |
+| `security.txt` | 1,530 | 1,144 | −386 |
+| `openid-configuration` | 1,427 | 1,064 | −363 |
+| `oauth-authorization-server` | 1,481 | 1,172 | −309 |
+| `oauth-protected-resource` | 550 | 438 | −112 |
+
+Every rejection is a verdict the pipeline wrote down, never an inference from a missing field.
+That distinction is load-bearing: 70% of `method: probed` artifacts saved no body at all, so
+requiring a saved `file:` would score our own harvest convention rather than the provider. Steps
+2 and 3 of #101 — a re-probe, then a positive required-field test — are a later release for
+exactly that reason.
+
+### Also
+
+`agent_readiness.planned_dimensions.protected_resource_metadata` corrected from
+`blocked_on: probe` to `blocked_on: rubric`. The document is already probed and saved on 1,467
+providers; only a check that reads it was missing. That value was wrong in the published
+0.12.1 snapshot.
+
+### Bands
+
+Not re-cut in this snapshot. Both changes reduce credit and the Agent Readiness distribution
+moves, so the ladder is re-cut against the first full rescore that carries 0.12.2 — before those
+numbers are published, not after.
+
 ## 0.12.1 — 2026-08-23
 
 **ROADMAP ONLY. NO SCORING CHANGE.** No check, weight, band, credit table or applicability rule
