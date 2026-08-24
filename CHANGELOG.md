@@ -109,14 +109,52 @@ The two discriminate against each other, which is the point: Stripe serves RFC 9
 authorization servers (`verified`, 5.0) and advertises no registration endpoint (0.0); 1komma5 is
 exactly the reverse.
 
+### `agentic_commerce` — and the operator problem (roadmap#123)
+
+**5 points, graded `self` 1.00 / `platform` 0.25.** 197 providers hold a real, parsing
+`/.well-known/ucp.json` and **every one scored zero**: `well_known_catalog` credits only
+api-catalog, security.txt and protected-resource, and not one of the 197 holds any of those. A
+provider standing up a conformant agentic-commerce document was indistinguishable from one serving
+no `.well-known` at all.
+
+**193 of the 197 point at `<store>.myshopify.com`.** That is not 193 merchants shipping an
+agentic-commerce surface — it is one platform shipping one, 193 times, under its merchants' names.
+The same operator-attribution failure that ranked universities for Figshare's contract. So
+attribution is settled **before** the award, from the document's own service endpoints:
+
+| endpoint domain | count | grade |
+|---|---:|---|
+| `myshopify.com` | 193 | `platform` |
+| `firmly.online` | 2 | `platform` |
+| `curie.app`, `taskfolk.ai` | 2 | **`self`** |
+
+`platform` is graded down rather than zeroed, because the capability genuinely exists — a buyer's
+agent can transact there — it is simply the vendor's, not the provider's.
+
+Matching uses **every domain the provider publishes**, not just its Website pointer. The first
+implementation used Website alone and produced a false negative: `curie` publishes `curie.co` and
+serves its endpoint on `curie.app`, the same company on a different TLD. It also publishes
+`chat.curie.app` in its own pointer list, so the wider read settles it without guessing at brand
+similarity.
+
+A parsing document is not enough — a version and at least one declared service are required, or it
+is a stub at the right path.
+
+**No AP2 check and no x402 check, deliberately.** AP2 defines no well-known path and no pointer; its
+artifacts are SD-JWT mandate chains presented in-band at transaction time, under authentication, so
+nothing anonymous is ever fetchable — and 0 of the 197 UCP documents reference it. x402 is a `402`
+plus a response header and needs a live request to a paid endpoint. Scoring either would claim a
+measurement the surface does not permit, which is the rule the rubric already applies to
+`draft-klrc-aiagent-auth`.
+
 ### Bands — the re-cut is not optional this time
 
-Four changes pull in different directions and three of them rescale everybody:
+Five changes pull in different directions and four of them rescale everybody:
 
 - 0.12.2 **reduces** credit for most of the catalog (auth regrade + withdrawn well-known credit)
 - the `served` tier **restores** some of it for the 889 providers serving discovery
-- three new dimensions raise **`max` from 117 to 134**, so every agent score is multiplied by
-  **0.8731 before any provider earns a single new point**
+- four new dimensions raise **`max` from 117 to 139**, so every agent score is multiplied by
+  **0.8417 before any provider earns a single new point**
 
 That last one is the 0.5.1 case again: `agent_card` at 8 points took max 104 → 112 and would have
 demoted 3,726 providers (14.6%) for publishing nothing different. A provider that changes nothing

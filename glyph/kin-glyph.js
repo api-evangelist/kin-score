@@ -101,6 +101,8 @@ export const DIMENSIONS = [
   // Slots 17-18, appended 0.13.0 (roadmap#98) — RFC 9728 and RFC 7591.
   { id: 'protected_resource_metadata', label: 'Protected Resource Metadata' },
   { id: 'dynamic_client_registration', label: 'Registration Without a Human' },
+  // Slot 19, appended 0.13.0 (roadmap#123).
+  { id: 'agentic_commerce', label: 'Agentic Commerce Surface' },
 ];
 
 /* Grades that mean PARTIAL credit rather than full. 0.6 made seven of the
@@ -124,6 +126,8 @@ export const PARTIAL_GRADES = new Set([
   // 0.13 (roadmap#102) — the OIDC-discovery tier, 0.90. NOT called `verified`: that string
   // already means 1.00 in five other dimensions and rayState() returns 'full' for it.
   'served',
+  // 0.13.0 (roadmap#123) — agentic_commerce `platform` at 0.25.
+  'platform',
 ]);
 
 /* off | partial | full — from a bool, a grade string, or a trit char. */
