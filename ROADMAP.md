@@ -15,6 +15,34 @@ has shipped.
 
 ---
 
+## Status 2026-08-24 — 0.12.1 IS LIVE, and two changes are riding on it unversioned
+
+**0.12.1 published catalog-wide on 2026-08-24.** Provider pages on APIs.io now read
+`rubric v0.12.1`, and `get_rating_rubric` serves it. The 0.12.0 → 0.12.1 hold described below is
+discharged.
+
+**Then two behavioural changes landed in `api-search/signals` the same day without a version bump:**
+
+| commit | change | describes itself as |
+|---|---|---|
+| `8948158` | well-known: honor every miss the harvest recorded, not just the note text (roadmap#101) | 0.12.2 |
+| `768a839` | `auth_clarity`: grade by scheme class instead of crediting presence (roadmap#97) | 0.12.2 |
+
+Both are real scoring changes — `auth_clarity` moves from a presence bit to a graded
+bound / negotiable / bearer credit — and `_data/scoring.yml` still declares `schema_version: 0.12.1`.
+Nothing in this repo names 0.12.2: no CHANGELOG entry, no frozen snapshot, no roadmap row. **That is
+the same failure mode as 0.11.0**, which shipped inside an unrelated delist commit whose message
+never named it, and which standing rule 1 exists to prevent.
+
+Nothing published is wrong today — the live catalog was scored *before* these commits, so live scores
+and the frozen `rubric/scoring-0.12.1.yml` still agree. The exposure is the **next** scoring pass,
+which would stamp `0.12.1` on scores that 0.12.1 does not describe.
+
+**To close it:** bump `schema_version` to 0.12.2, freeze `rubric/scoring-0.12.2.yml`, write the
+CHANGELOG entry, re-cut the bands if `auth_clarity` grading moves the distribution, then run
+`bin/sync-rubric-docs.py` so the README and the paper follow. `bin/sync-rubric-docs.py --check`
+detects this class of drift and is now a gate in the release checklist.
+
 ## Status after 0.12.0 (2026-08-18) — BUILT, VALIDATED, NOT YET WRITTEN
 
 Engine is **0.12.0**; published scores are **0.11.0**. The `--write` is held for the next apis.io
