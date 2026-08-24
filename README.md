@@ -253,12 +253,13 @@ denominator.
 | **Rate-Limit Signaling** | 7 | Does it surface live rate-limit state in response headers? |
 | **Documented Reversibility** | 6 | Can the action be taken back, and within what window? |
 | **Typed Event Surface** | 6 | Is the webhook/event surface described by a contract? |
+| **Delegated User Identity** | 6 |  |
 | **Agent Skills** | 5 | Are operating instructions packaged, not inferred? |
 | **Well-Known Catalog** | 4 | Is there an RFC 9727 `api-catalog` linkset? |
 | **Dry-Run / Simulate Mode** | 4 | Can a destructive operation be rehearsed before it commits? |
 | **Consent & Bot Identity** | 3 | AIPREF / Content-Signals / Web Bot Auth — the frontier signals. |
 
-**Fifteen dimensions, 117 points**, normalised to 0–100.
+**16 dimensions, 123 points**, normalised to 0–100.
 <!-- kin-score:agent-dimensions:end -->
 
 **`reversibility_documented` is the 0.12 addition**, and it was preferred over a consequence

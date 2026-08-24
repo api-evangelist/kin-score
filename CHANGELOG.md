@@ -59,12 +59,42 @@ served discovery document is exactly the evidence a regulated provider would be 
 publish — and it read a hand-maintained `apis.yml` pointer list instead. A regulated provider
 serving real OIDC discovery earned nothing there unless somebody had also declared the pointer.
 
-### Bands
+### New dimension: `delegated_identity` — 6 points (roadmap#99)
 
-**Not re-cut in this snapshot.** 0.12.2 reduces credit for most of the catalog and 0.13.0 restores
-some of it for the 889 providers serving discovery; the net distribution is not predictable from
-either change alone. The ladder is re-cut against the first full rescore that carries 0.13.0,
-before those numbers are published.
+Can a caller obtain a token scoped to the **human** it is acting for, or only a credential
+belonging to the integration itself? Section 10.3 of the same draft splits exactly this way, and
+nothing in the rubric distinguished them. It is the difference between an audit log that can name
+a delegated subject and one that cannot — which Section 11 makes a MUST.
+
+| grade | credit | evidence |
+|---|---|---|
+| `served` | 1.00 | a discovery document listing `authorization_code` in `grant_types_supported` |
+| `documented` | 0.50 | an `oauth2` `authorizationCode` flow, or `openIdConnect`, declared in an OpenAPI |
+
+**Distinct from `auth_clarity` on purpose.** A provider can hold strong bound credentials and still
+offer no delegation path; the reverse is equally possible. Scoring them as one dimension would let
+a strong answer to one question hide a missing answer to the other.
+
+**Measured before it was built.** 768 providers declare `authorizationCode` — ~67% of the 1,142
+declaring any `oauth2`, and 20× the `openIdConnect` population. That discriminating power is what
+separates it from `agent_identity_declared`, which stays parked at 13 providers.
+
+Appended at **slot 16**. Dimension order is positional in `DIM_ORDER` and in the glyph; appending
+shifts nothing, inserting would shift every slot after it.
+
+### Bands — the re-cut is not optional this time
+
+Three changes pull in different directions and one of them rescales everybody:
+
+- 0.12.2 **reduces** credit for most of the catalog (auth regrade + withdrawn well-known credit)
+- the `served` tier **restores** some of it for the 889 providers serving discovery
+- `delegated_identity` **raises `max` from 117 to 123**, so every agent score is multiplied by
+  **0.9512 before any provider earns a single new point**
+
+That last one is the 0.5.1 case again: `agent_card` at 8 points took max 104 → 112 and would have
+demoted 3,726 providers (14.6%) for publishing nothing different. A provider that changes nothing
+must not change band, so the ladder is cut against the first full rescore carrying 0.13.0 — before
+those numbers are published, not after.
 
 ## 0.12.2 — 2026-08-24
 
