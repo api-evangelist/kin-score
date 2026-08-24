@@ -74,14 +74,14 @@ weights sum to 1.0 and are the argument the score is making about what matters.
 <!-- kin-score:facets:start -->
 | Facet | Weight | Checks | The question it asks |
 |-------|:------:|:------:|----------------------|
-| **Contract Quality** | 0.25 | 39 | Is there a machine-readable contract at all — in any format — and can you call it? |
+| **Contract Quality** | 0.25 | 40 | Is there a machine-readable contract at all — in any format — and can you call it? |
 | **Developer Ergonomics** | 0.20 | 13 | Can a human get started — docs, portal, SDKs, auth clarity, a real description? |
 | **Access Clarity** | 0.20 | 9 | What does it cost, what are you permitted to do, and how do you get in? |
 | **Operational Transparency** | 0.13 | 9 | Will it tell you when it changes or breaks? |
 | **Contract Governance** | 0.12 | 6 | Is anyone holding the contract itself to a standard? |
 | **Discoverability** | 0.10 | 12 | Can an agent find you *without being told where to look*? |
 
-**Eighty-eight base checks.** Plus 22 more in the two conditional facets, for 110 in total.
+**89 base checks.** Plus 22 more in the two conditional facets, for 111 in total.
 <!-- kin-score:facets:end -->
 
 Checks on artifact types a provider doesn't ship are **N/A** — excluded from that facet's

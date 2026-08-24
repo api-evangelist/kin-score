@@ -147,9 +147,31 @@ plus a response header and needs a live request to a paid endpoint. Scoring eith
 measurement the surface does not permit, which is the rule the rubric already applies to
 `draft-klrc-aiagent-auth`.
 
+### Two wired pointer types that nothing read (roadmap#71)
+
+Found by **Ahmet Soormally at WunderGraph**, who wired nine `common[]` pointers to his own record
+unprompted after seeing the Kin Score. Two of the nine were read by **no check in the rubric**, and
+nothing in the build would ever have told him — or us.
+
+- **`examples_published`, 4 points, contract_quality.** A published corpus of worked examples,
+  separate from the contract. Distinct from `examples_present`, which reads examples *inside* the
+  OpenAPI document — a provider can reasonably have either or both. **595 providers** declare the
+  pointer and it earned nothing. The catalog already treats examples as first-class: there is an
+  `examples/` artifact class and an `api-search/examples` site. The rubric was the only part that
+  could not see them.
+- **`github_org_present` widened to accept `GitHubRepository`.** **600 providers** declare it, so a
+  provider pointing at their actual code repository scored below one pointing at an org page. Not
+  aliased in the table: an org and a repo are different things elsewhere in the catalog, and
+  collapsing them there would be wrong. They are the same answer only to the question this check
+  asks — is the code findable.
+
+The Examples family — `CodeExamples` (168), `Samples` (27), `CodeSamples` (5), `Demos` (2) — is
+handled in the `aliases:` table rather than in the lambda, per the standing rule that a vocabulary
+in code is where drift starts.
+
 ### Bands — the re-cut is not optional this time
 
-Five changes pull in different directions and four of them rescale everybody:
+Six changes pull in different directions, four of them rescale every agent score, and one moves the composite:
 
 - 0.12.2 **reduces** credit for most of the catalog (auth regrade + withdrawn well-known credit)
 - the `served` tier **restores** some of it for the 889 providers serving discovery
