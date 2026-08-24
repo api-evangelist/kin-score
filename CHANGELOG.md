@@ -16,6 +16,56 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.13.0 — 2026-08-24
+
+**Batched with 0.12.2, one band re-cut for both.** A rubric edit is inert until a rescore, so
+0.12.2's changes ride here rather than publishing separately — one re-cut instead of two. 0.12.2's
+entry below stands as the record of what it changed; nothing in it was reverted.
+
+### `auth_clarity` gains a `served` tier — the OIDC discovery document, finally read (roadmap#102)
+
+The enrichment pipeline probes `/.well-known/openid-configuration` on **5,881 providers** and
+`/.well-known/oauth-authorization-server` on 5,714, saving the body on 889 and 1,009. **Nothing in
+the rubric read the result as OIDC.** Those paths fed exactly one check — `well_known_published` —
+where they were OR'd into a five-way list, so a provider serving a complete, valid discovery
+document earned precisely what a provider serving only a `security.txt` earned.
+
+| grade | credit | evidence |
+|---|---|---|
+| `bound` | 1.00 | `mutualTLS`, or an `http` scheme naming DPoP / Signature |
+| **`served`** | **0.90** | **a served `openid-configuration` / `oauth-authorization-server` carrying `issuer`** |
+| `negotiable` | 0.75 | `oauth2` with `authorizationCode`/`clientCredentials`, or `openIdConnect` declared |
+| `bearer` | 0.35 | `http` bearer, `apiKey` |
+
+A served document sits above a declared scheme and below a bound credential. Declaring
+`openIdConnect` in a spec says the provider intends OIDC; serving the document is the thing an agent
+reads to authenticate with no human in the loop, and only the provider can produce it.
+
+**Presence of JSON is not evidence.** Two sampled providers return `application/json` at that path
+with no `issuer` at all. `issuer` is REQUIRED by OpenID Connect Discovery and RFC 8414, so the check
+tests for the required field rather than the media type — the same lesson as the well-known
+soft-200 filter in 0.12.2.
+
+**The grade is `served`, not `verified`.** `verified` already means 1.00 in five other dimensions
+(`mcp_server`, `idempotency`, `error_semantics`, `openapi_examples`, `rate_limit_signal`,
+`reversibility_documented`) and the glyph's `rayState()` hardcodes it as full. Reusing it at 0.90
+would make one grade string mean two different credits depending which dimension you read it in,
+and would draw a full ray for nine-tenths credit.
+
+### `reg_authentication_documented` reads the same document
+
+The third pointer-only blind spot. It sits inside the conditional `regulatory` facet — where a
+served discovery document is exactly the evidence a regulated provider would be expected to
+publish — and it read a hand-maintained `apis.yml` pointer list instead. A regulated provider
+serving real OIDC discovery earned nothing there unless somebody had also declared the pointer.
+
+### Bands
+
+**Not re-cut in this snapshot.** 0.12.2 reduces credit for most of the catalog and 0.13.0 restores
+some of it for the 889 providers serving discovery; the net distribution is not predictable from
+either change alone. The ladder is re-cut against the first full rescore that carries 0.13.0,
+before those numbers are published.
+
 ## 0.12.2 — 2026-08-24
 
 **THE FIRST 0.12.x THAT MOVES POINTS.** 0.12.0 and 0.12.1 shipped inert — planning surface only,

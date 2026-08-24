@@ -116,6 +116,9 @@ export const PARTIAL_GRADES = new Set([
   // earning 3.5 of 10 draws a ray identical to a mutualTLS provider earning all ten --
   // the exact thing partial grading exists to prevent.
   'negotiable', 'bearer',
+  // 0.13 (roadmap#102) — the OIDC-discovery tier, 0.90. NOT called `verified`: that string
+  // already means 1.00 in five other dimensions and rayState() returns 'full' for it.
+  'served',
 ]);
 
 /* off | partial | full — from a bool, a grade string, or a trit char. */
