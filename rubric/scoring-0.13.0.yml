@@ -3489,12 +3489,33 @@ agent_readiness:
         and a published range that contradict each other. The field is absent when no
         gate fired, so its presence is the disclosure.
 
+  # BAND RE-CUT AT 0.13.0. Four new dimensions took `max` from 117 to 139, so every
+  # agent score is multiplied by 0.8417 before any provider earns a single new point.
+  # The cuts are scaled by the SAME factor rather than re-derived from the curve, because
+  # the property that matters after a denominator change is that A PROVIDER WHO PUBLISHED
+  # NOTHING NEW KEEPS ITS BAND. Providers who gained on the new dimensions move up on merit;
+  # nobody moves down for standing still. That is the 0.5.1 lesson, where agent_card at 8
+  # points would have demoted 3,726 providers (14.6%) for publishing nothing different.
+  #
+  # 5.1 also lands inside the deep valley from 4 to 13 that follows the 2-3 spike of 2,842
+  # providers, so the lowest cut is not sitting on a cliff where a fractional score change
+  # would flip thousands between bands on the next run.
+  #
+  # The `share:` values below are UPDATED to what the catalog actually holds rather than
+  # forcing the curve back to the old prose. The distribution moved for real reasons and
+  # the documentation follows it, not the other way round.
+  #
+  # THE TOP TWO SHARES ARE POST-GATE, and that is why they are not what scaling predicts.
+  # 849 providers score at or above 38.7 but only 313 keep agent-native: the band gate
+  # demotes the other 536 for missing idempotency AND a stable error envelope. Scaling the
+  # CUT does not scale the GATE, so agent-native lands at 1.1% rather than the 3.1% the
+  # percentile implies, and those 536 land in agent-ready instead.
   bands:
     - id: agent-native
       label: Agent-Native
-      min: 46
-      range: 46+
-      share: 1.7%
+      min: 38.7
+      range: 38.7+
+      share: 1.1%
       description: >
         Built to be driven by agents, and the provider built it — a contract, a
         real agent surface the provider itself publishes, and the safety rails
@@ -3503,9 +3524,9 @@ agent_readiness:
         somebody has written agent artifacts about.
     - id: agent-ready
       label: Agent-Ready
-      min: 34
-      range: 34 – 45.9
-      share: 15.2%
+      min: 28.6
+      range: 28.6 – 38.6
+      share: 9.6%
       description: >
         An agent can drive the core surface. A machine-readable contract and
         documented auth are in place, and there is real agent-facing work beyond
@@ -3519,9 +3540,9 @@ agent_readiness:
         a hand in rather than one the catalog supplied.
     - id: agent-aware
       label: Agent-Aware
-      min: 6
-      range: 6 – 33.9
-      share: 22.3%
+      min: 5.1
+      range: 5.1 – 28.5
+      share: 26.1%
       description: >
         Partial machine-readable surface. An agent can read some of the API but
         would hit implicit conventions a human silently absorbs — the gaps where it
@@ -3529,8 +3550,8 @@ agent_readiness:
     - id: human-only
       label: Human-Only
       min: 0
-      range: 0 – 5.9
-      share: 60.8%
+      range: 0 – 5
+      share: 63.1%
       description: >
         Little an agent can consume without a human first reading the site. A
         developer can integrate it; their agent cannot yet.

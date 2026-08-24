@@ -338,10 +338,10 @@ after any material rubric change with `signals/band_distribution.rb`.
 <!-- kin-score:agent-bands:start -->
 | Band | Score | Share | Meaning |
 |---|:---:|:---:|---|
-| **Agent-Native** | 46+ | 1.7% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
-| **Agent-Ready** | 34 – 45.9 | 15.2% | An agent can drive the core surface. |
-| **Agent-Aware** | 6 – 33.9 | 22.3% | Partial machine-readable surface. |
-| **Human-Only** | 0 – 5.9 | 60.8% | Little an agent can consume without a human first reading the site. |
+| **Agent-Native** | 38.7+ | 1.1% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
+| **Agent-Ready** | 28.6 – 38.6 | 9.6% | An agent can drive the core surface. |
+| **Agent-Aware** | 5.1 – 28.5 | 26.1% | Partial machine-readable surface. |
+| **Human-Only** | 0 – 5 | 63.1% | Little an agent can consume without a human first reading the site. |
 <!-- kin-score:agent-bands:end -->
 
 **`Emerging` was split out of `Minimal`**, and it is the most useful band on the list. A quarter of
