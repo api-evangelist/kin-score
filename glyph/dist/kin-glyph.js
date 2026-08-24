@@ -106,6 +106,9 @@ const DIMENSIONS = [
   { id: 'reversibility_documented', label: 'Documented Reversibility' },
   // Slot 16, appended 0.13.0 (roadmap#99) — same rule as slot 15.
   { id: 'delegated_identity', label: 'Delegated User Identity' },
+  // Slots 17-18, appended 0.13.0 (roadmap#98) — RFC 9728 and RFC 7591.
+  { id: 'protected_resource_metadata', label: 'Protected Resource Metadata' },
+  { id: 'dynamic_client_registration', label: 'Registration Without a Human' },
 ];
 
 /* Grades that mean PARTIAL credit rather than full. 0.6 made seven of the

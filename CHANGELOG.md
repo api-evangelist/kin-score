@@ -82,14 +82,41 @@ separates it from `agent_identity_declared`, which stays parked at 13 providers.
 Appended at **slot 16**. Dimension order is positional in `DIM_ORDER` and in the glyph; appending
 shifts nothing, inserting would shift every slot after it.
 
+### Two more dimensions, from documents already on disk (roadmap#98)
+
+Neither needs a sweep. Both read bodies the pipeline already fetches and saves.
+
+**`protected_resource_metadata` — 5 points, graded.** RFC 9728, Section 10.9.2 of the draft: an
+agent discovers HOW a resource is protected and WHICH authorization server protects it, at runtime,
+instead of being configured by a human. It is the **only** part of that draft's composition that is
+a fetchable artifact at the provider's own domain — WIMSE identifiers, attestation and Transaction
+Tokens all live inside provider infrastructure and cannot be observed from outside.
+`resource` is the required field; `authorization_servers` is what makes the document actionable, so
+it grades `documented` 0.50 / `verified` 1.00. Probed on 1,467 providers, saved on 473.
+
+**`dynamic_client_registration` — 6 points.** RFC 7591, Section 10.9.3: if every new agent needs a
+developer to fill in a portal form and paste a key, the provider has no agent onboarding path
+regardless of what its docs claim. `console_or_sandbox` and `sign_up_present` measure the HUMAN
+path only. It costs **one JSON key** — `registration_endpoint` in the discovery document already
+being saved on 889 providers.
+
+**Never probed by status code.** `api.slack.com` answers `200 text/html` to all three OAuth
+well-known paths — a docs-site catch-all — so a status probe would award full credit three times
+over to a provider serving none of them. Every one of these checks reads the saved BODY and tests a
+required field.
+
+The two discriminate against each other, which is the point: Stripe serves RFC 9728 with named
+authorization servers (`verified`, 5.0) and advertises no registration endpoint (0.0); 1komma5 is
+exactly the reverse.
+
 ### Bands — the re-cut is not optional this time
 
-Three changes pull in different directions and one of them rescales everybody:
+Four changes pull in different directions and three of them rescale everybody:
 
 - 0.12.2 **reduces** credit for most of the catalog (auth regrade + withdrawn well-known credit)
 - the `served` tier **restores** some of it for the 889 providers serving discovery
-- `delegated_identity` **raises `max` from 117 to 123**, so every agent score is multiplied by
-  **0.9512 before any provider earns a single new point**
+- three new dimensions raise **`max` from 117 to 134**, so every agent score is multiplied by
+  **0.8731 before any provider earns a single new point**
 
 That last one is the 0.5.1 case again: `agent_card` at 8 points took max 104 → 112 and would have
 demoted 3,726 providers (14.6%) for publishing nothing different. A provider that changes nothing
