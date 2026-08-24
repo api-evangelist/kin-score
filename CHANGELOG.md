@@ -20,8 +20,13 @@ changelog and the snapshots here are the canonical public record.
 
 **THE FIRST 0.12.x THAT MOVES POINTS.** 0.12.0 and 0.12.1 shipped inert — planning surface only,
 no check or credit table touched. This one changes what providers earn, in two places, and both
-reduce credit. Published scores are still 0.11.0; 0.12.0, 0.12.1 and 0.12.2 all go live together
-at the next rebuild, so the jump a provider sees is measured from 0.11.0.
+reduce credit.
+
+Published scores now carry the `0.12.1` stamp (the 2026-08-24 full refresh rescored the catalog),
+but the VALUES are unchanged from 0.11.0, because neither 0.12.0 nor 0.12.1 moved a point. So the
+movement a provider sees when 0.12.2 lands is measured from 0.11.0-era numbers wearing a 0.12.1
+label. That distinction matters when reading a score history: the stamp moved twice without the
+number moving at all.
 
 ### `auth_clarity` is graded by scheme class instead of crediting presence (roadmap#97)
 
