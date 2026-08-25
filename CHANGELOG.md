@@ -16,6 +16,65 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.14.0 — 2026-08-25
+
+Three checks that were measuring the wrong thing. No new dimensions and no weight changes, so the
+denominator is unmoved — but two of them shift real populations, which makes this a release rather
+than a patch.
+
+### `llms_txt_published` stops paying providers for a file WE wrote (roadmap#128)
+
+The check asked existence and size: any `.txt` in `llms/` over 50 bytes earned all four points. The
+enrichment pipeline *generates* those files into `all/<slug>/llms/`, and **2,755 of the 8,976
+providers holding one carry a marker saying so** — a `method: generated` line, an explicit
+generation sentence, or a section heading only we emit. A provider's own llms.txt does not contain a
+section called "API Evangelist artifacts".
+
+This is the same defect as crediting a `raw.githubusercontent` apis.json to the provider whose repo
+we authored, which `CATALOG_HOSTS` already guards against. Four points of discoverability for a
+document the "publisher" has never seen.
+
+**The limit is stated rather than hidden.** Detection is marker-based, so 2,755 is a FLOOR. 6,221
+providers hold an unmarked file and keep the credit, and an unknown share of those are also ours,
+written before the pipeline stamped provenance. That is the same posture the rubric already takes on
+OpenAPI provenance, where `unknown` is credited in full by design and marker coverage — not the rule
+— is the binding constraint. Raising coverage moves this number without the check changing again.
+
+### `mcp_server` no longer scores zero for being catalogued too late (roadmap#125)
+
+`mcp_grade` looked the slug up in `all/0-working/mcp-deployment.json` and returned nil when it was
+absent. The dimension recorded that as plain `false` — indistinguishable from running no MCP server
+at all, on **twelve points, the third-largest award in the model**. That file is a frozen probe
+result of 4,163 entries and no scoring pass regenerates it, so every provider harvested afterwards
+forfeited the award for a reason that had nothing to do with them. **119 providers with a non-empty
+`mcp/` artifact are missing from it.**
+
+Absent from the snapshot now falls back to what IS known — authorship:
+
+| state | credit |
+|---|---|
+| in the snapshot | unchanged: `verified` 1.0 / `documented` 0.4 / derived nothing |
+| absent, `mcp/` authored first-party or unknown | `documented` (0.4) |
+| absent, `mcp/` derived | nothing, exactly as a derived snapshot entry |
+
+**61 providers move**, all to the partial tier. Deliberately never `verified`: nobody probed these,
+and claiming a running server for an unprobed slug is precisely the false credit 0.6 introduced this
+grading to stop — across four national banking markets exactly one institution ran a genuinely
+hosted MCP. An empty `mcp/` directory still earns nothing; 16 of them exist and `repo_has?` was
+already right about that.
+
+### Retired providers stop carrying a rating (roadmap#124)
+
+`score.rb --write` wrote a `score:` block onto redirect stubs, so a tombstone published
+`composite: 0.0, band: minimal`. Composite 0.0 is not a measurement — the stub has no artifacts to
+read — and `minimal` is a real band asserting the worst 16% of the catalog, applied to a page whose
+own header says it exists only to forward. `zus-health`, merged into `zus` on 2026-08-14, was
+carrying `scored_at: 2026-08-24`.
+
+Tombstones are now skipped at load and any block a previous pass wrote is stripped, the same
+treatment delisted companies already get. Stripping matters because `build_tombstones()` re-emits
+these pages only on a full build, so a score written between builds otherwise ships.
+
 ## 0.13.0 — 2026-08-24
 
 **Batched with 0.12.2, one band re-cut for both.** A rubric edit is inert until a rescore, so
