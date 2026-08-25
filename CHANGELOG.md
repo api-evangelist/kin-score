@@ -63,6 +63,40 @@ grading to stop — across four national banking markets exactly one institution
 hosted MCP. An empty `mcp/` directory still earns nothing; 16 of them exist and `repo_has?` was
 already right about that.
 
+### The specs that confess in their own prose (roadmap#82)
+
+`build_provenance.py` read five extension markers and nothing else, so a document could state in
+`info.description` that we modelled it and still be credited to the provider at full first-party
+weight — against all 132 provenance-graded points in `contract_quality`. **This was found from the
+outside**: a provider read our public artifact, diagnosed it, and told us (api-evangelist/nylas#1).
+
+Two recoverable signals, neither needing a re-harvest:
+
+- **Our own extension namespace.** 906 specs carry `x-apievangelist:` and none of the five markers,
+  so the block recording that we touched the document was invisible to the reader of that record.
+- **The prose.** 957 specs say it outright — "the request/response schemas here are modeled from the
+  published documentation and blog descriptions rather than exercised", "Reconstructed from
+  per-operation OpenAPI blocks published on docs.sfcompute.com". That is our authoring voice. A
+  provider describing their own API does not explain which public pages they reverse-engineered it
+  from.
+
+| | before | after |
+|---|---|---|
+| derived | 2,991 | **4,548** |
+| unknown | 91,479 | 89,923 |
+| first_party | 1,659 | **1,659** |
+| marker coverage | 4.8% | **6.5%** |
+| providers with a derived spec | 426 | **714** |
+
+**`first_party` is unchanged to the document**, which is the safety property that mattered. Both new
+signals sit behind the same first-party override added on 2026-08-04, when `x-provenance` turned out
+to be a blunt instrument: Oracle's 161 and Palo Alto's 314 harvested contracts carry our stamp AND
+`method: harvested`, and were briefly read as our own work. Presence of our marker means "we handled
+this", never "we authored this" — the block's own claim decides which, and it still does.
+
+This is the same correction as `llms_txt_published` above, one artifact class over, and it moves that
+issue's floor: coverage rather than the rule has always been the binding constraint here.
+
 ### Retired providers stop carrying a rating (roadmap#124)
 
 `score.rb --write` wrote a `score:` block onto redirect stubs, so a tombstone published
