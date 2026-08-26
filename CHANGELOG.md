@@ -16,6 +16,91 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.15.0 — 2026-08-26
+
+Two checks that were not measuring what they claimed. No new dimensions, no weight changes, and the 139-point agent-readiness denominator is unmoved — but this moves the
+largest population of any recent release, so the agent-readiness bands are re-cut with it.
+
+### `servers_resolvable` finally resolves servers (roadmap#159)
+
+The check's label has read "Servers resolve to a real host" since 0.6, and it never resolved
+anything. `server_url_kind` was a denylist of obvious placeholders followed by "has a dot and an
+alphabetic TLD" — so any host an author invented that missed the denylist was counted as a callable
+contract. Its own docstring asserted the thing it did not test.
+
+`oracle.api.com` was Oracle Hospitality's **entire** callable score, 1 spec of 59, and returns no
+DNS answer.
+
+Resolving all 14,061 literal hosts the classifier graded `real`:
+
+| verdict | hosts |
+|---|---|
+| resolves | 13,220 (94.0%) |
+| **no address** | **829 (5.9%)** |
+| cluster-internal | 12 |
+
+That moves **3,822 specs across 392 providers** out of the callable count — and into the
+denominator. Leaving them out would have raised every affected provider's callable share, which is
+the opposite of the finding.
+
+Four classes turn up and only one is lexical: invented placeholders the denylist missed
+(`merchant-defined-url.com`), cluster-internal names (`kubernetes.default.svc` — real, but not
+callable by a consumer), retired sandboxes (`sandbox.sendle.com`), and **dead or renamed hosts**
+(`api.revert.dev`). The last class is why a longer denylist could never work: a host that was live
+when harvested is indistinguishable from a working one by pattern matching, and the population only
+grows. One of the dead ones is ours — `search-api.apis.io`.
+
+Two deliberate limits, both in the generous direction:
+
+- **Only an authoritative negative answer removes credit.** A timeout or resolver error is our
+  failure to observe, not the provider's failure to exist, and keeps full credit — the same call
+  made for pointer liveness, where `refused` and `js_challenge` score full.
+- **Templated hosts are never resolved.** `https://{region}.api.acme.com` is callable by a consumer
+  who fills the variable in; stripping the variable and resolving the residue asks a different
+  question and gets a wrong answer two ways — `vpc-lattice.{region}.amazonaws.com` becomes a
+  double-dot name that can never resolve, and `{region}.api.acme.com` becomes the *parent* domain.
+
+Verdicts come from `signals/resolve_spec_hosts.py` into `_data/host_resolution.json`, which carries
+a `resolved_at` stamp because class 3 is contract rot: the artifact goes stale by nature and should
+be re-run, never silently trusted. Absent the artifact nothing is graded down.
+
+### `consent_identity` stops crediting security.txt (roadmap#160)
+
+The dimension's stated job is to reward "the providers defining the frontier": machine-readable AI
+usage preferences (AIPREF, Content-Signals) and cryptographically identified agent traffic (Web Bot
+Auth, RFC 9421 HTTP Message Signatures). It also accepted `SecurityTxt`.
+
+Measured across all 27,500 catalog repos rather than a sample: **1,089 providers earned the three
+points and 1,015 of them — 93.2% — earned it on `security.txt` alone.** An RFC 9116
+vulnerability-disclosure contact is an email address for reporting bugs. It expresses no AI usage
+preference and identifies no agent.
+
+The cost was never the points. It was the finding. A dimension that exists to reveal how rare these
+signals are reported 1,089 providers with an agent-consent posture when **74** have one:
+
+| signal | providers |
+|---|---|
+| ContentSignal | 72 |
+| HTTPMessageSignatures | 1 |
+| AIPREF | 1 |
+| **WebBotAuth** | **0**, across the entire catalog |
+
+Folding in a common file converted a sharp negative signal into a soft positive one.
+
+This is the third time the rubric has paid for an artifact adjacent to the thing being measured
+rather than the thing itself — after `mcp_server` in 0.6 (roadmap#59) and `llms_txt_published` in
+0.14.0 (roadmap#128). Same family, same fix: stop accepting the weak signal in the strong
+dimension.
+
+**Nobody loses the signal.** `security.txt` still scores under `well_known_published`, which is
+where a `/.well-known/` document belongs. This removes double credit in the wrong dimension, not
+credit as such.
+
+**Known and not fixed here:** the dimension reads `common[].type` pointers, so a provider serving a
+live `Content-Signal:` response header without declaring a pointer still scores false — Gutendex
+does exactly that (roadmap#143). This release makes the dimension honest about what it measures;
+making it read responses is separate work.
+
 ## 0.14.0 — 2026-08-25
 
 Three checks that were measuring the wrong thing. No new dimensions and no weight changes, so the

@@ -15,6 +15,32 @@ has shipped.
 
 ---
 
+## Status 2026-08-26 — 0.15.0 is staged, not yet published
+
+`consent_identity` no longer accepts `SecurityTxt` (roadmap#160). Measured across all 27,500 catalog
+repos: 1,089 providers earned the dimension and 1,015 of them — 93.2% — earned it on `security.txt`
+alone. The rubric, scorer, snapshot, changelog and generated docs are updated; **the catalog has not
+been rescored yet**, so published provider pages still read the previous version.
+
+Riding out with it, once `score.rb --write` runs:
+
+- **Agent-readiness bands must be re-cut.** The 139-point denominator is unmoved, but ~1,015
+  providers lose 3 points, which is the largest population shift of any recent release. Run
+  `band_distribution.rb` and re-cut before publishing, per the standing rule that a band re-cut is
+  part of the change and not a follow-up.
+- **The honest frontier number becomes publishable.** ContentSignal 72, HTTPMessageSignatures 1,
+  AIPREF 1, Web Bot Auth 0 across the whole catalog. That is a finding worth a post, and it was
+  invisible while a common file was earning 93% of the credit.
+
+### Next on this dimension
+
+`consent_identity` reads `common[].type` pointers, so it still cannot see a provider serving a live
+`Content-Signal:` response header without declaring one — Gutendex does exactly that (roadmap#143).
+The dimension now measures what it claims; making it read responses rather than declarations is the
+next step, and it belongs with the broader "derived, never probed" problem in roadmap#143/#144.
+
+---
+
 ## Status 2026-08-24 — 0.12.1 IS LIVE, and two changes are riding on it unversioned
 
 **0.12.1 published catalog-wide on 2026-08-24.** Provider pages on APIs.io now read
