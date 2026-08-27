@@ -21,9 +21,17 @@ release_note:
   version: 0.15.0
   body: |
     TWO CHECKS THAT WERE NOT MEASURING WHAT THEY CLAIMED. No new dimensions, no weight
-    changes and no change to the 139-point agent-readiness denominator — but between them
-    they move the largest population of any recent release, so read both the agent-readiness
-    bands and contract_quality as re-cut rather than stable.
+    changes and no change to the 139-point agent-readiness denominator. Between them they move
+    the largest population of any recent release.
+
+    THE BAND RE-CUT WAS MODELLED AND IS NOT NEEDED, which is worth stating because the standing
+    rule is that a re-cut ships WITH the change. Replaying the 2026-08-25 history: three points on
+    a 139-point denominator is 2.16 on the 0-100 scale, and 109 providers (0.41%) cross a cut —
+    agent-native 849 -> 806, agent-ready 2,071 -> 2,064. The 0.5.1 precedent that forced a re-cut
+    was different in kind: `agent_card` RAISED the denominator, so every score was rescaled and the
+    demotions were artifacts of arithmetic. Here the denominator is fixed and only providers who
+    lose a credit move. Those 109 genuinely publish no AI-usage preference; the demotion is the
+    correction, not collateral.
 
     `servers_resolvable` NOW RESOLVES SERVERS. Its label has always read "Servers resolve to
     a real host" and it never resolved anything: a denylist of obvious placeholders, then

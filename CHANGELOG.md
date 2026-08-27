@@ -18,8 +18,16 @@ changelog and the snapshots here are the canonical public record.
 
 ## 0.15.0 — 2026-08-26
 
-Two checks that were not measuring what they claimed. No new dimensions, no weight changes, and the 139-point agent-readiness denominator is unmoved — but this moves the
-largest population of any recent release, so the agent-readiness bands are re-cut with it.
+Two checks that were not measuring what they claimed. No new dimensions, no weight changes, and the
+139-point agent-readiness denominator is unmoved.
+
+**The band re-cut was modelled and is not needed** — stated explicitly because the standing rule is
+that a re-cut ships *with* the change. Replaying the 2026-08-25 history, three points on a 139-point
+denominator is 2.16 on the 0–100 scale and **109 providers (0.41%) cross a cut** (agent-native
+849 → 806, agent-ready 2,071 → 2,064). The 0.5.1 precedent that forced a re-cut was different in
+kind: `agent_card` *raised* the denominator, rescaling every score, so its 3,726 demotions were
+arithmetic artifacts. Here the denominator is fixed and only providers who lose a credit move —
+and those 109 genuinely publish no AI-usage preference, so the demotion is the correction.
 
 ### `servers_resolvable` finally resolves servers (roadmap#159)
 
