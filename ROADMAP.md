@@ -15,6 +15,55 @@ has shipped.
 
 ---
 
+## Status 2026-08-27 — two `mcp_server` false-credit paths, found by profiling a health cohort
+
+Profiling nine self-hosted health/nutrition providers (SparkyFitness, wger, Mealie, Tandoor, Hevy,
+Swiss Food Composition Database, Norish, Free Exercise DB, YAZIO) surfaced two ways `mcp_server` pays
+full credit for a server nobody can connect to. Both are reader defects, not rubric-math defects.
+**NOT YET APPLIED TO PUBLISHED SCORES** — the nine scores written 2026-08-27 carry the inflation.
+
+### **#144 — `deployment.mode: none` is scored as `documented`**
+
+Eight of the nine artifacts the enrichment pipeline wrote say, in their own prose, that the provider
+ships no MCP server: *"Mealie ships NO Model Context Protocol server — not hosted, not as a package"*,
+*"Tandoor ships NO Model Context Protocol server"*, *"mode is `none` because nobody at Hevy ships a
+server, remote or stdio"*. Every one of them scored `documented` and took the credit.
+
+The artifact is honest. The reader is not reading it. The rubric text for this dimension already says
+the grade comes from `deployment.mode` plus a probe verdict "not the pointer" — but the presence of
+an `mcp/` file is what is actually being detected. `mode: none` is the pipeline correctly recording a
+negative result, and a negative result must score zero, not `documented`.
+
+**Fix:** read `deployment.mode`. `none` → 0. Anything else grades as today. This is the same class as
+the 0.6 provenance grading that caught 1,882 derived candidates with no URL — that pass graded *who
+authored it* and never asked whether the artifact says the thing exists.
+
+**Measured impact on the nine:** 8 of 9 lose the award. Only SparkyFitness (`mode: remote`, a
+first-party in-process server at `POST /mcp`) and wger (`mode: local-stdio`, first-party, PyPI
+`wger-mcp` 0.2.0 plus a container image) keep it.
+
+### **#145 — an `MCPServer` pointer is credited without checking what it points at**
+
+Apple scores `mcp_server: documented` on a `common[].type: MCPServer` pointer to
+`github.com/apple/ml-mcp-repo-level-coding` — an Apple ML research repository about repo-level coding
+assistants. It is not an MCP server for any Apple API, and nothing in the health surface this cohort
+was scored against is reachable through it. The check credits the *type* of the pointer and never
+looks at the target.
+
+**Fix:** this is #16 (scored pointers are never fetched) with a specific, cheap special case — an
+`MCPServer` pointer at a GitHub URL should require the repo to declare an MCP server (a manifest, a
+published package, or `mcp` in its own description) before it grades above zero. Worth doing ahead of
+the general liveness pass because 12 points is the third-largest award in the agent model.
+
+### Why this cohort found it
+
+Both defects need a population where the *honest negative* is common. Across the commercial device
+makers the artifact is usually absent, which scores zero correctly. It took a set of small
+open-source projects — where the pipeline could actually read a repository and conclude "no server
+here" — for the difference between *absent* and *recorded as absent* to become visible and wrong.
+
+---
+
 ## Status 2026-08-26 — 0.15.0 is staged, not yet published
 
 `consent_identity` no longer accepts `SecurityTxt` (roadmap#160). Measured across all 27,500 catalog
