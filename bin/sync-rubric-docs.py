@@ -149,6 +149,10 @@ def load_current():
             f"sync-rubric-docs: {os.path.basename(snaps[version])} declares "
             f"schema_version {declared!r}; a snapshot must match its own filename"
         )
+    # Hand the loaded rubric to the prose-stamp rewriter, which needs last_updated/live_since to
+    # regenerate the dates rather than leave the previous version's attached to a new number.
+    global _RUBRIC_FOR_STAMP
+    _RUBRIC_FOR_STAMP = rubric
     return version, rubric, snaps[version]
 
 
@@ -339,7 +343,29 @@ def apply_blocks(text, rubric, version, blocks, label, problems):
     return text
 
 
+_RUBRIC_FOR_STAMP = None
+
 VERSION_PROSE = re.compile(r"(Kin Score rubric )\d+(?:\.\d+)*")
+
+# The version stamp in the paper is followed by DATES, and rewriting the number alone re-badged
+# 0.14.0's dates onto 0.15.0 — "rubric 0.15.0 (published 2026-08-23, live catalog-wide 2026-08-24)",
+# both false, and the second one asserting a deploy that had not happened. That is precisely the
+# self-re-badging failure scoring.yml's own release_note comment describes, one document over: a
+# heading that stayed "current" through ten versions while describing none of them.
+#
+# `published` comes from the rubric's own last_updated. `live catalog-wide` is a DEPLOY fact the
+# rubric cannot know, so it is read from an explicit `live_since:` — and when that is absent or
+# older than this version, the stamp says so rather than inventing a date.
+VERSION_DATED = re.compile(
+    r"(Kin Score rubric )(\d+(?:\.\d+)*)(</strong>)?\s*\(published [^)]*\)")
+
+
+def _dated_stamp(rubric, version):
+    published = str(rubric.get("last_updated") or "").strip()
+    live = str(rubric.get("live_since") or "").strip()
+    if live:
+        return f"(published {published}, live catalog-wide {live})"
+    return f"(published {published}; not yet live catalog-wide)"
 VERSION_FM = re.compile(r'^(rubric_version:\s*)["\']?\d+(?:\.\d+)*["\']?\s*$', re.M)
 
 
@@ -348,6 +374,10 @@ def apply_version(text, version, where, label, problems):
         if not VERSION_PROSE.search(text):
             problems.append(("version", label, "no `Kin Score rubric <version>` stamp found"))
             return text
+        if VERSION_DATED.search(text):
+            stamp = _dated_stamp(_RUBRIC_FOR_STAMP or {}, version)
+            text = VERSION_DATED.sub(
+                lambda m: f"{m.group(1)}{version}{m.group(3) or ''} {stamp}", text)
         return VERSION_PROSE.sub(rf"\g<1>{version}", text)
     if where == "frontmatter":
         if not VERSION_FM.search(text):
