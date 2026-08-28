@@ -6,3 +6,7 @@ node_modules/
 # manifest.json IS committed — it is what makes a re-run after a rescore render
 # only what moved.
 cards/dist/
+
+# Python bytecode from bin/ tooling
+__pycache__/
+*.pyc

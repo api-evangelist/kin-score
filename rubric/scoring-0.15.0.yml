@@ -9,6 +9,11 @@
 
 schema_version: 0.15.0
 last_updated: '2026-08-26'
+# Deployed catalog-wide 2026-08-27: 27,303 providers stamped 0.15.0, search catalog rebuilt and the
+# SearchFn `live` alias repointed (27,308 providers served = 27,308 uploaded). Read by
+# bin/sync-rubric-docs.py to stamp the published papers; absent it, they correctly say
+# "not yet live catalog-wide".
+live_since: '2026-08-27'
 maintainer: kin@apievangelist.com
 
 # The public "what changed" note. The apis.io /rating/ page renders this rather than
