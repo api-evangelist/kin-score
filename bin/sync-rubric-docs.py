@@ -399,8 +399,16 @@ def source_drift(version, rubric):
             f"working rubric is {live_version}, newest published snapshot is {version} — "
             f"freeze `rubric/scoring-{live_version}.yml` and write the CHANGELOG entry"
         )
-    if live != rubric:
-        changed = sorted(k for k in set(live) | set(rubric) if live.get(k) != rubric.get(k))
+    # Keys that record a fact about the RELEASE rather than scoring behaviour. `live_since` can
+    # only ever be known AFTER a snapshot is frozen — the snapshot freezes when the version is cut,
+    # the deploy happens later — so comparing it always reports drift for the one field that is
+    # supposed to differ. Stamping 0.15.1 as live tripped this gate on 2026-08-28; the rubric had
+    # not changed behaviour at all.
+    RELEASE_META = {"live_since"}
+    if {k: v for k, v in live.items() if k not in RELEASE_META} != \
+       {k: v for k, v in rubric.items() if k not in RELEASE_META}:
+        changed = sorted(k for k in (set(live) | set(rubric)) - RELEASE_META
+                         if live.get(k) != rubric.get(k))
         return (
             f"working rubric differs from the frozen {version} snapshot but still declares "
             f"{version} — behaviour changed under a released version number "

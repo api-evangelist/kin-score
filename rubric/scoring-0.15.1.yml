@@ -9,6 +9,12 @@
 
 schema_version: 0.15.1
 last_updated: '2026-08-27'
+# Deployed catalog-wide 2026-08-27: providers rescored at 0.15.1, catalog rebuilt and the SearchFn
+# `live` alias repointed (live API providers=27,358 = uploaded catalog). Verified on the live
+# endpoint: /v1/ratings/rubric reports schema_version 0.15.1. Read by bin/sync-rubric-docs.py to
+# stamp the published papers; absent it, they say "not yet live catalog-wide" — which was true when
+# the snapshot was frozen at 08:43 and stopped being true that night.
+live_since: '2026-08-27'
 maintainer: kin@apievangelist.com
 
 # The public "what changed" note. The apis.io /rating/ page renders this rather than
