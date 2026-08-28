@@ -16,6 +16,63 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.15.1 — 2026-08-27
+
+A tracked signal, not a scored one. No new dimensions, no weight changes, no change to the
+139-point agent-readiness denominator, and **no band re-cut** — nothing about any provider's score
+moves, and scores stamped 0.15.0 remain correct under 0.15.1.
+
+**A third list in the agent-readiness layer.** `dimensions` are scored. `planned_dimensions` are
+things we cannot measure yet, each blocked on a capability we do not have — a probe, a parser, a
+collection. `observed_signals` is neither: fully implemented, running on every pass, and finding
+nobody. The detector works; the catalog is empty. That is a different reason for waiting and it was
+worth its own name.
+
+**The first two entries are RFC 10008** — the HTTP QUERY method, published as a Proposed Standard in
+June 2026 out of `draft-ietf-httpbis-safe-method-w-body-14`. QUERY is safe and idempotent like GET
+but carries a request body like POST, and the RFC registers `Accept-Query` as the response header
+through which a resource advertises that it accepts QUERY and which query media types it
+understands. Both are tracked:
+
+| Signal | What it reads |
+|---|---|
+| `accept_query` | An OpenAPI response declares an `Accept-Query` header (RFC 10008 §3) |
+| `query_method` | An OpenAPI 3.2 path declares `additionalOperations.QUERY` |
+
+**Why this signal.** Every other machine-readable declaration this rubric reads is a document
+somewhere else — a spec file, a well-known linkset, an MCP manifest. `Accept-Query` is served *by
+the resource, at the resource, at request time*. An agent asking whether a search endpoint speaks a
+structured query language, and which one, asks the endpoint. No documentation site, no catalog, no
+out-of-band artifact. That is a different class of discovery from anything currently scored here.
+
+**Why zero points.** A dimension no provider can earn is not a measurement, it is a rescale. Adding
+a four-point dimension with zero earners divides every provider by 143 instead of 139 and moves
+roughly 1,900 of them across a band cut without anyone having gotten worse at anything. That is the
+0.5.1 `agent_card` failure exactly — a raised denominator produced 3,726 demotions that were pure
+arithmetic — and the standing rule that a denominator change ships with a band re-cut is what makes
+the trade not worth paying to distinguish nobody from nobody.
+
+**The zero is the point.** Zero of 26,641 providers declare `Accept-Query` as of 2026-08-27, per the
+headers catalog (whose `assemble.py` reads declared headers out of every published specification
+file in the network) and confirmed independently by the new spec detector. The method is three months
+old, and OpenAPI could not describe it at all until 3.2 added `additionalOperations` — 3.1's Path
+Item Object has a fixed set of method fields with no room for QUERY — so the tooling gate only just
+lifted. Recording the zero now makes it a baseline rather than a discovery later. `Accept-Query`
+adoption is the cleanest single measure of whether QUERY is landing in production or living in
+specification documents, and that curve is worth having from t=0.
+
+**Promotion.** `score.rb` prints each signal's count in the run summary under "Observed signals
+(tracked, unscored)". At **25 distinct providers** — the headers catalog's own promotion line,
+reused so both catalogs mean the same thing by "in use" — a signal becomes a scored dimension in the
+next rubric version, with points and a band re-cut.
+
+**One ceiling recorded with the number:** `query_method` can only ever fire on an OpenAPI 3.2
+document, because 3.1 cannot express the method. A 3.1 provider serving QUERY registers as a miss,
+and that is a property of the description format, not of the provider.
+
+Also in the standards catalog: [`http-query-method`](https://standards.apievangelist.com/store/http-query-method/)
+and [`json-query-language`](https://standards.apievangelist.com/store/json-query-language/).
+
 ## 0.15.0 — 2026-08-26
 
 Two checks that were not measuring what they claimed. No new dimensions, no weight changes, and the

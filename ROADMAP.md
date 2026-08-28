@@ -64,6 +64,45 @@ here" — for the difference between *absent* and *recorded as absent* to become
 
 ---
 
+## Status 2026-08-27 — 0.15.1 adds a tracked signal and needs no rescore
+
+`observed_signals` is a new, third list in the agent-readiness layer, holding signals that are
+**fully implemented, running on every pass, and finding nobody**. That is distinct from
+`planned_dimensions` below, where every entry is blocked on a capability we lack. These are blocked
+on the catalog.
+
+First two entries: `accept_query` and `query_method`, both RFC 10008 (the HTTP QUERY method,
+Proposed Standard June 2026). **Zero of 26,641 providers**, and the zero is the deliverable — it is a
+t=0 baseline for the adoption curve rather than a discovery someone makes later.
+
+**Nothing rides out with this.** No dimension, no weight, no denominator change, no band re-cut, and
+no rescore required — scores stamped 0.15.0 are correct under 0.15.1. It stacks in front of the
+0.15.0 rescue below rather than competing with it; whenever that `--write` runs, it stamps 0.15.1.
+
+### Why not just score it at zero
+
+Because a dimension nobody can earn is a rescale, not a measurement. Four points with zero earners
+divides every provider by 143 instead of 139 and moves ~1,900 across a band cut without anyone
+having gotten worse at anything — the 0.5.1 `agent_card` failure, where a raised denominator
+produced 3,726 demotions that were pure arithmetic. The standing band-re-cut rule is precisely what
+makes that trade not worth paying to distinguish nobody from nobody.
+
+### The promotion path
+
+`score.rb` prints each signal's count under "Observed signals (tracked, unscored)" on every pass. At
+**25 distinct providers** — the headers catalog's own promotion line, reused so both catalogs mean
+the same thing by "in use" — a signal graduates to a scored dimension with points and a band re-cut.
+
+### Known ceiling
+
+`query_method` can only fire on an OpenAPI 3.2 document; 3.1's Path Item Object has a fixed set of
+method fields and cannot express QUERY at all. A 3.1 provider serving QUERY reads as a miss, and
+that is a property of the description format rather than of the provider. Worth revisiting if 3.2
+adoption stays thin — a live probe for `Accept-Query` (roadmap#143/#144, "derived, never probed")
+would see what the contract cannot.
+
+---
+
 ## Status 2026-08-26 — 0.15.0 is staged, not yet published
 
 `consent_identity` no longer accepts `SecurityTxt` (roadmap#160). Measured across all 27,500 catalog
