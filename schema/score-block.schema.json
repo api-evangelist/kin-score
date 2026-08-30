@@ -18,7 +18,7 @@
       "$comment": "unknown is credited in full deliberately: only artifacts the enrichment pipeline authored carry a marker, so absence of one is not evidence of derivation."
     },
     "dimension": {
-      "description": "A dimension is false, true, or a GRADE STRING. Graded-on-evidence dimensions return verified/partial/documented; provenance-graded dimensions return their authorship state; agent_card returns its A2A conformance grade. A grade string is never merely truthy - 'derived' is a different fact from 'the provider runs one'.",
+      "description": "A dimension is false, true, or a GRADE STRING \u2014 never merely truthy, because 'derived' is a different fact from 'the provider runs one'. The enum is the union of the values this schema already listed and every value observed across 350,971 emitted dimension entries. Values the schema was missing and that broke validation of real published blocks: na (inapplicable, not missing \u2014 a GET is idempotent by definition), platform, and the auth_clarity scheme classes bearer / served / negotiable / bound added by roadmap#97.",
       "oneOf": [
         {
           "type": "boolean"
@@ -26,16 +26,23 @@
         {
           "type": "string",
           "enum": [
-            "verified",
-            "partial",
+            "bearer",
+            "bound",
+            "conformance",
+            "conformant",
+            "derived",
             "documented",
             "first-party",
-            "conformance",
-            "derived",
+            "flavored",
             "mixed",
-            "conformant",
+            "na",
             "near-conformant",
-            "flavored"
+            "negotiable",
+            "partial",
+            "platform",
+            "self",
+            "served",
+            "verified"
           ]
         }
       ]
@@ -75,8 +82,11 @@
           "format": "date"
         },
         "schema_version": {
-          "type": "number",
-          "description": "Rubric version, e.g. 0.6"
+          "type": [
+            "string",
+            "number"
+          ],
+          "description": "Rubric version. A two-part version (0.6) parses as a YAML float; a three-part one (0.17.0) has two dots and parses as a string. Every version since 0.9.x has been emitted unquoted and read back as a STRING, so the earlier `number` type rejected every score block the catalog actually holds. Both are accepted."
         },
         "trend": {
           "type": "string",
@@ -141,16 +151,14 @@
         },
         "regulatory": {
           "type": "object",
-          "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet.",
+          "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet. Emitted even when no regime applies (roadmap#34), because `undetermined` is not the same statement as `not regulated` \u2014 so `regime` is optional and `applies` carries the answer.",
           "required": [
-            "applies",
-            "regime",
-            "regime_id",
-            "score"
+            "applies"
           ],
           "properties": {
             "applies": {
-              "const": true
+              "type": "boolean",
+              "description": "Whether a regulatory regime applies. Was `const: true` from when this block was emitted ONLY for regulated providers; roadmap#34 made it always present so that `undetermined` could be distinguished from `not regulated`, and the const then rejected every unregulated provider."
             },
             "regime": {
               "type": "string",
@@ -160,15 +168,16 @@
               "type": "string",
               "enum": [
                 "banking_open_finance",
-                "securities_market_data",
-                "health",
-                "payments",
-                "insurance",
-                "telecommunications",
+                "education",
                 "energy_utilities",
-                "government"
+                "government",
+                "health",
+                "insurance",
+                "payments",
+                "securities_market_data",
+                "telecommunications"
               ],
-              "description": "Extensible; telecommunications and energy_utilities were added in 0.6."
+              "description": "Regime id, from scoring.yml's `industry_regulatory` block. Kept in step with the rubric \u2014 `education` was added there and not here, and this enum then rejected every education provider's score block."
             },
             "score": {
               "type": "number",
@@ -183,7 +192,31 @@
                 "weak_tags"
               ],
               "description": "0.6+. 'tags' means a strong tag matched. 'weak_tags' means the regime matched only on an ambiguous tag (broker, brokerage, exchange, trading) because nothing else matched anywhere - a weaker claim, and the mechanism that stopped insurance brokers being scored against MiFID II."
+            },
+            "undetermined": {
+              "type": "boolean",
+              "description": "True when the regime question could not be ANSWERED \u2014 the provider carries no tags \u2014 as opposed to being answered 'not regulated'. roadmap#34: thin tagging must not read as a clean bill of health."
+            },
+            "note": {
+              "type": "string",
+              "description": "Why the regime is undetermined."
             }
+          },
+          "if": {
+            "properties": {
+              "applies": {
+                "const": true
+              }
+            },
+            "required": [
+              "applies"
+            ]
+          },
+          "then": {
+            "required": [
+              "regime_id",
+              "score"
+            ]
           }
         },
         "provenance": {
@@ -230,6 +263,27 @@
               }
             }
           }
+        },
+        "coverage": {
+          "type": "object",
+          "description": "Enrichment depth, disclosed beside the score and NEVER folded into it (roadmap#35). A low composite with a high catalog_gap means API Evangelist has not looked; a low composite with a low catalog_gap means the provider published little. The composite alone cannot tell those apart, and a cohort statistic that compares two markets is comparing two enrichment depths unless it says otherwise.",
+          "properties": {
+            "artifact_dirs": {
+              "type": "integer",
+              "description": "Artifact directories held in the provider's repo. Excludes kin/, which holds this scorer's own output and is present on 98.9% of providers."
+            },
+            "catalog_gap": {
+              "type": "number",
+              "description": "Unearned rubric points on checks the attribution block classes as `catalog` \u2014 work needing no provider action. Our backlog, not their gap."
+            },
+            "catalog_max": {
+              "type": "number",
+              "description": "Total applicable catalog-attributed points, so the gap has a denominator. N/A checks are excluded from both."
+            },
+            "note": {
+              "type": "string"
+            }
+          }
         }
       }
     },
@@ -269,7 +323,7 @@
           "description": "Fourteen dimensions as of 0.6 (twelve at 0.4, plus agent_card in 0.5.1 and dry_run_mode in 0.6). Most are booleans; seven can carry a grade string - see $defs/dimension.",
           "properties": {
             "spec_presence": {
-              "type": "boolean",
+              "$ref": "#/$defs/dimension",
               "description": "0.6: satisfied by an OpenAPI, AsyncAPI, GraphQL SDL or FHIR CapabilityStatement."
             },
             "agentic_access": {
@@ -279,7 +333,7 @@
               "$ref": "#/$defs/dimension"
             },
             "auth_clarity": {
-              "type": "boolean"
+              "$ref": "#/$defs/dimension"
             },
             "idempotency": {
               "$ref": "#/$defs/dimension"
@@ -300,16 +354,16 @@
               "$ref": "#/$defs/dimension"
             },
             "well_known_catalog": {
-              "type": "boolean"
+              "$ref": "#/$defs/dimension"
             },
             "consent_identity": {
-              "type": "boolean"
+              "$ref": "#/$defs/dimension"
             },
             "agent_card": {
               "$ref": "#/$defs/dimension"
             },
             "dry_run_mode": {
-              "type": "boolean"
+              "$ref": "#/$defs/dimension"
             }
           }
         }
