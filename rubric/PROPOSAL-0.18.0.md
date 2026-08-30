@@ -1,5 +1,30 @@
 # Proposal 0.18.0 — parsed evidence for `developer_ergonomics`
 
+> ## ⚠ CORRECTED 2026-08-30, after a per-check `--explain` diff
+>
+> **This proposal is no longer the answer to roadmap#13.** A `--explain` run finished after it was
+> written and decomposed the Xquik/Shopify gap by the rubric's own `attribution:` block: the gap is
+> `frontier` (+32.5) and `catalog` (+26.5), and on `index` and `harvest` Xquik is *behind*. Since
+> `catalog` is defined in `scoring.yml` as *"API Evangelist can satisfy this alone — an unearned
+> check here is our backlog, not their gap"*, **roughly half the anomaly is our own uneven coverage
+> of the large providers** — 43.5 unearned catalog points on Shopify, 57.5 on Twilio, 69.5 on
+> Stripe. The largest lever on roadmap#13 is closing that backlog, which needs no rubric change.
+>
+> **Two of the three checks proposed below already exist**, which was not checked before writing:
+> `error_responses_documented` is already scored in `contract_quality` (4 pts), and response
+> examples are scored twice — `examples_present` (contract_quality, 4) and `openapi_examples`
+> (agent_readiness, 7). **Only `params_documented` is new.**
+>
+> What survives, and is still worth doing on its own merits:
+>
+> - **`params_documented`** — genuinely new, and the one signal found that ranks the platform above
+>   the optimizer (Shopify 99.7%, Twilio 86.4%, Xquik 32.2%).
+> - **`operations_summary_coverage` awards 6 points on a 92.3%-saturated signal** — near-universal
+>   credit is inflation, not measurement. A regrade candidate this measurement turned up.
+> - **The `tags` near-miss below**, which is a permanent lesson regardless of what ships.
+>
+> The rest of this document is left as written, including the parts the correction contradicts.
+
 **Status: proposed, not implemented.** Nothing in `scoring.yml` or `score.rb` changes with this
 document. 0.17.0 has been scored and its bands re-fitted; this is the next version's subject.
 
