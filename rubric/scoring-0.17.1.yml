@@ -18,39 +18,33 @@ maintainer: kin@apievangelist.com
 # checked against schema_version by test_rubric_record.py: a rubric cannot reach a
 # rebuild carrying the previous release's story.
 release_note:
-  version: 0.17.0
+  version: 0.17.1
   body: |
-    SCORES MOVE, AND FURTHER THAN 0.16.0. Two checks stop crediting a provider for the catalog's
-    own processing. 0.16.x scores are not comparable to 0.17.0.
+    A DISCLOSURE, NOT A SCORED CHANGE. No new check, no weight change, no facet denominator moved
+    and no band re-cut. Nothing about any provider's composite moves, and scores stamped 0.17.0
+    remain correct under 0.17.1.
 
-    MULTIPLE APIs MEANS THE PROVIDER PUBLISHED SEVERAL, NOT THAT WE SPLIT ONE. `multiple_apis`
-    read a count of post-split spec files. refine-openapis emits one OpenAPI per tag, so Chimoney
-    published ONE contract, we split it into nine, and it earned a check for shipping multiple
-    APIs. IXON published one and read as 359. 5,247 providers lose the check, 1,173 keep it, and
-    303 are unaffected — they have no archive, so the count falls back to split files and nothing
-    about them changed.
+    HOW DEEPLY WE HAVE ENRICHED A PROVIDER IS NOW PRINTED BESIDE ITS SCORE. Every score block
+    carries a `coverage:` block: how many artifact directories the provider's repo holds, and
+    `catalog_gap` — the rubric points API Evangelist could add with no action by the provider at
+    all.
 
-    AN AGENT CARD ABOUT A DOCUMENTATION SITE IS NOT AN AGENT CARD ABOUT AN API. `agent_card` is an
-    8-point frontier dimension, worth that much because only a provider is supposed to be able to
-    produce one. A documentation platform emits one for every customer: docs.ghost.org serves a
-    card reading "Ghost Developer Docs" whose url is the docs site. Of 195 providers holding a
-    card, 49 point at a host the provider registers as an API base URL and 79 at a documentation
-    host. Those 79 lose the dimension.
+    THAT SECOND NUMBER IS THE POINT. The rubric's own attribution block defines the `catalog` class
+    as work needing no provider action, so an unearned check there is our backlog, not their gap.
+    A low score with a high catalog_gap means WE HAVE NOT LOOKED; a low score with a low one means
+    the provider published little. The composite alone cannot tell those apart, and until now
+    nothing said which one you were reading. Measured: stripe 69.5, twilio 57.5, shopify 43.5.
 
-    NEITHER CHANGE INVENTS A PENALTY. Both remove a credit that was measuring us rather than the
-    provider — the same correction as 0.16.0, which stopped crediting providers for llms.txt,
-    well-known and overlay files API Evangelist generated.
+    It is never subtracted from the composite. It is there so a cohort statistic can state the
+    enrichment depth it was computed over — because only 12.8% of the catalog holds both
+    enrichment tiers, and two providers differing only in which wave reached them differ by about
+    18 composite points.
 
-    THE 67 CARDS ON NEITHER KIND OF HOST ARE LEFT ALONE. A card on a marketing host may well be
-    the provider's own, and 0.16.0 is the standing lesson on what a confident guess costs: the
-    same reasoning would have zeroed 8,621 providers whose llms.txt we had ourselves harvested,
-    and had to be corrected within hours of being written.
-
-    STILL NO BAND RE-CUT. Four changes have now moved the distribution downward across two
-    versions and the curve should be re-fitted once, deliberately, after this pass lands — not
-    before it.
-
-
+    THE PUBLISHED SCORE-BLOCK SCHEMA WAS REBUILT ALONGSIDE IT. Adding `coverage` meant validating
+    the schema against real data for the first time, and it rejected roughly one published block
+    in twelve — a version number typed as a number when it parses as a string, a dimension typed
+    boolean after it became a grade, four dimensions that could not be marked inapplicable. It now
+    validates all 27,459 published blocks.
 aliases:
   # 0.13 (roadmap#71) — the Examples family. A provider publishing a separate example
   # corpus wired `Examples` in good faith and it was read by NOTHING; four spellings of
