@@ -37,11 +37,16 @@ release_note:
     re-verified — Gymshark's support index, Solaris Developer Hub, Infoway's Chinese docs.
     `llms_txt_published` now credits a harvested artifact and not a generated one.
 
-    NO FACET REACHES 100 ON DECLARATION ALONE. A facet caps at 99.0 unless at least one check that
-    PARSED a document contributed to it. 401 of 556 points are satisfiable by writing text about
-    yourself, and one provider held six perfect facets — the only one in the catalog above four —
-    while a platform with 213 APIs and 1,298 operations held one. 99.0 rather than 99.9 is
-    deliberate: a visible ceiling, so "why is this 99" has an answer a provider can act on.
+    A DECLARATION CEILING WAS TRIED AND REMOVED, and the reason is the more useful finding. The
+    proposal was that no facet reaches 100 unless a check that PARSED a document contributed.
+    Implemented broadly it capped almost every facet, because SEVEN OF EIGHT FACETS HAVE NO PARSED
+    CHECKS AT ALL — only contract_quality has any, 23 of 40. Narrowed to facets that have them, it
+    capped nobody, because reaching 100 on contract_quality means you earned it with a parsed
+    document. Over-caps or no-ops, with nothing in between.
+
+    So the reason 401 of 556 points are satisfiable by writing text about yourself is not five
+    loose checks. It is that the rubric has almost no parsed evidence outside contract_quality,
+    and no ceiling can fix that. Tracked on roadmap#13.
 
     WHAT THIS DOES NOT DO. No band re-cut. Three staged changes still pending — agent cards
     emitted by documentation platforms, `api_count` counting split files as products, and the

@@ -46,13 +46,22 @@ own document we had fetched and re-verified** — Gymshark's support index, Sola
 Infoway's Chinese docs. `llms_txt_published` now credits a harvested artifact and not a generated
 one, read from `all/0-working/llms-provenance.json`.
 
-### No facet reaches 100 on declaration alone
+### A declaration ceiling was tried and removed — and the reason is the finding
 
-A facet caps at **99.0** unless at least one check that PARSED a document contributed to it. 401 of
-556 points are satisfiable by writing text about yourself; one provider held six perfect facets —
-the only one in the catalog above four — while a platform with 213 APIs and 1,298 operations held
-one. 99.0 rather than 99.9 is deliberate: a visible ceiling, so "why is this 99" has an answer a
-provider can act on — publish something a parser can read.
+The proposal was that no facet reaches 100 unless a check that PARSED a document contributed.
+
+Implemented broadly, it capped almost every facet — because **seven of eight facets have no parsed
+checks at all**. Only `contract_quality` has any, 23 of 40. Narrowed to facets that have them, it
+capped **nobody**, because reaching 100 on `contract_quality` means you earned it with a parsed
+document. Over-caps or no-ops, with nothing in between.
+
+So the reason 401 of 556 points are satisfiable by writing text about yourself is **not five loose
+checks**. It is that the rubric has almost no parsed evidence outside `contract_quality`, and no
+ceiling can fix that. `xquik-api` still holds four perfect facets — `discoverability`,
+`developer_ergonomics`, `commercial_clarity`, `access_clarity` — every one declaration-only because
+the rubric offers no parsed check in any of them.
+
+Tracked on roadmap#13.
 
 ### What this does not do
 
