@@ -57,10 +57,63 @@ A card on a marketing host may well be the provider's own. 0.16.0 is the standin
 confident guess costs: the same reasoning would have zeroed **8,621 providers whose `llms.txt` we
 had ourselves harvested**, and had to be corrected within hours of being written.
 
-### Still no band re-cut
+### The band re-cut: the curve did not need one
 
-Four changes have now moved the distribution downward across two versions. The curve should be
-re-fitted **once, deliberately, after this pass lands** — not before it.
+The pass has landed and the curve was re-measured against it. **The bands were left where they are.**
+
+| band | opens at | share at 0.17.0 | documented (fitted pre-0.16) |
+|---|---:|---:|---:|
+| exemplar | 66.5 | 0.9% | 1.0% |
+| strong | 54.3 | 4.1% | 3.8% |
+| developing | 39.3 | 14.3% | 13.3% |
+| thin | 26.2 | 15.6% | 15.9% |
+| emerging | 11.0 | 24.0% | 24.0% |
+| minimal | 0 | 41.0% | 41.9% |
+
+Four checks stopped crediting the catalog's own processing and **no band moved by more than one
+point.** `multiple_apis` alone took a check away from 5,247 providers, and the distribution absorbed
+it. The reason is in the deciles: the median composite is **14.3** and p30 is **7.6**, so most of the
+catalog sits inside `minimal` and `emerging`, where a check or two is not enough to cross a boundary.
+The providers who lost points were largely not near a cut.
+
+The two bands that grew — `strong` and `developing` — grew because `minimal` shrank, not because
+anyone rose. This snapshot has 27,459 scored providers against the earlier fit's smaller set; the
+share is a share of a larger denominator.
+
+**Moving the cuts would have been the wrong call.** Re-fitting to restore the documented percentages
+would have reshuffled the published band of thousands of providers to preserve a number that is
+descriptive, not a target — a provider's band would have changed with no change in what it publishes.
+The `share:` fields in `scoring.yml` are updated to the observation instead; that is what they are
+for. The band minimums have now survived a deliberate re-fit, which is worth more than never having
+been questioned.
+
+The observed ceiling is **90.4**, with 23.9 points of occupied range above where `exemplar` opens.
+That is the open question the next version inherits: `exemplar` is one band covering a quarter of
+the usable scale, and 237 providers are not obviously one population.
+
+### The agent-readiness bands were re-fitted at the same time, and also held
+
+0.15.0 left a standing item: `consent_identity` dropping `SecurityTxt` took 3 points from 1,015
+providers, the largest population shift of any recent release, and the agent bands were to be re-cut
+once that pass ran. 0.17.0 then moved an 8-point frontier dimension on top of it. Both have now
+landed and been measured together.
+
+| band | opens at | share at 0.17.0 | documented |
+|---|---:|---:|---:|
+| agent-native | 38.7 | 1.3% | 1.1% |
+| agent-ready | 28.6 | 10.3% | 9.6% |
+| agent-aware | 5.1 | 26.5% | 26.1% |
+| human-only | 0 | 61.9% | 63.1% |
+
+Maximum drift **1.2 points**, and the cuts stay. These cuts were placed at named valleys in the
+distribution — 6 at the floor's shoulder, 34 above the enrichment baseline plateau, 46 at a >50%
+drop — and a re-fit to percentages would move them off the features they were chosen for. The
+`share:` values are documentation of where the catalog sits; the cuts are the measurement.
+
+The band gate is doing more work than the cuts are: **935 providers score above the agent-native
+floor and 572 are demoted** for having no idempotency and no stable error envelope. More than three
+in five providers that clear the top cut on points do not clear it on safety.
+
 
 ## 0.16.0 — 2026-08-29
 

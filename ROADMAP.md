@@ -112,10 +112,14 @@ been rescored yet**, so published provider pages still read the previous version
 
 Riding out with it, once `score.rb --write` runs:
 
-- **Agent-readiness bands must be re-cut.** The 139-point denominator is unmoved, but ~1,015
-  providers lose 3 points, which is the largest population shift of any recent release. Run
-  `band_distribution.rb` and re-cut before publishing, per the standing rule that a band re-cut is
-  part of the change and not a follow-up.
+- ~~**Agent-readiness bands must be re-cut.**~~ **Done 2026-08-30, and the answer was to leave them.**
+  The re-fit ran against the 0.17.0 pass, which carried this shift plus an 8-point frontier
+  dimension change on top of it. Every agent band came in within **1.2 points** of its documented
+  share, and the composite bands within **1.0**. The cuts sit at named valleys in the distribution,
+  not at round percentages, so re-fitting to restore the documented numbers would have moved them
+  off the features they were chosen for and changed thousands of published bands with no change in
+  what any provider publishes. `share:` refreshed to the observation instead. See the 0.17.0
+  changelog entry.
 - **The honest frontier number becomes publishable.** ContentSignal 72, HTTPMessageSignatures 1,
   AIPREF 1, Web Bot Auth 0 across the whole catalog. That is a finding worth a post, and it was
   invisible while a common file was earning 93% of the credit.

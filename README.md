@@ -327,21 +327,21 @@ after any material rubric change with `signals/band_distribution.rb`.
 <!-- kin-score:bands:start -->
 | Band | Composite | Share of catalog | What it means |
 |------|:---------:|:----------------:|---------------|
-| **Exemplar** | 66.5+ | 1.0% | Reference-quality API operations across every facet — a rich contract, published governance, transparent operations, and machine-readable commercial terms. |
-| **Strong** | 54.3 – 66.4 | 3.8% | Solid contracts, transparent operations, and an easy start. |
-| **Developing** | 39.3 – 54.2 | 13.3% | Real signal across most facets with visible, nameable gaps. |
-| **Thin** | 26.2 – 39.2 | 15.9% | Limited machine-readable signal and partial portal coverage. |
+| **Exemplar** | 66.5+ | 0.9% | Reference-quality API operations across every facet — a rich contract, published governance, transparent operations, and machine-readable commercial terms. |
+| **Strong** | 54.3 – 66.4 | 4.1% | Solid contracts, transparent operations, and an easy start. |
+| **Developing** | 39.3 – 54.2 | 14.3% | Real signal across most facets with visible, nameable gaps. |
+| **Thin** | 26.2 – 39.2 | 15.6% | Limited machine-readable signal and partial portal coverage. |
 | **Emerging** | 11 – 26.1 | 24.0% | More than an index entry, but the surface is still mostly links rather than artifacts. |
-| **Minimal** | 0 – 10.9 | 41.9% | Index entry only; little beyond a description and a link. |
+| **Minimal** | 0 – 10.9 | 41.0% | Index entry only; little beyond a description and a link. |
 <!-- kin-score:bands:end -->
 
 <!-- kin-score:agent-bands:start -->
 | Band | Score | Share | Meaning |
 |---|:---:|:---:|---|
-| **Agent-Native** | 38.7+ | 1.1% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
-| **Agent-Ready** | 28.6 – 38.6 | 9.6% | An agent can drive the core surface. |
-| **Agent-Aware** | 5.1 – 28.5 | 26.1% | Partial machine-readable surface. |
-| **Human-Only** | 0 – 5 | 63.1% | Little an agent can consume without a human first reading the site. |
+| **Agent-Native** | 38.7+ | 1.3% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
+| **Agent-Ready** | 28.6 – 38.6 | 10.3% | An agent can drive the core surface. |
+| **Agent-Aware** | 5.1 – 28.5 | 26.5% | Partial machine-readable surface. |
+| **Human-Only** | 0 – 5 | 61.9% | Little an agent can consume without a human first reading the site. |
 <!-- kin-score:agent-bands:end -->
 
 **`Emerging` was split out of `Minimal`**, and it is the most useful band on the list. A quarter of
