@@ -16,6 +16,51 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.16.0 — 2026-08-29
+
+**Scores move. 0.15.x scores are not comparable to 0.16.0.**
+
+### We were scoring our own files
+
+`llms_txt_published`, `well_known_published` and `overlay_published` were satisfied by a pointer at
+a file inside the provider's own mirror — a file API Evangelist generated during enrichment. Of the
+providers earning each check, measured across 27,657 records:
+
+| check | pts | providers | pointed at a LOCAL file |
+|---|---:|---:|---:|
+| `llms_txt_published` | 4 | 8,710 | 98.5% |
+| `well_known_published` | 6 | 3,904 | 99.6% |
+| `overlay_published` | 4 | 3,094 | 100.0% |
+
+**79,540 rubric points were awarded for artifacts nobody outside this network wrote.** The tell was
+that roadmap#16's pointer-liveness grader covers `change_log` and `status_page` and not these three
+— liveness was wired wherever there was something remote to fetch, and the checks with nothing to
+fetch kept full marks by default.
+
+### With one correction made the same day
+
+`harvest-llms.py` fetches a provider's **real** llms.txt into their mirror so the artifact carries
+the credit rather than a pointer that might be wrong. It writes the body unmarked, so a harvested
+file looks exactly like a generated one. The blanket rule would have zeroed **8,621 providers whose
+own document we had fetched and re-verified** — Gymshark's support index, Solaris Developer Hub,
+Infoway's Chinese docs. `llms_txt_published` now credits a harvested artifact and not a generated
+one, read from `all/0-working/llms-provenance.json`.
+
+### No facet reaches 100 on declaration alone
+
+A facet caps at **99.0** unless at least one check that PARSED a document contributed to it. 401 of
+556 points are satisfiable by writing text about yourself; one provider held six perfect facets —
+the only one in the catalog above four — while a platform with 213 APIs and 1,298 operations held
+one. 99.0 rather than 99.9 is deliberate: a visible ceiling, so "why is this 99" has an answer a
+provider can act on — publish something a parser can read.
+
+### What this does not do
+
+**No band re-cut.** Three staged changes are still pending — agent cards emitted by documentation
+platforms, `api_count` counting split files as products, and the provenance reader — and all three
+push down. A re-cut fitted before they land would be wrong by the time it shipped.
+
+
 ## 0.15.1 — 2026-08-27
 
 A tracked signal, not a scored one. No new dimensions, no weight changes, no change to the
