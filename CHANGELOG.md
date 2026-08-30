@@ -16,6 +16,52 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.17.0 — 2026-08-30
+
+**Scores move, and further than 0.16.0. Two checks stop crediting a provider for the catalog's own
+processing.**
+
+### Multiple APIs means the provider published several, not that we split one
+
+`multiple_apis` read a count of **post-split spec files**. `refine-openapis` emits one OpenAPI per
+tag, so Chimoney published **one** contract, we split it into nine, and it earned a check for
+shipping multiple APIs. IXON published one and read as **359**.
+
+| | providers |
+|---|---:|
+| lose the check | **5,247** |
+| keep it | 1,173 |
+| unaffected — no archive, count falls back to split files | 303 |
+
+### An agent card about a documentation site is not an agent card about an API
+
+`agent_card` is an 8-point **frontier** dimension, worth that much because only a provider is
+supposed to be able to produce one — which is why the Area Market Reports lean on it.
+
+A documentation platform emits one for every customer. `docs.ghost.org` serves a card reading
+*"Ghost Developer Docs"* whose `url` is the docs site. It is not lying; it accurately describes what
+serves it. It is just not the provider's API.
+
+Of **195** providers holding a card: **49** point at a host the provider registers as an API base
+URL, **79** at a documentation host, **67** at neither. The 79 lose the dimension.
+
+### Neither change invents a penalty
+
+Both **remove a credit** that was measuring API Evangelist rather than the provider — the same
+correction as 0.16.0, which stopped crediting providers for `llms.txt`, `.well-known` and overlay
+files we generated ourselves.
+
+### The 67 cards on neither kind of host are left alone
+
+A card on a marketing host may well be the provider's own. 0.16.0 is the standing lesson on what a
+confident guess costs: the same reasoning would have zeroed **8,621 providers whose `llms.txt` we
+had ourselves harvested**, and had to be corrected within hours of being written.
+
+### Still no band re-cut
+
+Four changes have now moved the distribution downward across two versions. The curve should be
+re-fitted **once, deliberately, after this pass lands** — not before it.
+
 ## 0.16.0 — 2026-08-29
 
 **Scores move. 0.15.x scores are not comparable to 0.16.0.**
