@@ -16,6 +16,68 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.17.1 — 2026-08-30
+
+**A disclosure, not a scored change.** No new check, no weight change, no facet denominator moved,
+and no band re-cut. **Nothing about any provider's composite moves, and scores stamped 0.17.0 remain
+correct under 0.17.1.** This is the 0.15.1 shape: something the pass now reports that it did not
+report before.
+
+### `coverage:` — how deeply we have enriched this provider, printed beside its score
+
+roadmap#35 measured that cross-cohort score comparisons measure our own coverage as much as the
+market. Three published cohorts were enriched by different generations of the pipeline: API
+Management carries `plans/` at **100%** against a catalog-wide **32.3%**, because it is the
+population the pipeline was tuned on. Catalog-wide, only **12.8%** of providers hold both the
+scaffold and probe tiers, **46%** hold exactly one, and the two single-tier states differ by **17.8
+composite points** — for providers that differ only in which enrichment wave reached them.
+
+Every score block now carries:
+
+```yaml
+  coverage:
+    artifact_dirs: 14
+    catalog_gap: 69.5
+    catalog_max: 115.0
+```
+
+**`catalog_gap` is the honest unit, and the rubric already defined it.** `scoring.yml`'s
+`attribution:` block says of the `catalog` class, in its own words: *"API Evangelist can satisfy this
+alone. No provider action is required, and an unearned check here is our backlog, not their gap."*
+Summing those unearned points per provider gives the first number that separates *this provider
+published little* from *we have not looked*. The composite alone cannot tell those apart. Measured
+on four providers: `stripe` **69.5**, `twilio` 57.5, `shopify` 43.5, `xquik-api` 17.0 — which is
+most of why the small provider outranks the platforms (roadmap#13).
+
+**Never folded into the composite**, exactly like `needs_work:`. Disclosure is the whole point: a low
+score with a high `catalog_gap` is a statement about us.
+
+### `kin/` is excluded from `artifact_dirs`, and that is not a detail
+
+It holds the score artifacts this scorer writes, so it is present on **98.9%** of providers.
+Counting it would add a near-constant and make a measure of enrichment depth partly a measure of our
+own output — the same trap as crediting `llms_txt_published` for an llms.txt we generated (0.16.0),
+and as the operation-`tags` check rejected in PROPOSAL-0.18.0 because our own splitter guarantees
+it. Caught while measuring, before it shipped.
+
+Excluding it, artifact-directory depth across 27,765 providers reads: **median 5, p10 1, p90 19, max
+43**; 6.5% hold none and 33.1% hold ten or more. A provider at p90 carries nineteen artifact types
+and one at p10 carries one, and both are scored on the same rubric and ranked in the same list.
+
+### The score-block schema was rewritten too, because it did not describe the catalog
+
+Adding `coverage` to `schema/score-block.schema.json` meant validating it, and it had never been
+validated against real data. **It rejected roughly one published score block in twelve.** Six
+defects, each the scorer moving while the contract stayed put — `schema_version` typed `number` when
+a three-part version parses as a string, `auth_clarity` typed `boolean` when roadmap#97 made it a
+scheme class (rejecting the 9,919 providers that *earn* it), four dimensions unable to be `na`,
+`education` missing from the regime enum, and `regulatory.applies` still `const: true` from before
+roadmap#34 made the block always present.
+
+Now **27,459 valid, 0 invalid.** `regime_id` reads its enum from `scoring.yml` so it cannot drift
+again. Same class as roadmap#213: a published contract that nothing checks against the thing it
+describes.
+
 ## 0.17.0 — 2026-08-30
 
 **Scores move, and further than 0.16.0. Two checks stop crediting a provider for the catalog's own
