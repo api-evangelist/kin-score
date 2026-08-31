@@ -16,6 +16,41 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.17.2
+
+**AAuth is a recognised well-known surface. No score moves.**
+
+`well_known_published` now accepts a served `/.well-known/aauth-resource.json` alongside
+api-catalog, security.txt and RFC 9728 protected-resource metadata. `score.rb` gains
+`aauth_resource_doc`, which body-reads the document and requires both `issuer` and `jwks_uri` —
+never a status probe, for the reason already recorded on `protected_resource_doc`.
+
+**Why add a rule nobody satisfies.** Measured 2026-08-30: zero providers serve one. The probe ran
+across the 1,486 hosts in the catalog that serve a *real* OAuth/OIDC discovery document — 1,304
+providers, 513 of them serving a real RFC 9728 protected-resource doc, the most AAuth-adjacent
+cohort that exists — at all four AAuth well-known paths, 5,944 requests. No hits; 269 hosts
+answered 200 with something that was not a document. Naming the path before anyone serves one is
+roadmap#123's lesson applied in advance: the first provider to publish one is credited instead of
+scoring as though they published nothing.
+
+**A scored AAuth dimension is parked, not added.** `aauth_resource_metadata` joins
+`agent_identity_declared` in the agent-auth cluster under the same rule — a dimension nobody can
+earn measures the market, not the provider. AAuth does pass the observability test this cluster
+applies to AP2 and x402: it defines four well-known paths, three JWT `typ` values and three HTTP
+headers, so there is something to fetch. It is the population, not the protocol, that parks it.
+
+**A probe discipline change that outlives AAuth.** The single apparent hit, `data.nasdaq.com`, was
+a host echoing the requested path back into the document's own required field — so a
+required-field test credited it. A negative control at a path that cannot exist returned the
+identical body. **Any probe for a new well-known path must now carry a negative control and
+discard the host on a 2xx.** A control sweep of all 1,486 hosts found exactly one host behaving
+this way, so this is a guard against a future false positive rather than a repair of a present
+one. `nasdaq-data-link`'s `protected_resource_metadata` credit stands: that document is genuine
+and served at its own correct path.
+
+Standards catalogued: [`/store/aauth/`](https://standards.apievangelist.com/store/aauth/) and
+[`/store/aauth-r3/`](https://standards.apievangelist.com/store/aauth-r3/).
+
 ## 0.17.1 — 2026-08-30
 
 **A disclosure, not a scored change.** No new check, no weight change, no facet denominator moved,
