@@ -33,15 +33,27 @@ nothing. 0.18.0 fixes both halves: inbound documents leave the `callable` ratio 
 *and* denominator, the way `reversibility_documented` and `idempotency` already do, and publishing
 one now earns points.
 
-**Who moves.** 132 providers publish at least one inbound contract, 208 documents between them, at
+**Who gains.** 132 providers publish at least one inbound contract, 208 documents between them, at
 most 9 for any one. They gain on two counts — the callable share they were losing, and the new
-points. LINE's `callable` goes 88.9% → 100%. Nobody loses anything.
+points. LINE's `callable` goes 88.9% → 100%.
 
-**Nobody without events is asked.** The check is `na` for a provider with no event surface at all —
-no advertised webhooks, no AsyncAPI, no inbound document — so the ~19,000 records with nothing to
-document are not scored down on a question that does not apply to them. Same posture as
-`contract_self_operated` below, and the same reason: a rubric must not dock a provider for a
-category it is not in.
+**Who loses, because this is not a free release.** The check opens for every provider with an event
+surface — 2,689 of them — and only 128 have an inbound contract. **The other 2,561 now score 0 on a
+check that did not exist before**: two points added to their `contract_quality` denominator with
+nothing earned against it. That is the check working as designed, and "you advertise webhooks and
+published no contract for them" is a real finding, but it is a cost and it is paid by twenty times
+more providers than the gain.
+
+This entry originally read *"Nobody loses anything."* That was written from the gain measurement
+without measuring the other side of the gate, and it was wrong. Correcting it here rather than
+quietly is the point of a changelog: 0.18.0 moved scores in both directions, and a provider reading
+this to understand why theirs fell deserves to find the reason.
+
+**A provider with no event surface is not asked.** The check is `na` when there are no advertised
+webhooks, no AsyncAPI and no inbound document — so the ~19,000 records with nothing to document are
+not scored down on a question that does not apply. Same posture as `contract_self_operated` below,
+and the same reason: a rubric must not dock a provider for a category it is not in. That exemption
+is real; it is just not the same claim as nobody losing anything.
 
 **Distinct from `webhooks_or_callbacks`.** That check asks whether an *outbound* spec declares a
 `webhooks`/`callbacks` block. This asks whether the inbound surface has a contract of its own.
