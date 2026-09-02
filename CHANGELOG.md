@@ -16,6 +16,78 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.18.0 — 2026-09-01
+
+Two new checks, and both are about not crediting the wrong party.
+
+**`inbound_contract_published`** (contract_quality, 2 points) credits a provider for publishing a
+standalone machine-readable contract for the events it *sends* — the webhook envelope, not the API
+you call. Until roadmap#175 those documents were scored as broken APIs: `callable` grades a spec on
+whether its `servers[]` host resolves, and for a webhook envelope that question has no answer,
+because the consumer is the one who stands up the endpoint.
+
+The penalty landed on exactly the wrong providers. LINE publishes a document defining the whole
+`CallbackRequest` schema tree, whose `servers[]` reads `https://example.com` — the only honest value
+available — and lost a ninth of its callable share for it. A provider who documented nothing paid
+nothing. 0.18.0 fixes both halves: inbound documents leave the `callable` ratio entirely, numerator
+*and* denominator, the way `reversibility_documented` and `idempotency` already do, and publishing
+one now earns points.
+
+**Who moves.** 132 providers publish at least one inbound contract, 208 documents between them, at
+most 9 for any one. They gain on two counts — the callable share they were losing, and the new
+points. LINE's `callable` goes 88.9% → 100%. Nobody loses anything.
+
+**Nobody without events is asked.** The check is `na` for a provider with no event surface at all —
+no advertised webhooks, no AsyncAPI, no inbound document — so the ~19,000 records with nothing to
+document are not scored down on a question that does not apply to them. Same posture as
+`contract_self_operated` below, and the same reason: a rubric must not dock a provider for a
+category it is not in.
+
+**Distinct from `webhooks_or_callbacks`.** That check asks whether an *outbound* spec declares a
+`webhooks`/`callbacks` block. This asks whether the inbound surface has a contract of its own.
+LINE's has no `webhooks:` key at all — it is a paths-based envelope, which is why the older check
+never saw it, and why a filename test would have missed it too: harvesting renamed the file to
+`line-dummy-api-openapi.yml`, leaving the word only in its own `info.title`.
+
+**`contract_self_operated`** (contract_quality, 6 points, graded) settles **who operates** the thing
+each registered contract describes *before* awarding contract credit.
+
+The failure it fixes was measured, not theorised. Twenty-five universities were credited for one
+Figshare contract, saved under their own slugs and titled "&lt;University&gt; articles API". The eight
+highest-scoring universities in the whole catalog were scoring that same document, and all eight
+returned an identical agent readiness of **38.9** — because it literally was the same document. The
+shape recurs wherever a platform is popular: 193 Shopify merchants, 11 Elsevier Pure deployments,
+23 Instructure tenancies. A rating that cannot tell "this organisation built an API" from "this
+organisation bought a product that has one" is not rating the organisation.
+
+This generalises the rule 0.13 already applied to a single `.well-known` document. Attribution is
+settled from evidence the pipeline gathers anyway — IP ownership, DNS CNAME chains, and the
+contract's own `info.title` / `info.contact` — and recorded as `x-operator` on each `apis[]` entry.
+
+| grade | meaning | credit |
+|---|---|---|
+| `self` | every operated surface is institution- or federation-run | 1.00 |
+| `mixed` | runs some of its own alongside vendor tenancies | 0.60 |
+| `tenant` | every registered surface is somebody else's platform | 0.25 |
+
+A vendor tenancy is graded **down, not zeroed**, the same posture `agentic_commerce` takes for
+`platform`: a university running Figshare really does give its community a repository with an API;
+it just did not engineer the contract. Registry memberships (DataCite, Crossref, ROR) are excluded
+from both sides — a DataCite account is a true fact about the organisation but is not a contract it
+operates.
+
+**It is a no-op unless the axis is declared.** A provider whose `apis.yml` carries no `x-operator`
+scores the check `na` and its composite does not move — the points leave the denominator entirely,
+as they do for a missing spec kind. This required N/A semantics for graded checks, which did not
+previously exist: the graded branch credited `max_eval` *before* evaluating, so a nil return would
+have scored 0 and docked all ~25k providers that carry no annotation. Opt-in per check via
+`GRADED_NA_ON_NIL`, so the three graded checks that predate this are untouched.
+
+The field is populated today on the 254-institution university cohort (2,569 entries) and nowhere
+else, so nothing outside that cohort shifts, and the check sharpens as the annotation spreads. It
+must never dock a provider for catalog work *we* have not done — the rule the `open_source` facet
+already states.
+
 ## 0.17.2
 
 **AAuth is a recognised well-known surface. No score moves.**

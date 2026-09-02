@@ -15,6 +15,72 @@ has shipped.
 
 ---
 
+## Status 2026-09-01 — the event surface stops being a penalty (0.18.0)
+
+`inbound_contract_published` credits a provider for publishing a standalone contract for the events
+it sends. It ships alongside the roadmap#175 provenance fix that stopped those documents being
+scored as broken APIs — the two are one change: you cannot credit an artifact the same pass is
+penalising.
+
+### **SHIPPED — inbound contracts leave the callable ratio, and earn**
+
+208 documents across 132 providers, classified in the provenance index rather than by filename.
+LINE's `callable` reads 100% where it read 88.9%. The check is `na` for a provider with no event
+surface at all, so the ~19,000 records with nothing to document are not scored down.
+
+### **#179 — the classifier sees 132 providers and there are 2,112 advertising webhooks**
+
+Only 6.3% of providers that advertise a webhook surface publish a contract for it — which may be
+the true state of the market, or may be the classifier's reach. Every signal is gated on the
+absence of a resolvable host, so a provider who publishes a webhook contract WITH their own domain
+in `servers[]` is invisible to it. Worth measuring before reading the 6.3% as a finding.
+
+### **#180 — `webhooks_advertised` and this check disagree about what an event surface is**
+
+One reads a `common[]` link type, the other reads the spec corpus. A provider can satisfy either
+without the other, and nothing reconciles them. The event surface is currently described by three
+checks in two facets (`webhooks_or_callbacks`, `webhooks_advertised`, this one) that were added at
+different times for different reasons.
+
+---
+
+## Status 2026-09-01 — the operator axis ships (0.18.0), and it is only as good as its coverage
+
+`contract_self_operated` landed after a seven-batch re-profile of the whole 254-institution
+university cohort. The check is live; what it can *see* is now the constraint.
+
+### **SHIPPED — `x-operator` is read by the score**
+
+Attribution is settled before contract credit is awarded, graded `self` / `mixed` / `tenant`.
+`api.figshare.com` went from 19 institutions to 1 during the re-profile, `shared_contract` from 730
+to 7, `hostless_vendor` from 102 to 0. Cohort operator split: institution 1,382, tenant 545,
+registry 220, federation 88.
+
+### **#176 — the axis is populated on 254 providers out of ~25,000**
+
+The check is a deliberate no-op everywhere else, so it currently sharpens one cohort and measures
+nothing about the rest of the catalog. The two obvious next cohorts are the ones where the same
+failure was already measured: **193 Shopify merchants** carrying `<store>.myshopify.com` agentic
+commerce documents, and every provider whose specs resolve to a shared vendor host. `x-operator`
+should be written by the general enrichment pipeline, not only by `pipeline-university`.
+
+### **#177 — 334 university `apis[]` entries still carry no `x-operator`**
+
+Within the one cohort that has the axis, 13% of entries are unannotated and score as if the axis
+were undeclared for that entry. The grade is computed from the entries that *do* declare, which is
+right, but the coverage should be closed.
+
+### **#178 — three attribution classes the audit still cannot see**
+
+Named by agents during the re-profile, recorded in the repos, not yet in the tool:
+`vendor-cname-behind-per-tenant-aws-elb` (the `CLOUD_SUFFIXES` exclusion that stops crediting Amazon
+for a self-hosted IdP also *hides* this real case), `vendor-contract-retitled-to-institution` (a
+vendor spec whose `info.title` was rewritten to name the customer, defeating the shared-title
+fingerprint), and discovered hosts that are never pre-resolved because the audit only resolves hosts
+already recorded in `apis.yml`.
+
+---
+
 ## Status 2026-08-27 — two `mcp_server` false-credit paths, found by profiling a health cohort
 
 Profiling nine self-hosted health/nutrition providers (SparkyFitness, wger, Mealie, Tandoor, Hevy,
