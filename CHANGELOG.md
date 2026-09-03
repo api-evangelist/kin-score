@@ -16,6 +16,50 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.18.2 — 2026-09-03
+
+Four honesty fixes in one release: two band gates, one facet-applicability rule, one emission
+shape. **No weight changes, no new dimensions, no band re-cut** — the cuts are untouched and the
+movement is confined to the specific providers each rule names.
+
+**The agent-native gate reads idempotency COVERAGE, not presence (roadmap#243).** A `documented`
+idempotency credit — `common[].type` matching `/idempoten/i` — satisfied the gate while the
+provider's own conventions artifact said the mechanism covers 2 of 99 mutating operations
+(leadping, which crossed a band boundary on it). The gate now also consults that artifact,
+structurally and never by prose: `idempotency.coverage: partial|none` fails the gate, an
+enumerated `scope:` list of ≤5 operations reads as partial where no coverage field exists, and
+`coverage: full` or a prose-only artifact passes unchanged. Stripe-safe by construction — its
+artifact states a header across all writes and enumerates nothing. Demotes 1–2 providers today;
+the enrichment recipe now emits the coverage field, so the gate tightens as artifacts are
+re-touched. Disclosed via `band_gated_from` like every gate demotion.
+
+**A reachability cap below the gate (roadmap#245).** gutendex serves no request to any
+programmatic client — host-wide 403 including an invented control path, wildcard robots
+`Disallow` on its only API endpoint, named agent bans, `Content-Signal: ai-train=no` — and kept
+band agent-ready, because nothing read reachability or operator consent. The enrichment probe's
+own verdict (`x_coverage.state`, lifted to the provider record by the build) now caps the agent
+band at agent-aware for `probed-unreachable` and `parked` surfaces, disclosed via
+`band_gated_from`. `blocked` and `unreadable` deliberately do NOT cap — they are statements
+about the probe run, not the operator. Two providers move today.
+
+**The open-source facet requires an open-source product (roadmap#219).** The facet's own
+description said "for providers whose product is itself open source ONLY"; the gate required
+only a live read of *some* repository, so Apigee scored 85.0 on a CLI for a closed Google Cloud
+platform and Azure API Management 100.0 on a gateway component of a closed SaaS — four
+adjacent-repo providers moved the API Management cohort's facet average from 44.7 to 47.0,
+reversing roadmap#39's sign. The facet now applies only where the published delivery model
+(roadmap#41's stricter deriver) says `open_source: true` — one answer to one question. ~698
+providers keep the facet; ~446 go N/A (not zero: the facet is excluded from their composite
+denominator, never scored against them).
+
+**`undetermined` regulatory stops rendering a confident negative (roadmap#191).** The block
+emitted `applies: false` alongside `undetermined: true`, so every consumer reading `applies`
+saw "not regulated" on providers we never determined — the distinction roadmap#34 added
+`undetermined` to preserve, destroyed at the point of rendering. `applies` is now omitted when
+undetermined; it appears exactly when a determination exists. The false "provider carries no
+tags" note was corrected separately just before this release. Schema updated
+(`score-block.schema.json`): `applies` is conditionally required on determination.
+
 ## 0.18.1 — 2026-09-03
 
 A tracked signal, not a scored one — the 0.15.1 shape. No new dimensions, no weight changes, no

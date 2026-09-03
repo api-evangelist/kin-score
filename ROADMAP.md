@@ -15,6 +15,21 @@ has shipped.
 
 ---
 
+## Status 2026-09-03 — four honesty fixes land together (0.18.2)
+
+### **SHIPPED — gates read what the artifacts say, not that they exist**
+
+The agent-native band gate consults the provider's own conventions artifact for idempotency
+COVERAGE (roadmap#243); a reachability cap holds probed-unreachable/parked surfaces below
+agent-ready (roadmap#245); the open-source facet applies only to open-source products via the
+delivery model (roadmap#219); and `undetermined` regulatory stops rendering `applies: false`
+(roadmap#191). No weights, no dimensions, no re-cut — see the CHANGELOG entry for the movement,
+which is confined to the providers each rule names.
+
+Next in this family: the rubric-side follow-ons parked on their issues — regime-specific
+regulatory checks (0.6 direction), the reversibility stamp's rebuild-or-delete decision
+(roadmap#213), and the deeper reachability probe roadmap#143/#144 design.
+
 ## Status 2026-09-03 — WebMCP joins the observed signals (0.18.1), and the baseline was not zero
 
 The third observed signal, and the first that is probe-backed rather than spec-parsed: `webmcp` —

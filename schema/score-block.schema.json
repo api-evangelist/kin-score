@@ -151,10 +151,8 @@
         },
         "regulatory": {
           "type": "object",
-          "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet. Emitted even when no regime applies (roadmap#34), because `undetermined` is not the same statement as `not regulated` \u2014 so `regime` is optional and `applies` carries the answer.",
-          "required": [
-            "applies"
-          ],
+          "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet. Emitted even when no regime applies (roadmap#34), because `undetermined` is not the same statement as `not regulated`. 0.18.2 (roadmap#191): when `undetermined` is true, `applies` is OMITTED \u2014 both used to be emitted and every consumer reading `applies` saw a confident negative on providers never determined. `applies` appears exactly when a determination exists.",
+          "required": [],
           "properties": {
             "applies": {
               "type": "boolean",
@@ -217,7 +215,33 @@
               "regime_id",
               "score"
             ]
-          }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "undetermined": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "undetermined"
+                ]
+              },
+              "then": {
+                "not": {
+                  "required": [
+                    "applies"
+                  ]
+                }
+              },
+              "else": {
+                "required": [
+                  "applies"
+                ]
+              }
+            }
+          ]
         },
         "provenance": {
           "type": "object",
