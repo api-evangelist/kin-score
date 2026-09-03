@@ -3049,7 +3049,14 @@ agent_readiness:
         the discovery document the pipeline already fetches and saves on 889 providers.
         APPENDED AT SLOT 18. Dimension order is positional in DIM_ORDER and the glyph.
     - id: agentic_commerce
-      label: Agentic Commerce Surface
+      # 0.18.2 (roadmap#188) — LABEL ONLY, no scoring change. "Agentic Commerce Surface"
+      # invited exactly the reading roadmap#185 made: "98.3% false = nobody has built for
+      # agents acting with consequence." The check measures one thing — a UCP/ACP
+      # well-known document on the provider's own domain — and correctly reads false on
+      # both protocol authors (Stripe, OpenAI), because neither is a storefront. The
+      # label now says what is measured, so it can no longer support the sentence the
+      # dimension cannot.
+      label: Agentic Commerce Well-Known Document
       points: 5
       graded: true
       credit:

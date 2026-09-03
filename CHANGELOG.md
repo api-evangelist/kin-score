@@ -60,6 +60,13 @@ undetermined; it appears exactly when a determination exists. The false "provide
 tags" note was corrected separately just before this release. Schema updated
 (`score-block.schema.json`): `applies` is conditionally required on determination.
 
+**And one label rename, no scoring change (roadmap#188).** `agentic_commerce` is now labeled
+"Agentic Commerce Well-Known Document" — the old "Agentic Commerce Surface" invited the reading
+roadmap#185 published (98.3% false = "nobody has built for agents"), when the check measures
+exactly one thing: a UCP/ACP well-known document on the provider's own domain. It correctly
+reads false on both ACP co-authors, because neither is a storefront. The label now says what is
+measured.
+
 ## 0.18.1 — 2026-09-03
 
 A tracked signal, not a scored one — the 0.15.1 shape. No new dimensions, no weight changes, no

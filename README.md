@@ -257,7 +257,7 @@ denominator.
 | **Registration Without a Human** | 6 |  |
 | **Agent Skills** | 5 | Are operating instructions packaged, not inferred? |
 | **Protected Resource Metadata** | 5 |  |
-| **Agentic Commerce Surface** | 5 |  |
+| **Agentic Commerce Well-Known Document** | 5 |  |
 | **Well-Known Catalog** | 4 | Is there an RFC 9727 `api-catalog` linkset? |
 | **Dry-Run / Simulate Mode** | 4 | Can a destructive operation be rehearsed before it commits? |
 | **Consent & Bot Identity** | 3 | AIPREF / Content-Signals / Web Bot Auth — the frontier signals. |
