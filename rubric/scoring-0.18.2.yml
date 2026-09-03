@@ -18,46 +18,42 @@ maintainer: kin@apievangelist.com
 # checked against schema_version by test_rubric_record.py: a rubric cannot reach a
 # rebuild carrying the previous release's story.
 release_note:
-  version: 0.18.1
+  version: 0.18.2
   body: |
-    A TRACKED SIGNAL, NOT A SCORED ONE — the 0.15.1 shape. No new dimensions, no
-    weight changes, no change to the agent-readiness denominator, and no band
-    re-cut: nothing about any provider's score moves, and scores stamped 0.18.0
-    remain correct under 0.18.1.
+    FOUR HONESTY FIXES AND A LABEL — no new dimensions, no weight changes, no
+    band re-cut. Movement is confined to the providers each rule names; scores
+    stamped 0.18.1 remain correct except where a gate below applies.
 
-    `webmcp` joins `observed_signals`: does a script served by the provider's
-    own pages register tools with the browser's modelContext (the W3C WebMCP
-    draft — document.modelContext.registerTool(), Chrome origin trial 149-156)?
-    It is the browser-side counterpart of the MCP server the layer already
-    scores: not "is the API agent-drivable out-of-band" but "is the SITE
-    agent-drivable in the session the user is already in". A new prober
-    (signals/probe_webmcp.py) writes a frozen snapshot with the
-    mcp-deployment.json contract — every probed slug carries a verdict, so
-    absent means unprobed — and the scorer reads it through a new `probe:` key
-    on observed signals, the first non-spec-check signal in the list.
+    The agent-native band gate reads idempotency COVERAGE, not presence
+    (roadmap#243): a documented credit whose own conventions artifact declares
+    `coverage: partial|none` — or enumerates a scope list of five or fewer
+    operations — no longer holds the top band. leadping's mechanism covered 2 of
+    99 mutating operations and crossed a band boundary on it; Stripe, which
+    states a header across all writes and enumerates nothing, is untouched.
 
-    The baseline is the finding, and it is not the zero we expected. 81 of 730
-    providers probed across the hosted-MCP cohort ship WebMCP registration —
-    but 72 of the 81 are ONE SCRIPT: ReadMe.io's docs-hub bundle registers a
-    search_docs tool on every docs site it hosts. A documentation platform
-    quietly made seventy-two providers' docs agent-drivable, none of whom
-    necessarily know. Distinct, provider-engineered deployments number 9
-    (Cloudflare, Zapier, Nylas, Render, and self-hosted bridges), and 6 of the
-    81 ship only the deprecated navigator surface — dead in Chrome 150+.
+    A reachability cap (roadmap#245): a surface the enrichment probe verdicts
+    `probed-unreachable` or `parked` cannot band above agent-aware, disclosed
+    via band_gated_from. gutendex — host-wide 403 including an invented control
+    path, wildcard robots Disallow on its only endpoint, named agent bans —
+    held agent-ready because nothing read reachability or operator consent.
+    `blocked` and `unreadable` do not cap: they describe the probe run, not the
+    operator.
 
-    The raw count already clears the 25-provider promotion line and promotion
-    is deferred anyway: the number that has to clear it is providers whose own
-    engineering shipped the tools — 9 — or promotion would hand out credit for
-    ReadMe's work, re-creating exactly the false credit contract_self_operated
-    removed in 0.18.0. When it promotes, it promotes graded (runtime-verified
-    1.0 / statically-detected 0.4 / platform-shipped graded down the way
-    tenant contracts are), with points and the band re-cut a denominator
-    change requires. Until then, zero rescale: the agent_card lesson stands.
+    The open-source facet applies only to open-source products (roadmap#219):
+    the facet description always said so; the gate now enforces it through the
+    published delivery model. Apigee's 85.0 on a CLI for a closed platform ends
+    — the facet goes N/A there, never zero. ~698 providers keep it, ~446 leave
+    the denominator.
 
-    Also recorded: the name is already colliding — at least one provider
-    markets a server-side MCP endpoint as its "WebMCP Server" — so the probe
-    keys on the registration API, never the word.
+    `undetermined` regulatory omits `applies` (roadmap#191): emitting
+    `applies: false` beside `undetermined: true` handed every reader a
+    confident negative about providers never determined — in the frontmatter
+    AND in the per-provider kin history artifacts.
 
+    And `agentic_commerce` is relabeled "Agentic Commerce Well-Known Document"
+    (roadmap#188): the check measures a UCP/ACP well-known document on the
+    provider's own domain, reads false on both protocol authors because
+    neither is a storefront, and the old label invited exactly that misreading.
 aliases:
   # 0.13 (roadmap#71) — the Examples family. A provider publishing a separate example
   # corpus wired `Examples` in good faith and it was read by NOTHING; four spellings of
