@@ -16,6 +16,58 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.18.1 — 2026-09-03
+
+A tracked signal, not a scored one — the 0.15.1 shape. No new dimensions, no weight changes, no
+change to the agent-readiness denominator, and **no band re-cut**: nothing about any provider's
+score moves, and scores stamped 0.18.0 remain correct under 0.18.1.
+
+**`webmcp` joins `observed_signals`.** WebMCP is the W3C Web Machine Learning CG draft that lets a
+web page register typed, callable tools with the browser (`document.modelContext.registerTool()`;
+Chrome ships it as an origin trial, 149–156, having deprecated the original `navigator` surface in
+Chrome 150). It is the browser-side counterpart of the MCP server the layer already scores:
+`mcp_server` asks whether the API is agent-drivable out-of-band; this asks whether the provider's
+*site* is agent-drivable in the session the user is already in — auth, state and all.
+
+**A new prober, and the first probe-backed observed signal.** `signals/probe_webmcp.py` fetches a
+provider's Website / DeveloperPortal / Documentation pages plus their scripts, and detects the
+registration API — the `modelContext` object AND a registration call in the *same script*, so an
+article about WebMCP can never score as shipping it. Results freeze into
+`all/0-working/webmcp-deployment.json` under the `mcp-deployment.json` contract: every probed slug
+carries a verdict, so absent means unprobed, never "has nothing" (roadmap#125's lesson, inherited
+on day one). The scorer reads it through a new `probe:` key on observed signals, alongside the
+existing `spec_check:` path.
+
+**The baseline is the finding, and it is not the zero we expected.** Probing the 730-provider
+hosted-MCP cohort (the likeliest adopters — they already run a live MCP endpoint):
+
+| | |
+|---|---:|
+| providers probed | 730 |
+| WebMCP registration detected | **81** |
+| …via one script: ReadMe.io's docs-hub bundle | 72 |
+| distinct, provider-engineered deployments | **9** |
+| shipping only the deprecated `navigator` surface | 6 |
+
+ReadMe.io's hub bundle registers a `search_docs` tool on every docs site it hosts — verified in the
+bundle itself (`document.modelContext ?? navigator.modelContext`, then `registerTool`). A
+documentation platform quietly made seventy-two providers' docs agent-drivable, and it is unlikely
+most of them know. The distinct deployments are Cloudflare (two properties), Zapier, Nylas, Render,
+and four self-hosted — two of them a shared `/.webmcp/bridge.js` pattern worth watching as a
+possible framework fingerprint.
+
+**Why the promotion line is cleared and promotion is deferred anyway.** The raw 81 already beats
+the 25-provider line, but 72 of the 81 are one platform's engineering. Promoting on the raw count
+would credit providers for ReadMe's work — precisely the false credit `contract_self_operated`
+removed one release ago, and the same shape as the live-MCP cohort finding before it. The count
+that has to clear the line is providers whose own engineering shipped the tools: **9 today**. When
+it promotes, it promotes graded — runtime-verified 1.0 / statically-detected 0.4, with
+platform-shipped graded down the way tenant contracts are — with points and the band re-cut a
+denominator change requires.
+
+One name collision is already recorded: at least one provider markets a server-side MCP endpoint as
+its "WebMCP Server", which is why the probe keys on the registration API and never on the word.
+
 ## 0.18.0 — 2026-09-01
 
 Two new checks, and both are about not crediting the wrong party.

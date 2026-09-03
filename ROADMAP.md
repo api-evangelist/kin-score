@@ -15,6 +15,36 @@ has shipped.
 
 ---
 
+## Status 2026-09-03 — WebMCP joins the observed signals (0.18.1), and the baseline was not zero
+
+The third observed signal, and the first that is probe-backed rather than spec-parsed: `webmcp` —
+does a script served by the provider's own pages register tools with the browser's `modelContext`
+(the W3C WebMCP draft, Chrome origin trial 149–156)? A new prober
+(`api-search/signals/probe_webmcp.py`) freezes verdicts into
+`all/0-working/webmcp-deployment.json` under the `mcp-deployment.json` contract, and the scorer
+reads it through a new `probe:` key on observed signals.
+
+Unlike RFC 10008's clean zeros, the first pass over the 730-provider hosted-MCP cohort found **81 —
+of which 72 are one script**: ReadMe.io's docs-hub bundle registers a `search_docs` tool on every
+docs site it hosts. Provider-engineered deployments number **9** (Cloudflare ×2, Zapier, Nylas,
+Render, four self-hosted). Six of the 81 ship only the deprecated `navigator` surface, dead in
+Chrome 150+.
+
+**The raw count clears the 25-provider promotion line and promotion is deferred anyway** — the
+number that has to clear it is providers whose own engineering shipped the tools, or promotion
+hands out credit for ReadMe's work: the `contract_self_operated` false credit, one release later,
+on a new surface. Queued for promotion when 25 distinct provider-engineered deployments exist,
+graded (runtime-verified 1.0 / statically-detected 0.4 / platform-shipped graded down), with the
+band re-cut a denominator change requires.
+
+Follow-ons queued:
+- widen the probe beyond the hosted-MCP cohort (broad sweep is bounded and re-runnable;
+  `--stale-days` re-probes old verdicts);
+- a headless-browser verify tier that observes a non-empty tool list at runtime and promotes
+  `detected` → `verified` (the prober never claims `verified` on its own);
+- classify the platform in the snapshot (ReadMe today; Mintlify-style hosts likely next) so the
+  provider-engineered count is a query, not a hand count.
+
 ## Status 2026-09-01 — the event surface stops being a penalty (0.18.0)
 
 `inbound_contract_published` credits a provider for publishing a standalone contract for the events
