@@ -16,6 +16,74 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.18.3 — 2026-09-04
+
+Three provenance corrections. **No weight changes, no new dimensions, no band re-cut** — each one
+stops a score crediting work the provider did not do, or penalising a provider for the only
+correct answer available to them.
+
+**An operator-supplied host is not an uncallable one (roadmap#184, #249).** Self-hosted software
+cannot publish a callable host, because there is not one until somebody installs it. Matomo
+declares `https://{matomo_host}/index.php`, Elasticsearch `https://{elasticsearch_endpoint}`,
+Grafana `http://localhost:3000/api` — the only correct values any of them could write — and all
+three were scored as though they had failed to fill in a blank. `server_url_kind` gains an
+`operator` class, and `servers_resolvable` treats it as N/A: out of the numerator **and** the
+denominator, the same treatment `inbound` has had since 0.18.0, because in both cases somebody
+other than the vendor is the host. Measured on #249, a naive reconciliation of `callable` with
+`baseURL` would have demoted 758 providers, of which **439 are this case against 137 publishing a
+genuine placeholder** — and would have taken elk-stack, matomo and qliksense out of `exemplar` for
+documenting themselves properly. The line is instruction versus blank: `{host}`, `localhost` and
+`your-<product>-host` all say "you supply this"; `example.com`, `<host>`, `TODO` and `changeme` are
+an unfilled blank. Crediting the operator case in the numerator was the other option and is wrong —
+it would rank Matomo's callability equal to Stripe's.
+
+**A Postman collection we generated is not the provider's (roadmap#208).** `postman_present` pays 2
+points of developer_ergonomics for "the fastest path from reading about the API to calling it" —
+a claim about what the **provider** published. **1,623 providers were satisfying it with a
+collection API Evangelist authored** — 656 pointing at a file inside their own repo, and 1,080 at
+`postman.com/kinlaneapi/...`, which is our own Postman workspace. Our per-repo provenance manifest
+records every one as `derived`. The check is now provenance-graded against a new `collections`
+class, exactly as `agent_skill_present` has been since 0.6 for the identical situation. Authorship
+is read from the manifest rather than from the files: 201,094 of the 201,100 artifacts under
+`collections/` are JSON a Postman importer validates, so a marker cannot go inside them — which is
+why Kin chose a per-repo manifest for this class on 2026-08-29.
+
+**The pointer decides, not the directory.** Grading by the collections class alone also docked 301
+providers who publish their own collection, because their repo happens to hold ones we derived;
+they keep full credit. The test is the workspace OWNER and never the scheme — `postman.com/
+kinlaneapi/...` is an https URL and it is ours, so treating "remote" as "theirs" would have handed
+the 1,080 their points straight back, which is the exact inversion this release exists to fix. The
+pointer is resolved through `all_pointers` + `canon`, the same readers the check uses, because 73
+of those 301 declare their collection on an API rather than on the provider and a `common[]`-only
+read left them penalised.
+
+**Movement, modelled before writing anything:** 166 providers up, 1,816 down (1,623 postman, 174
+scaffold, 19 other), **191 band changes out of 27,471 — 0.70%**. Every band moves by at most 41
+places on populations in the thousands (Exemplar 261 → 242, Strong 1,109 → 1,096), so **the cuts
+are not re-cut**.
+
+**A self-confessed scaffold is 0% coverage (roadmap#251, Kin's ruling 2026-09-03).** A spec whose
+own `info.description` says "modeled from the published documentation", "reconstructed from" or
+"endpoint scaffold" is stating that nobody exercised the API. Those documents shared a bucket and a
+0.25 credit with `derived`, so a contract mechanically derived from something the provider
+published and a document admitting it was never tested counted the same — and a scaffold-tier repo
+could read 100% covered. `scaffold` is now its own authorship tier at **0.00**, split out of
+`derived` in the OpenAPI corpus, so a scaffold-backed check contributes its full points to
+`catalog_gap` instead of reducing it. A mixed corpus interpolates toward whichever tier it actually
+contains more of.
+
+**Not a rubric change, shipped in the same pass: the `domain_standards` signal was orphaned.**
+`domain_standard_conformance` (contract_quality, 4 pts) reads `applicability(slug).domain_standards`.
+164 providers carried that key and **no committed code produced it** — while
+`derive-applicability.py`, which owns the file, rebuilds it from an empty dict and would have
+silently zeroed the check for all 164 on its next routine run. The derivation is rebuilt and now
+covers **230 providers**, including **18 OGC providers** whose `/conformance` endpoints declare
+`opengis.net` conformance classes (roadmap#81 — OGC is the one domain standard that declares its
+own conformance, machine-readably and anonymously). It also drops 18 entries credited on a bare
+substring — "Microdata" contains "odata", and `crystal-reports` was credited for the phrase "data
+retrieval via OData" in a description, against this check's own evidence-not-claim rule — plus one
+credited by a conformance artifact that says `conforms: false`.
+
 ## 0.18.2 — 2026-09-03
 
 Four honesty fixes in one release: two band gates, one facet-applicability rule, one emission

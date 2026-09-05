@@ -15,6 +15,33 @@ has shipped.
 
 ---
 
+## Status 2026-09-04 — three provenance corrections land together (0.18.3)
+
+### **SHIPPED — stop crediting our work to the provider, and stop penalising the only correct answer**
+
+An operator-supplied host (`{matomo_host}`, `localhost:3000`) is N/A in `servers_resolvable`
+rather than uncallable — the same treatment `inbound` gets, because in both cases somebody other
+than the vendor is the host (roadmap#184, #249). `postman_present` is provenance-graded against a
+new `collections` class read from the per-repo manifest, because 610 providers were earning it for
+a collection we generated from their OpenAPI (roadmap#208). And `scaffold` becomes its own
+authorship tier at 0.00, split out of `derived`, so a spec whose own description says it was
+modeled from documentation contributes its full points to `catalog_gap` instead of reducing it
+(roadmap#251, Kin's ruling 2026-09-03). No weights, no dimensions, no re-cut.
+
+**A finding that is not a rubric change and matters more than any of them:** the `domain_standards`
+signal `domain_standard_conformance` reads was ORPHANED — 164 providers carried the key and no
+committed code produced it, while the script that owns the file rebuilt it from an empty dict.
+The next routine run of a routine derivation would have zeroed a 4-point check for all 164, with
+nothing anywhere reporting it. Rebuilt to 230 providers including 18 OGC (roadmap#81). **A scored
+signal with no committed producer is a class of defect worth sweeping for**, not just fixing here.
+
+Next in this family: the two 0.18.3 candidates deliberately held — the OGC conformance signature
+now has data but its own rubric question is open (roadmap#81), and the multi-jurisdiction vector
+stays published-not-scored on 0.17.1's stated reasoning until the distribution is real
+(roadmap#85).
+
+---
+
 ## Status 2026-09-03 — four honesty fixes land together (0.18.2)
 
 ### **SHIPPED — gates read what the artifacts say, not that they exist**
