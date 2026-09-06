@@ -16,6 +16,31 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.19.0 — 2026-09-06
+
+**Structural only. No weight change, no new check, no band re-cut, and no score moves.** This
+version makes a join possible; it does not yet use it.
+
+`industry_regulatory.*.regime_jurisdictions` gives every one of the 42 regimes a jurisdiction as a
+**field**. Until now it existed only as prose inside the regime label, where nothing could read it:
+extracting a trailing parenthetical finds 20 of 42, misses the prefix forms (`UK Open Banking`,
+`Green Button / ESPI`) and false-positives on `CPNI`, which is not a jurisdiction at all.
+
+**32 of 42 name one. 10 are stated-empty rather than unfilled** — FDX and ISO 20022 are industry
+bodies, PCI-DSS and card-network rules are contractual, ITU is a treaty organisation. An empty list
+is a decision, and recording it as one matters: an absent field and a jurisdiction-free regime are
+different facts, and collapsing them is the defect class this catalog keeps paying for.
+
+Slugs use the same vocabulary as `provider_countries.json` and `provider_regions.json`, so the two
+sides can actually be joined. ISO codes would join nothing.
+
+**Why this is not the fix for roadmap#85.** The regulatory facet is conditional on industry and its
+regime set still falls out of the industry tag alone, so a provider operating in two jurisdictions
+is measured against one. 8,263 providers match a regulated regime, 3,210 now carry a jurisdiction
+signal, and 839 of those are multi-region. Making the facet evaluate the **union** of applicable
+regimes moves those scores and needs a band model, so it belongs to a later version. This is the
+precondition, shipped alone so that change can be attributed when it lands.
+
 ## 0.18.3 — 2026-09-04
 
 Three provenance corrections. **No weight changes, no new dimensions, no band re-cut** — each one
