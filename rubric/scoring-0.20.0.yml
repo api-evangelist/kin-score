@@ -31,30 +31,30 @@ release_note:
     somebody forgets, the customer's records grow a duplicate.
 
     IT APPLIES ONLY TO PROVIDERS THAT ACCEPT WRITES, and that is the design rather than a
-    detail. 1,143 providers hold a parseable contract with no write operation in it. A
+    detail. 1,125 providers hold a parseable contract with no write operation in it. A
     weather or reference API cannot upsert and is not deficient for it, so it goes N/A —
     excluded from the denominator, never zeroed. So do the ~19,700 providers holding no
-    OpenAPI at all. 6,876 are scored, and a zero among those is a real zero.
+    OpenAPI at all. 6,803 are scored, and a zero among those is a real zero.
 
     FOUR CHECKS, 36 POINTS, priced by scarcity and by what each signal commits the
     provider to. A boolean outcome discriminator is 14 points at 1.4% coverage; a
-    caller-declared match key 10 at 9.8%; a named upsert 8 at 12.4%; duplicate handling
-    merely stated in prose or as a flag, 4 at 9.3%. Naming an operation `upsert` is a
+    caller-declared match key 10 at 9.8%; a named upsert 8 at 12.3%; duplicate handling
+    merely stated in prose or as a flag, 4 at 9.2%. Naming an operation `upsert` is a
     claim, accepting the caller's key is a commitment, and telling the caller which
-    branch ran is the only one they can reconcile against afterwards. 21 providers earn
+    branch ran is the only one they can reconcile against afterwards. 20 providers earn
     the whole set.
 
     WHAT IS DELIBERATELY NOT COUNTED. A documented 200-vs-201 split is not an outcome
     discriminator. The scanner detects it and the original specification invited counting
     it, but a 200/201 pair is documented for many unrelated reasons and says nothing
-    about which branch actually ran. It matches 573 providers against 98 for a real
+    about which branch actually ran. It matches 569 providers against 94 for a real
     discriminator field; counting it would have made the top of this facet six times
     commoner than the scarcity that justified building it.
 
     RE-CENTRED, the way 0.12 re-centred `regulatory`. Applied raw at weight 0.10, a
-    provider with no upsert would lose a tenth of its composite — 5,256 providers docked
+    provider with no upsert would lose a tenth of its composite — 5,635 providers docked
     around six points each for lacking something 0.3% of the catalog has. That is a
-    rubric picking a fight, not a measurement. Scored against the observed mean of 7.07
+    rubric picking a fight, not a measurement. Scored against the observed mean of 7.06
     instead: at the mean you are unchanged, above it you gain, below it you lose a
     little.
 aliases:
@@ -643,7 +643,7 @@ facets:
     # is safe to call twice.
     #
     # WHY CONDITIONAL, and this is the whole design. 82.7% of providers that accept
-    # writes offer no create-or-update, and 1,143 providers with a parseable contract
+    # writes offer no create-or-update, and 1,125 providers with a parseable contract
     # accept no writes at all. A weather or reference API cannot upsert; scoring it 0
     # would dock it for a capability it has no business having. So the facet applies
     # ONLY where we parsed a contract AND found write operations in it. Absent
@@ -652,12 +652,16 @@ facets:
     # gets wrong most often (roadmap#199, #216, #217, #171).
     #
     # RE-CENTRED, for the reason 0.12 re-centred `regulatory`. Uncentred at w=0.10 a
-    # provider with no upsert loses a tenth of its composite — 5,256 providers docked
+    # provider with no upsert loses a tenth of its composite — 5,635 providers docked
     # ~6 points each for lacking something 0.3% of the catalog has. That is not a
     # measurement, it is a rubric picking a fight. Scored against the observed mean
     # instead: a provider AT the mean is unchanged, above it gains, below it loses a
     # little. See `recentre_mean`.
-    recentre_mean: 7.07       # measured 2026-09-07 over the 6,876 scorable providers
+    # Measured 2026-09-07 by the SCORER, over the 6,775 providers it actually applies the
+    # facet to — not the 6,803 the evidence file marks scorable. 28 carry a contract but no
+    # catalog page, so re-centring never touches them and averaging them in would describe a
+    # population the number is not used on.
+    recentre_mean: 7.06
     description: >
       For providers that ACCEPT WRITES only: can a caller create-or-update in one
       call, keyed on an identifier the caller already holds, and does the response
@@ -2599,8 +2603,8 @@ artifacts:
       Whether a provider's WRITE surface lets a caller create-or-update in one
       call, measured directly from the OpenAPIs in the catalog rather than from
       anything we wired. Scored ONLY where a contract parsed AND carried write
-      operations: 6,876 providers of 8,048 with a parseable contract. The other
-      1,143 accept no writes and go N/A — a read-only API is not deficient for
+      operations: 6,803 providers of 7,955 with a parseable contract. The other
+      1,125 accept no writes and go N/A — a read-only API is not deficient for
       being unable to upsert.
 
       TWO TRAPS THE SCANNER AVOIDS, both found by getting them wrong first.
@@ -2618,7 +2622,7 @@ artifacts:
       200-vs-201 split, and an earlier draft of this facet counted it as an
       outcome discriminator. It is not one: a 200/201 pair is documented for many
       unrelated reasons and says nothing about which branch actually ran. It
-      matches 573 providers against 98 for a real discriminator field, and
+      matches 569 providers against 94 for a real discriminator field, and
       counting it would have made the top of this facet six times commoner than
       the measurement that justifies the facet at all. Recorded in the evidence
       file, worth zero points.
@@ -2656,7 +2660,7 @@ artifacts:
         points: 8
         rule: 'an operation is named as an upsert or a create-or-update in its path, operationId or summary'
         description: >
-          12.4%. The capability is discoverable from the contract without reading
+          12.3%. The capability is discoverable from the contract without reading
           prose. Priced below the alternate key deliberately: naming an operation
           `upsert` is a claim, whereas accepting a caller's key is a commitment.
       - id: upsert_declared_conflict
@@ -2665,7 +2669,7 @@ artifacts:
         points: 4
         rule: 'the create endpoint carries a conflict/duplicate-handling flag, or the description states create-if-absent behaviour'
         description: >
-          9.3%, and worth little on purpose. This is the capability existing but
+          9.2%, and worth little on purpose. This is the capability existing but
           undiscoverable — stated only in prose ("creates it if it does not
           exist", usually on PUT /{id}), or bolted onto create as a boolean
           (Twenty CRM's `upsert: true`). It is real and a caller can use it, but
@@ -2759,7 +2763,7 @@ bands:
     label: Thin
     min: 26.2
     range: 26.2 – 39.2
-    share: 16.6%
+    share: 16.5%
     description: >
       Limited machine-readable signal and partial portal coverage. Usually a provider
       with documentation a human can read but little a machine or agent can consume

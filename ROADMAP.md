@@ -23,15 +23,15 @@ has shipped.
 themselves: is there a named create-or-update operation, does it accept a key the CALLER already
 holds, and does the response say which branch ran? Every existing contract facet asks whether an
 API is described and callable. None asked what happens when the same write arrives twice, and the
-answer for 82.7% of providers that accept writes is "you search first, and the day you forget, the
+answer for 82.8% of providers that accept writes is "you search first, and the day you forget, the
 customer's records grow a duplicate."
 
-Conditional on ACCEPTING WRITES, which is the design and not a detail. 1,143 providers hold a
-parseable contract with no write operation at all; a weather or reference API cannot upsert and is
-not deficient for it. They go N/A. So do the ~19,700 providers holding no OpenAPI. Only 6,876 are
+Conditional on ACCEPTING WRITES, which is the design and not a detail. 1,125 providers hold a
+parseable first-party contract with no write operation at all; a weather or reference API cannot upsert and is
+not deficient for it. They go N/A. So do the ~19,800 providers holding no OpenAPI. Only 6,803 are
 scored, and a zero among them is a real zero.
 
-Re-centred on the observed mean (7.07) rather than applied raw — the same correction 0.12 made for
+Re-centred on the observed mean (7.06) rather than applied raw — the same correction 0.12 made for
 `regulatory`, and for the same reason: a conditional facet whose population mostly scores zero
 drags every one of them down for lacking something almost nobody has. That branch is no longer
 hardcoded to a facet name; it reads `recentre_mean` off the facet config, so the next conditional
@@ -39,8 +39,8 @@ facet gets it for free (roadmap#270).
 
 **What this release deliberately did not do.** The specification proposed counting a documented
 200-vs-201 split as an outcome discriminator. It is not one — a 200/201 pair is documented for many
-unrelated reasons — and counting it would have made the top of the facet six times commoner (573
-providers against 98) than the scarcity that justified building it. The signal is recorded in the
+unrelated reasons — and counting it would have made the top of the facet six times commoner (569
+providers against 94) than the scarcity that justified building it. The signal is recorded in the
 evidence file and scores nothing. **A rubric that grades on a signal its own argument does not
 support is worse than no facet**, and this is the second time in three releases that the fix was to
 narrow a check rather than widen one.

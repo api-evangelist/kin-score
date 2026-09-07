@@ -331,7 +331,7 @@ after any material rubric change with `signals/band_distribution.rb`.
 | **Exemplar** | 66.5+ | 1.1% | Reference-quality API operations across every facet — a rich contract, published governance, transparent operations, and machine-readable commercial terms. |
 | **Strong** | 54.3 – 66.4 | 4.3% | Solid contracts, transparent operations, and an easy start. |
 | **Developing** | 39.3 – 54.2 | 14.4% | Real signal across most facets with visible, nameable gaps. |
-| **Thin** | 26.2 – 39.2 | 16.6% | Limited machine-readable signal and partial portal coverage. |
+| **Thin** | 26.2 – 39.2 | 16.5% | Limited machine-readable signal and partial portal coverage. |
 | **Emerging** | 11 – 26.1 | 24.6% | More than an index entry, but the surface is still mostly links rather than artifacts. |
 | **Minimal** | 0 – 10.9 | 39.0% | Index entry only; little beyond a description and a link. |
 <!-- kin-score:bands:end -->

@@ -27,16 +27,16 @@ create-or-update in one call, keyed on an identifier the caller already holds, a
 response says which branch ran. Measured directly from the 109,940 OpenAPIs in the catalog, never
 from anything we wired — the same rule `open_source` follows for the same reason.
 
-**It applies only to providers that ACCEPT WRITES, and that is the whole design.** 8,048 providers
-hold a parseable contract; 1,143 of them accept no writes at all. A weather or reference API cannot
+**It applies only to providers that ACCEPT WRITES, and that is the whole design.** 7,955 providers
+hold a parseable first-party contract; 1,125 of them accept no writes at all. A weather or reference API cannot
 upsert, and scoring it 0 would dock it for a capability it has no business having. Three states,
 two of which are N/A rather than zero:
 
 | state | meaning | providers |
 |---|---|---:|
-| `ok` | a contract parsed AND carried write operations — **scorable**, and a zero here is real | 6,876 |
-| `read_only` | a contract parsed, no write operations — **N/A** | 1,143 |
-| `no_specs` | nothing parseable to read — **N/A** | 29 + the ~19,700 holding no OpenAPI |
+| `ok` | a contract parsed AND carried write operations — **scorable**, and a zero here is real | 6,803 |
+| `read_only` | a contract parsed, no write operations — **N/A** | 1,125 |
+| `no_specs` | nothing parseable to read — **N/A** | 27 + the ~19,800 holding no OpenAPI |
 
 **Four checks, 36 points.** Priced against how rare each signal is and how much it changes what an
 integrator can build:
@@ -45,28 +45,28 @@ integrator can build:
 |---|---:|---:|
 | the response says which branch ran (boolean discriminator) | 14 | **1.4%** |
 | the caller declares the key to match on (`idProperty`, `external_id`, `match_on`…) | 10 | 9.8% |
-| a named create-or-update operation | 8 | 12.4% |
-| duplicate handling stated at all (conflict flag, or prose only) | 4 | 9.3% |
+| a named create-or-update operation | 8 | 12.3% |
+| duplicate handling stated at all (conflict flag, or prose only) | 4 | 9.2% |
 
 Naming an operation `upsert` is a claim; accepting the caller's key is a commitment; telling the
 caller which branch ran is the only one they can reconcile against afterwards. The pricing follows
-that order, not the coverage order. 21 providers earn the full set. HubSpot's
+that order, not the coverage order. 20 providers earn the full set. HubSpot's
 `POST /crm/objects/{version}/contacts/batch/upsert` is the reference implementation and now scores
 its own facet — it did not before the re-harvest that preceded this release, because its
 `openapi/_original/` set had been reconstructed rather than harvested.
 
 **A documented 200-vs-201 split is deliberately NOT an outcome discriminator.** The scanner detects
 it and the original specification invited counting it. It is not one: a 200/201 pair is documented
-for many unrelated reasons and says nothing about which branch actually ran. It matches 573
-providers against 98 for a real discriminator field. Counting it would have made the top of this
+for many unrelated reasons and says nothing about which branch actually ran. It matches 569
+providers against 94 for a real discriminator field. Counting it would have made the top of this
 facet six times commoner than the measurement that justifies the facet's existence, and would have
 contradicted the figure APIs.io has already published. It stays in the evidence file, worth zero
 points.
 
 **RE-CENTRED, and `regulatory`'s 0.12 re-centring is generalised to make it possible.** Uncentred
-at weight 0.10, a provider with no upsert loses a tenth of its composite — 5,256 providers docked
+at weight 0.10, a provider with no upsert loses a tenth of its composite — 5,635 providers docked
 around six points each for lacking something 0.3% of the catalog has. That is not a measurement.
-The facet is scored against the observed mean of 7.07 instead: a provider at the mean is unchanged,
+The facet is scored against the observed mean of 7.06 instead: a provider at the mean is unchanged,
 above it gains, below it loses a little. The branch that did this for `regulatory` was hardcoded to
 that facet name; it now reads a `recentre_mean` off the facet config, so `regulatory` keeps its
 per-REGIME mean and any future conditional facet can re-centre without a third branch.
