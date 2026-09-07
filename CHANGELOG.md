@@ -16,6 +16,71 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.20.0 — 2026-09-07
+
+**A seventh facet, conditional, for write ergonomics — the one thing no existing facet reaches.**
+The contract facets ask whether an API is described and callable. None of them asks whether it is
+safe to call twice.
+
+`upsert` (weight 0.10, conditional) scores whether a provider's write surface lets a caller
+create-or-update in one call, keyed on an identifier the caller already holds, and whether the
+response says which branch ran. Measured directly from the 109,940 OpenAPIs in the catalog, never
+from anything we wired — the same rule `open_source` follows for the same reason.
+
+**It applies only to providers that ACCEPT WRITES, and that is the whole design.** 8,048 providers
+hold a parseable contract; 1,143 of them accept no writes at all. A weather or reference API cannot
+upsert, and scoring it 0 would dock it for a capability it has no business having. Three states,
+two of which are N/A rather than zero:
+
+| state | meaning | providers |
+|---|---|---:|
+| `ok` | a contract parsed AND carried write operations — **scorable**, and a zero here is real | 6,876 |
+| `read_only` | a contract parsed, no write operations — **N/A** | 1,143 |
+| `no_specs` | nothing parseable to read — **N/A** | 29 + the ~19,700 holding no OpenAPI |
+
+**Four checks, 36 points.** Priced against how rare each signal is and how much it changes what an
+integrator can build:
+
+| check | points | coverage of scorable |
+|---|---:|---:|
+| the response says which branch ran (boolean discriminator) | 14 | **1.4%** |
+| the caller declares the key to match on (`idProperty`, `external_id`, `match_on`…) | 10 | 9.8% |
+| a named create-or-update operation | 8 | 12.4% |
+| duplicate handling stated at all (conflict flag, or prose only) | 4 | 9.3% |
+
+Naming an operation `upsert` is a claim; accepting the caller's key is a commitment; telling the
+caller which branch ran is the only one they can reconcile against afterwards. The pricing follows
+that order, not the coverage order. 21 providers earn the full set. HubSpot's
+`POST /crm/objects/{version}/contacts/batch/upsert` is the reference implementation and now scores
+its own facet — it did not before the re-harvest that preceded this release, because its
+`openapi/_original/` set had been reconstructed rather than harvested.
+
+**A documented 200-vs-201 split is deliberately NOT an outcome discriminator.** The scanner detects
+it and the original specification invited counting it. It is not one: a 200/201 pair is documented
+for many unrelated reasons and says nothing about which branch actually ran. It matches 573
+providers against 98 for a real discriminator field. Counting it would have made the top of this
+facet six times commoner than the measurement that justifies the facet's existence, and would have
+contradicted the figure APIs.io has already published. It stays in the evidence file, worth zero
+points.
+
+**RE-CENTRED, and `regulatory`'s 0.12 re-centring is generalised to make it possible.** Uncentred
+at weight 0.10, a provider with no upsert loses a tenth of its composite — 5,256 providers docked
+around six points each for lacking something 0.3% of the catalog has. That is not a measurement.
+The facet is scored against the observed mean of 7.07 instead: a provider at the mean is unchanged,
+above it gains, below it loses a little. The branch that did this for `regulatory` was hardcoded to
+that facet name; it now reads a `recentre_mean` off the facet config, so `regulatory` keeps its
+per-REGIME mean and any future conditional facet can re-centre without a third branch.
+
+**Two traps the scanner avoids, both found by getting them wrong first.** Component titles are not
+the contract — Pipedrive names its *response schemas* `UpsertPersonResponse` and
+`UpsertOrganizationResponse` on plain `addPerson` and `updatePerson`, so a naive grep credits it
+with an upsert it does not have; matching is restricted to path, operationId, summary and
+description. And alternate-key lookup is not upsert — HubSpot's `/batch/read` also takes
+`idProperty`, so read/search/query/list/export/archive/delete/merge/validate/preview/clone/revert/
+publish paths are excluded along with every non-write method.
+
+roadmap#270.
+
 ## 0.19.0 — 2026-09-06
 
 **Structural only. No weight change, no new check, no band re-cut, and no score moves.** This

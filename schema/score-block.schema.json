@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/api-evangelist/kin-score/schema/score-block.schema.json",
   "title": "Kin Score output block",
-  "description": "The score:, regulatory:, provenance:, and agent_readiness: blocks written to a provider record by the Kin Score scorer. schema_version 0.6.",
+  "description": "The score:, regulatory:, provenance:, and agent_readiness: blocks written to a provider record by the Kin Score scorer. schema_version 0.20.0.",
   "type": "object",
   "$defs": {
     "authorship": {
@@ -18,7 +18,7 @@
       "$comment": "unknown is credited in full deliberately: only artifacts the enrichment pipeline authored carry a marker, so absence of one is not evidence of derivation."
     },
     "dimension": {
-      "description": "A dimension is false, true, or a GRADE STRING \u2014 never merely truthy, because 'derived' is a different fact from 'the provider runs one'. The enum is the union of the values this schema already listed and every value observed across 350,971 emitted dimension entries. Values the schema was missing and that broke validation of real published blocks: na (inapplicable, not missing \u2014 a GET is idempotent by definition), platform, and the auth_clarity scheme classes bearer / served / negotiable / bound added by roadmap#97.",
+      "description": "A dimension is false, true, or a GRADE STRING — never merely truthy, because 'derived' is a different fact from 'the provider runs one'. The enum is the union of the values this schema already listed and every value observed across 350,971 emitted dimension entries. Values the schema was missing and that broke validation of real published blocks: na (inapplicable, not missing — a GET is idempotent by definition), platform, and the auth_clarity scheme classes bearer / served / negotiable / bound added by roadmap#97.",
       "oneOf": [
         {
           "type": "boolean"
@@ -151,7 +151,7 @@
         },
         "regulatory": {
           "type": "object",
-          "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet. Emitted even when no regime applies (roadmap#34), because `undetermined` is not the same statement as `not regulated`. 0.18.2 (roadmap#191): when `undetermined` is true, `applies` is OMITTED \u2014 both used to be emitted and every consumer reading `applies` saw a confident negative on providers never determined. `applies` appears exactly when a determination exists.",
+          "description": "Present ONLY for providers in a regulated industry (matched by tags via industry_regulatory). The conditional 7th facet. Emitted even when no regime applies (roadmap#34), because `undetermined` is not the same statement as `not regulated`. 0.18.2 (roadmap#191): when `undetermined` is true, `applies` is OMITTED — both used to be emitted and every consumer reading `applies` saw a confident negative on providers never determined. `applies` appears exactly when a determination exists.",
           "required": [],
           "properties": {
             "applies": {
@@ -175,7 +175,7 @@
                 "securities_market_data",
                 "telecommunications"
               ],
-              "description": "Regime id, from scoring.yml's `industry_regulatory` block. Kept in step with the rubric \u2014 `education` was added there and not here, and this enum then rejected every education provider's score block."
+              "description": "Regime id, from scoring.yml's `industry_regulatory` block. Kept in step with the rubric — `education` was added there and not here, and this enum then rejected every education provider's score block."
             },
             "score": {
               "type": "number",
@@ -193,7 +193,7 @@
             },
             "undetermined": {
               "type": "boolean",
-              "description": "True when the regime question could not be ANSWERED \u2014 the provider carries no tags \u2014 as opposed to being answered 'not regulated'. roadmap#34: thin tagging must not read as a clean bill of health."
+              "description": "True when the regime question could not be ANSWERED — the provider carries no tags — as opposed to being answered 'not regulated'. roadmap#34: thin tagging must not read as a clean bill of health."
             },
             "note": {
               "type": "string",
@@ -298,7 +298,7 @@
             },
             "catalog_gap": {
               "type": "number",
-              "description": "Unearned rubric points on checks the attribution block classes as `catalog` \u2014 work needing no provider action. Our backlog, not their gap."
+              "description": "Unearned rubric points on checks the attribution block classes as `catalog` — work needing no provider action. Our backlog, not their gap."
             },
             "catalog_max": {
               "type": "number",
@@ -392,6 +392,36 @@
           }
         }
       }
+    },
+    "upsert": {
+      "type": "object",
+      "description": "0.20.0 (roadmap#270). The conditional create-or-update ergonomics facet. Emitted on EVERY provider, unlike open_source, because the two reasons for it not applying are different facts a provider deserves to be able to tell apart: `read_only` means their own contracts declare no write operations (a read-only API cannot upsert and is excluded from the denominator, never zeroed), while `no_specs` means we hold nothing parseable to read. An absent facet alone reads as 'we did not look' in both cases.",
+      "properties": {
+        "applies": {
+          "type": "boolean",
+          "description": "True only where a contract parsed AND carried write operations."
+        },
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Facet score 0-100, present only when applies is true. Folded into the composite re-centred on the rubric's recentre_mean, not raw."
+        },
+        "reason": {
+          "type": "string",
+          "enum": [
+            "read_only",
+            "no_specs"
+          ],
+          "description": "Present only when applies is false. Why the facet was not scored."
+        },
+        "note": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "applies"
+      ]
     }
   }
 }

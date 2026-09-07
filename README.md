@@ -81,7 +81,7 @@ weights sum to 1.0 and are the argument the score is making about what matters.
 | **Contract Governance** | 0.12 | 6 | Is anyone holding the contract itself to a standard? |
 | **Discoverability** | 0.10 | 12 | Can an agent find you *without being told where to look*? |
 
-**91 base checks.** Plus 22 more in the two conditional facets, for 113 in total.
+**91 base checks.** Plus 26 more in the two conditional facets, for 117 in total.
 <!-- kin-score:facets:end -->
 
 Checks on artifact types a provider doesn't ship are **N/A** — excluded from that facet's
@@ -209,6 +209,7 @@ full catalog run crashed on exactly that, because nothing sits below `minimal`'s
 |---|:---:|:---:|---|
 | **Regulatory Posture** | 0.15 | 18 | The provider's tags match one of **nine regulated regimes** |
 | **Open Source Surface** | 0.10 | 4 | The product itself is open source *and* we hold a live repository read |
+| **Create-or-Update Ergonomics** | 0.10 | 4 |  |
 <!-- kin-score:conditional-facets:end -->
 
 Open Source Surface asks one question: does the repository publish the maintainership surface a
@@ -327,21 +328,21 @@ after any material rubric change with `signals/band_distribution.rb`.
 <!-- kin-score:bands:start -->
 | Band | Composite | Share of catalog | What it means |
 |------|:---------:|:----------------:|---------------|
-| **Exemplar** | 66.5+ | 0.9% | Reference-quality API operations across every facet — a rich contract, published governance, transparent operations, and machine-readable commercial terms. |
-| **Strong** | 54.3 – 66.4 | 4.1% | Solid contracts, transparent operations, and an easy start. |
-| **Developing** | 39.3 – 54.2 | 14.3% | Real signal across most facets with visible, nameable gaps. |
-| **Thin** | 26.2 – 39.2 | 15.6% | Limited machine-readable signal and partial portal coverage. |
-| **Emerging** | 11 – 26.1 | 24.0% | More than an index entry, but the surface is still mostly links rather than artifacts. |
-| **Minimal** | 0 – 10.9 | 41.0% | Index entry only; little beyond a description and a link. |
+| **Exemplar** | 66.5+ | 1.1% | Reference-quality API operations across every facet — a rich contract, published governance, transparent operations, and machine-readable commercial terms. |
+| **Strong** | 54.3 – 66.4 | 4.3% | Solid contracts, transparent operations, and an easy start. |
+| **Developing** | 39.3 – 54.2 | 14.4% | Real signal across most facets with visible, nameable gaps. |
+| **Thin** | 26.2 – 39.2 | 16.6% | Limited machine-readable signal and partial portal coverage. |
+| **Emerging** | 11 – 26.1 | 24.6% | More than an index entry, but the surface is still mostly links rather than artifacts. |
+| **Minimal** | 0 – 10.9 | 39.0% | Index entry only; little beyond a description and a link. |
 <!-- kin-score:bands:end -->
 
 <!-- kin-score:agent-bands:start -->
 | Band | Score | Share | Meaning |
 |---|:---:|:---:|---|
-| **Agent-Native** | 38.7+ | 1.3% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
-| **Agent-Ready** | 28.6 – 38.6 | 10.3% | An agent can drive the core surface. |
-| **Agent-Aware** | 5.1 – 28.5 | 26.5% | Partial machine-readable surface. |
-| **Human-Only** | 0 – 5 | 61.9% | Little an agent can consume without a human first reading the site. |
+| **Agent-Native** | 38.7+ | 1.5% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
+| **Agent-Ready** | 28.6 – 38.6 | 11.4% | An agent can drive the core surface. |
+| **Agent-Aware** | 5.1 – 28.5 | 27.0% | Partial machine-readable surface. |
+| **Human-Only** | 0 – 5 | 60.1% | Little an agent can consume without a human first reading the site. |
 <!-- kin-score:agent-bands:end -->
 
 **`Emerging` was split out of `Minimal`**, and it is the most useful band on the list. A quarter of
@@ -477,7 +478,7 @@ The rubric is a living argument and is versioned (`schema_version`). Published s
 in [`ROADMAP.md`](ROADMAP.md).
 
 <!-- kin-score:version:start -->
-Current: **0.19.0** — published 2026-09-06.
+Current: **0.20.0** — published 2026-09-06.
 <!-- kin-score:version:end -->
 
 A score is only interpretable against the rubric that produced it, so `schema_version` is stamped on
