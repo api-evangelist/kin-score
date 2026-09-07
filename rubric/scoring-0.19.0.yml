@@ -9,6 +9,10 @@
 
 schema_version: 0.19.0
 last_updated: '2026-09-06'
+# The deploy fact the rubric cannot know: 0.19.0 was written by the 2026-09-06 nightly
+# (18/18 phases OK) and verified live — stripe stamps 0.19.0 and bbva's composite held at
+# 28.6, which is the check for a structural-only release.
+live_since: '2026-09-07'
 maintainer: kin@apievangelist.com
 
 # The public "what changed" note. The apis.io /rating/ page renders this rather than
