@@ -15,6 +15,35 @@ has shipped.
 
 ---
 
+## Status 2026-09-11 — the idempotency check stops crediting prose (0.20.1)
+
+`idempotency_key_param` fired on a substring over the stringified request body, so an operation
+documented as NOT idempotent earned the 9-point check it denied. Fixed — three arms, all reading
+declared fields, with the vocabulary moved into `scoring.yml` under `key_names`.
+
+The lesson is not the substring. It is that **`score.rb` already contained a helper written to
+avoid this exact failure, whose docstring names `idempotency_key_param` as the thing it is not
+doing** — and nobody wired it in. That is the fourth check this month whose implementation had
+drifted from an intent written down a few lines away (roadmap#287, #289, #290, #291).
+
+Measured before changing anything, the reported defect was the smaller half: 79 providers GAIN the
+check because the reader would not resolve a single `$ref`, against 29 who lose credit they never
+evidenced. Square, Block, Moneris and Stigg were being held up by the very arm that was about to be
+deleted.
+
+Next in this family:
+
+- **`dry_run_mode` has the identical blind spot.** It calls the same helper and passes no spec, so
+  it resolves no `$ref` either. Held out of 0.20.1 deliberately — it is its own movement to measure.
+- **A sweep of the graded checks for the same shape**, argued for on roadmap#290 and now four
+  instances deep. The pattern is a narrow reader plus a stated intent nobody re-measured against,
+  and finding the fifth by accident is worse than looking for it.
+- **`error_envelope` and `openapi_examples` read a spec set and may read the wrong one.** roadmap#291
+  established that the upsert facet measured our refined mirror rather than the provider's published
+  archive; whether the contract-quality checks inherit that is unmeasured.
+
+---
+
 ## Status 2026-09-07 — write ergonomics becomes a facet (0.20.0)
 
 ### **SHIPPED — the first facet that asks whether an API is safe to call twice**

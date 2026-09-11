@@ -16,6 +16,96 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.20.1 — 2026-09-11
+
+**The idempotency check stops crediting prose, and starts seeing the fields it was always meant
+to read.** `idempotency_key_param` — the verified arm of the 9-point Idempotency dimension, and
+half of the agent-native band gate — had a second arm nobody re-measured:
+
+```ruby
+op["requestBody"].to_s =~ /idempoten/i
+```
+
+A substring over the stringified request body. Any operation whose body *mentioned* the word
+earned a capability check: in a description, in an example, in an enum value. An operation
+documented as "this endpoint is **not** idempotent" earned the check it denied.
+
+`score.rb` already knew. A sibling helper written to avoid exactly this names it in its own
+docstring — *"rather than stringifying the whole requestBody the way `idempotency_key_param`
+does. That shortcut fires on a DESCRIPTION mentioning the word, which credits prose instead of a
+field."* The helper was written, used elsewhere, and never wired into the check it was named
+after.
+
+**Measured before changing anything, over all 133,932 contracts in the catalog.** 70 of the 337
+providers earning the check rested on that arm alone — and deleting it would have been wrong for
+41 of them:
+
+| what the 70 actually are | count |
+|---|---:|
+| declare a real `idempotency_key`, missed only because the reader would not resolve one `$ref` | 11 |
+| ship the capability under the industry's other name (`clientToken`, `dedupe_key`) | 29 |
+| the word describes some unrelated property | 19 |
+| pure prose — attached to no property at all | 11 |
+
+**Square, Block, Moneris, Stigg and Insforge were in the first group.** They declare
+`idempotency_key` as a request-body property; their body `$ref`s a component schema, and the
+reader resolved nothing, so the only thing crediting them was the substring arm it was about to
+lose.
+
+### What 0.20.1 changes
+
+The verified arm is now three arms, and every one reads a **declared field**:
+
+1. a header parameter named `/idempoten/i` — unchanged, and still the strongest signal
+2. a request-body **property** named `/idempoten/i`, with one level of local `$ref` resolved on
+   the schema, on each property, and through one nested envelope
+3. a property whose name is a known de-duplication token **and whose own description, example or
+   default says it prevents duplicate execution**
+
+Arm 3 exists because AWS ships idempotency as `ClientToken` across hundreds of APIs — *"Unique,
+case-sensitive identifier that you provide to ensure the idempotency of the request"* — and the
+check would otherwise miss every one. It reads **that property's own words**, not the operation's:
+the difference between "this field is documented as an idempotency token" and "the word appears
+somewhere nearby". `clientToken` is never taken on the name alone, because elsewhere it means an
+auth token.
+
+**The vocabulary lives in `scoring.yml`, not in a regex in `score.rb`**, under the dimension's new
+`key_names` block — so widening it later is a rubric decision with a version behind it.
+
+`unique_token` is in the vocabulary and `unique_id` / `uniqueId` deliberately are not: measured,
+the latter are ordinary identifiers — 10web's sitemap id, akamai's network-list id.
+
+### Movement
+
+```
+providers with the verified arm    337  ->  387      +79, -29
+  header parameter                 233
+  declared body property           116
+  de-dup name + confirming text     47
+```
+
+**The dominant effect is under-crediting, not over-crediting** — the opposite of how the defect
+was reported. 79 providers gain a capability they had published all along and the reader could not
+see, against 29 who lose credit they never evidenced.
+
+The 29 losses are real prose-only cases. Shopify is one, and its request schema is literally
+`schema: {}` with the token appearing only inside an example payload — no declared field for an
+agent to find.
+
+Of those 29, 14 keep half credit from a documented conventions artifact. **4 providers are demoted
+from agent-native** by the band gate — fenergo, gamesight, kibana, scorecard — each of which holds
+the band today on a substring match and declares no idempotency field anywhere.
+
+**No band re-cut.** 108 providers move on one 9-point dimension of the standalone Agent Readiness
+layer, against ~8,000 holding a parseable contract — ~1.3%, which neither empties nor swells a
+band. The composite is untouched: this dimension never fed it.
+
+### Deliberately not in this release
+
+`dry_run_mode` reads the same helper and still passes no spec, so it resolves no `$ref` and has the
+identical blind spot. That is a second scoring change with its own movement to measure, and it is
+not riding along on this one.
+
 ## 0.20.0 — 2026-09-07
 
 **A seventh facet, conditional, for write ergonomics — the one thing no existing facet reaches.**
