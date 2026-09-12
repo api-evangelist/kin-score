@@ -76,9 +76,9 @@ weights sum to 1.0 and are the argument the score is making about what matters.
 |-------|:------:|:------:|----------------------|
 | **Contract Quality** | 0.25 | 42 | Is there a machine-readable contract at all — in any format — and can you call it? |
 | **Developer Ergonomics** | 0.20 | 13 | Can a human get started — docs, portal, SDKs, auth clarity, a real description? |
-| **Access Clarity** | 0.20 | 9 | What does it cost, what are you permitted to do, and how do you get in? |
+| **Access Clarity** | 0.20 | 9 |  |
 | **Operational Transparency** | 0.13 | 9 | Will it tell you when it changes or breaks? |
-| **Contract Governance** | 0.12 | 6 | Is anyone holding the contract itself to a standard? |
+| **Contract Governance** | 0.12 | 6 |  |
 | **Discoverability** | 0.10 | 12 | Can an agent find you *without being told where to look*? |
 
 **91 base checks.** Plus 26 more in the two conditional facets, for 117 in total.
@@ -93,8 +93,13 @@ an organisation governs itself — the standalone `accountability` layer now doe
 could not carry both. `commercial_clarity` became **Access Clarity**, because for a free statutory
 interface or a provider whose own OpenAPI says *"No authentication, no registration, no rate limit,
 no quota"*, the word *commercial* described nothing; 14 of the facet's 38 points were never
-commercial. **Both key names are emitted side by side through 0.12.x** — they are schema, not labels,
-and appear in ~27,300 files including data bundles inside sold reports. The old keys drop at 1.0.
+commercial. **Both key names were emitted side by side from 0.12 until 0.21.0**, so consumers could migrate
+without a hard cut — they are schema, not labels. **0.21.0 ended it**, four releases before the 1.0
+boundary it was scheduled for, because the duplication had become a defect: `/rating/facets` served
+eight names for six facets with the pairs carrying identical values, so anything summing the object
+double-counted two of nine. The old names are still **accepted as input** (`?sort=governance` works)
+and are simply no longer returned. `kin/score` artifacts written before 0.21.0 keep the old keys —
+they accumulate per run rather than being rewritten.
 
 **What Contract Governance does NOT read (0.12, roadmap#62).** These checks read what a ruleset
 *declares*, never the result of running it. Spectral is not executed against the provider's own spec.
@@ -382,12 +387,10 @@ score:
   facets:
     discoverability: 100.0
     contract_quality: 62.2
-    governance: 0.0             # emitted side by side with its 0.12 name...
-    contract_governance: 0.0    #   ...until the old keys drop at 1.0
+    contract_governance: 0.0    # 0.12 emitted this beside `governance`; 0.21.0 ends that
     operational_transparency: 31.6
     developer_ergonomics: 60.9
-    commercial_clarity: 44.7
-    access_clarity: 44.7
+    access_clarity: 44.7        # likewise, `commercial_clarity` is no longer emitted
   regulatory:            # present only for regulated industries
     applies: true
     regime: Banking & Open Finance
@@ -478,7 +481,7 @@ The rubric is a living argument and is versioned (`schema_version`). Published s
 in [`ROADMAP.md`](ROADMAP.md).
 
 <!-- kin-score:version:start -->
-Current: **0.20.1** — published 2026-09-06.
+Current: **0.21.0** — published 2026-09-06.
 <!-- kin-score:version:end -->
 
 A score is only interpretable against the rubric that produced it, so `schema_version` is stamped on
