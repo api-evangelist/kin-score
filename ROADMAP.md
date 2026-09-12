@@ -15,6 +15,34 @@ has shipped.
 
 ---
 
+## Status 2026-09-12 — MCP authorship becomes scoreable (0.22.0)
+
+The third entry in one pattern, and the one that names it: **prevalence measured without authorship
+credits a checkbox in somebody's platform config.**
+
+- `agentic_access` cut 15 -> 10 when 6,383 of 6,388 artifacts turned out to be `method: generated`
+- `mcp_server` provenance-graded in 0.6 — 12 points for servers nobody could connect to
+- WebMCP promotion deferred in 0.18.1 — 72 of 81 detections were one ReadMe script
+- **0.22.0 — 292 of 451 enumerable MCP servers are a platform's design, not the provider's**
+
+Each time the correction arrives after the dimension has been paying out for a while, because
+prevalence is cheap to measure and authorship is not.
+
+Next in this family:
+
+- **The 1,055 gated servers are the unmeasured majority.** Authorship is knowable only where
+  `tools/list` answers anonymously. That cohort is larger than the one this release grades, and
+  nothing about it is known — not a gap in the rubric, a gap in the evidence.
+- **`discoverability` still has no MCP check** (roadmap#318). An endpoint an agent cannot construct
+  is a discovery failure as well as a deployment one, and that facet cannot see it.
+- **Six platform verdicts rest on a cluster of two.** `shared > 1` is the current rule; a small
+  platform and a naming coincidence are indistinguishable at that size. Worth revisiting the
+  threshold on evidence rather than raising it on instinct.
+- **The auth half is roadmap#321**, and its mechanism is not what it says: 46% of live RFC 9728
+  metadata sits at a provider-chosen suffixed path no well-known sweep can reach.
+
+---
+
 ## Status 2026-09-11 — the facet rename finishes early (0.21.0)
 
 `governance` -> `contract_governance`, `commercial_clarity` -> `access_clarity`. The dual-emit

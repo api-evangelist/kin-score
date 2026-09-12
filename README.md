@@ -481,7 +481,7 @@ The rubric is a living argument and is versioned (`schema_version`). Published s
 in [`ROADMAP.md`](ROADMAP.md).
 
 <!-- kin-score:version:start -->
-Current: **0.21.0** — published 2026-09-06.
+Current: **0.22.0** — published 2026-09-06.
 <!-- kin-score:version:end -->
 
 A score is only interpretable against the rubric that produced it, so `schema_version` is stamped on

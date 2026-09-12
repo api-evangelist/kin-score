@@ -16,6 +16,88 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.22.0 — 2026-09-12
+
+**MCP servers are graded by who built them, not only by whether they answered.**
+
+0.6 fixed *reachability* — it stopped paying twelve points for servers nobody could connect to. It
+left *authorship* alone, and authorship turns out to be most of the cohort.
+
+| shape | providers | credit before | credit now |
+|---|---:|---:|---:|
+| public endpoint that answered | ~1,060 | 1.0 | 1.0 |
+| **tool surface shared with other providers** | **292** | **1.0** | **0.25** |
+| real server at a URL an agent cannot construct | 47 | 1.0 / 0.4 | 0.6 |
+| claimed, never probed | 517 | 0.4 | 0.4 |
+
+### What the measurement found
+
+Clustering tool-name shapes across every MCP server that enumerates — 451 of the 472 live — finds
+**292 providers (64.7%) serving a surface shared with other providers**. Eleven distinct shapes
+account for all of them:
+
+```
+n=129   cancel_*, complete_checkout, create_*        one commerce fingerprint
+n=62    call_wix_site_*, execute_wix_*               Wix
+n=37    query_docs_filesystem_*, submit_feedback     Mintlify
+n=35    search_shop_policies_and_faqs                Shopify
+```
+
+51 answer at `/wp-json/mcp/mcp-oauth-server` — one WordPress plugin installed on a company
+marketing site, not 51 separate product decisions.
+
+Every one of those 292 held the full twelve points. **That is 2,628 points paid for other people's
+engineering**, inside the layer whose entire purpose is to say whether *this* provider is ready for
+an agent.
+
+### The rubric had already decided the harder half
+
+`agentic_commerce` grades `{self: 1.0, platform: 0.25}` — the same question about a different
+protocol. Answering it differently for MCP was the inconsistency; `platform` at 0.25 removes it
+rather than inventing a number.
+
+`templated` at 0.6 is new: a real server whose URL an agent cannot construct
+(`https://{tenant}.mcp.example.com/mcp`). Positive evidence, so above `documented`; no self-service
+path, so below `verified`.
+
+### `templated` moves in both directions, deliberately
+
+The proposal assumed it was a downgrade. Measured, the population is mostly the other way:
+
+```
+templated endpoints            63
+  currently `verified`          5   ->  0.6   lowered: an agent cannot get in
+  currently `claimed`          42   ->  0.6   RAISED: a documented template is evidence
+                                              of a real server, more than a bare claim
+  currently `derived`          16   ->  0     unchanged; inferred, not published
+```
+
+Net for `templated`: **+77**. Net across both grades: **−2,551**. This release mostly removes
+credit.
+
+No provider is both platform-authored and templated, so the two grades never compete.
+
+### What this deliberately does not do
+
+Authorship is knowable only where a server enumerates its tools. **1,055 gate `tools/list` behind
+auth and are never classified** — they keep `verified`, and absent authorship is never read as
+platform authorship. That is roadmap#125's rule pointed the other way: unknown is not a finding.
+The correction reaches the 292 measured and no further, which is the honest reach of the evidence.
+
+**90% of the platform verdicts rest on clusters of ten or more.** Six rest on a cluster of exactly
+two, which is the weak end — a small platform and a naming coincidence look alike at that size. The
+stamp records each verdict's cluster size and a `confident` flag rather than hiding the distinction.
+
+### Mechanics
+
+`all/0-working/derive-mcp-authorship.py` writes the verdict as a stamp, because `score.rb` cannot
+run a clustering pass mid-scoring. It is **offline** — it classifies the cached enumeration probe
+and never touches the network; re-probing is `audit_mcp_authorship.py --probe` on its own cadence.
+Registered in `check-stamp-freshness.py`, so it heals nightly like every other derived input.
+
+The ceiling does not move — `mcp_server` stays 12 points and the layer stays 139 — so nothing is
+rescaled and no denominator changes. Only the credit earned within it.
+
 ## 0.21.0 — 2026-09-11
 
 **The facet rename is finished.** Two facets have been emitted under two names since 0.12; the
