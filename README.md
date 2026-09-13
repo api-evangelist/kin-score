@@ -250,25 +250,38 @@ denominator.
 |---|:---:|---|
 | **Machine-Readable Contract** | 18 | Is there an OpenAPI contract to drive at all? |
 | **MCP Server** | 12 | Is there a live Model Context Protocol surface — *probed*, not pointed at? |
+| | | *partial credit:* verified 1 · templated 0.6 · documented 0.4 · platform 0.25 |
 | **Agentic Access Contract** | 10 | Are operations classified by action-class, consequence and escalation? |
 | **Machine-Readable Auth** | 10 | Can auth be negotiated without reading prose? |
+| | | *partial credit:* bound 1 · served 0.9 · negotiable 0.75 · bearer 0.35 |
 | **Idempotency** | 9 | Can an agent retry without double-charging a card? |
+| | | *partial credit:* verified 1 · documented 0.5 |
 | **Stable Error Semantics** | 8 | Can an agent branch on errors, or only on free text? |
+| | | *partial credit:* verified 1 · documented 0.5 |
 | **A2A Agent Card** | 8 | Is there an agent discovery manifest at the well-known path? |
+| | | *partial credit:* conformant 1 · near-conformant 0.6 · flavored 0.25 · invalid 0 |
 | **Request/Response Examples** | 7 | Can an agent learn a payload shape before its first call? |
+| | | *partial credit:* verified 1 · partial 0.5 · documented 0.25 |
 | **Rate-Limit Signaling** | 7 | Does it surface live rate-limit state in response headers? |
+| | | *partial credit:* verified 1 · documented 0.5 |
 | **Documented Reversibility** | 6 | Can the action be taken back, and within what window? |
+| | | *partial credit:* verified 1 · documented 0.4 |
 | **Typed Event Surface** | 6 | Is the webhook/event surface described by a contract? |
 | **Delegated User Identity** | 6 |  |
+| | | *partial credit:* served 1 · documented 0.5 |
 | **Registration Without a Human** | 6 |  |
 | **Agent Skills** | 5 | Are operating instructions packaged, not inferred? |
 | **Protected Resource Metadata** | 5 |  |
+| | | *partial credit:* verified 1 · documented 0.5 |
 | **Agentic Commerce Well-Known Document** | 5 |  |
+| | | *partial credit:* self 1 · platform 0.25 |
 | **Well-Known Catalog** | 4 | Is there an RFC 9727 `api-catalog` linkset? |
 | **Dry-Run / Simulate Mode** | 4 | Can a destructive operation be rehearsed before it commits? |
 | **Consent & Bot Identity** | 3 | AIPREF / Content-Signals / Web Bot Auth — the frontier signals. |
 
 **19 dimensions, 139 points**, normalised to 0–100.
+
+11 dimensions award **partial credit**: the multiplier beside each tier is applied to the dimension's points, so a tier at 0.25 on a 12‑point dimension earns 3. A dimension with no tiers listed is all‑or‑nothing.
 <!-- kin-score:agent-dimensions:end -->
 
 **`reversibility_documented` is the 0.12 addition**, and it was preferred over a consequence

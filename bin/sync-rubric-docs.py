@@ -223,13 +223,38 @@ def block_bands(rubric, **_):
 def block_agent_dimensions(rubric, **_):
     dims = rubric["agent_readiness"]["dimensions"]
     rows = ["| Dimension | Points | What it asks |", "|---|:---:|---|"]
+    graded = 0
     for d in sorted(dims, key=lambda d: -int(d["points"])):
         rows.append(f"| **{d['label']}** | {d['points']} | {DIMENSION_QUESTION.get(d['id'], '')} |")
+        # roadmap#322 — PARTIAL CREDIT IS THE ANSWER, NOT A FOOTNOTE.
+        #
+        # Eleven of these award graded credit, and the published rubric rendered none of it. A
+        # provider on static API keys read "Can auth be negotiated without reading prose?", saw 10
+        # points, and had no way to learn they earn 3.5 or what would earn the rest. The grades have
+        # been on `/v1/ratings/rubric` the whole time, so an agent could discover the grading and a
+        # person could not — backwards from every other asymmetry in this catalog.
+        #
+        # Rendered as a second line under the dimension rather than a column, because the tier sets
+        # are different widths (two to four) and a column would be mostly empty.
+        credit = d.get("credit") or {}
+        if len(credit) > 1:
+            graded += 1
+            tiers = " · ".join(
+                f"{k} {_num(v)}" for k, v in sorted(credit.items(), key=lambda kv: -float(kv[1]))
+            )
+            rows.append(f"| | | *partial credit:* {tiers} |")
     rows.append("")
     rows.append(
         f"**{_spell(len(dims))} dimensions, {sum(int(d['points']) for d in dims)} points**, "
         f"normalised to 0–100."
     )
+    if graded:
+        rows.append("")
+        rows.append(
+            f"{_spell(graded).capitalize()} dimensions award **partial credit**: the multiplier "
+            f"beside each tier is applied to the dimension's points, so a tier at 0.25 on a "
+            f"12‑point dimension earns 3. A dimension with no tiers listed is all‑or‑nothing."
+        )
     return "\n".join(rows)
 
 
