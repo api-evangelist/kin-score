@@ -15,6 +15,35 @@ has shipped.
 
 ---
 
+## Status 2026-09-22 — two approved changes queued for London (0.23.0)
+
+Both approved by Kin on 2026-09-22 and both staged in the London candidate
+(`api-search/signals/_release/scoring-0.23.0.yml`), gated on `schema_version >= 0.23`. The rubric
+is frozen at 0.22.0 until 2026-09-30, so neither moves a published number before then. Their
+CHANGELOG text is staged in the release runbook and lands in the 0.23.0 entry on release day.
+
+- **roadmap#485: a WordPress MCP plugin is not first-party.** A new provenance class,
+  `site-plugin`, covers a graded MCP endpoint under `/wp-json/mcp/...`. It is recognised by the
+  path, whether or not the tools can be listed. It is credited 0.25, like derived work, and graded
+  `platform` in `mcp_server`. The provenance multiplier is not applied a second time on top of
+  the grade.
+  - A manifest whose own status says someone else runs the server (`third-party`, `platform`,
+    `platform-default`, `community`) becomes a `third-party` class and is treated the same way.
+  - Measured: 108 providers become `site-plugin` and 17 become `third-party`.
+  - `mcp_server` across the 112 providers that carry a plugin URL falls from 913 to 348 points.
+    Four of the 112 are graded on a real product server and do not move.
+  - 33 agent-readiness band changes; no composite band changes.
+- **roadmap#501: an absorbed acquisition is unrated.** A record marked `x-status: acquired` that
+  has no website and no APIs now carries no rating, the same as a defunct one (roadmap#250). This
+  changes the reader, not the rubric weights.
+  - Measured: 220 of 624 acquired pages are unrated; 218 of them were in `minimal`.
+  - The other 404 still have a website or an API, so they keep their rating.
+
+Next in this family: the plugin's *REST* namespaces are still catalogued as API records
+(roadmap#484). The `agent-native` tag still counts the plugin as well (roadmap#479).
+
+---
+
 ## Status 2026-09-12 — MCP authorship becomes scoreable (0.22.0)
 
 The third entry in one pattern, and the one that names it: **prevalence measured without authorship
