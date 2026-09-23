@@ -24,6 +24,12 @@ const argv = process.argv.slice(2);
 const sample = Number(argv[argv.indexOf('--sample') + 1]) || 250;
 const all = argv.includes('--all');
 
+/* The shard is gitignored and written by `rebuild.sh index`. A fresh clone, or a night whose
+   gate skipped the index, has none -- that is "nothing to compare yet", not a crash. */
+if (!fs.existsSync(BADGES)) {
+  console.log(`SKIPPED — no badge shard at ${BADGES}; re-run after \`rebuild.sh index\``);
+  process.exit(0);
+}
 const shard = JSON.parse(fs.readFileSync(BADGES, 'utf8'));
 console.log(`badges.json: ${shard.count} providers, built ${shard.generated_at}, ` +
   `rubric ${shard.schema_version}`);
