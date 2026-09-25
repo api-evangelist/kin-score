@@ -94,9 +94,23 @@ FACET_QUESTION = {
 }
 
 CONDITIONAL_WHEN = {
-    "regulatory": "The provider's tags match one of **nine regulated regimes**",
+    # {sectoral} and {fallback_clause} are filled from industry_regulatory at render time, so the
+    # count cannot go stale the way "nine regulated regimes" did when 0.23.0 made it ten plus one.
+    "regulatory": "The provider's tags match one of **{sectoral} sectoral regimes**{fallback_clause}",
     "open_source": "The product itself is open source *and* we hold a live repository read",
+    "upsert": "A contract parses *and* carries write operations",
 }
+
+
+def _conditional_when(fid, rubric):
+    text = CONDITIONAL_WHEN.get(fid, "")
+    if fid != "regulatory":
+        return text
+    regimes = {k: v for k, v in (rubric.get("industry_regulatory") or {}).items() if isinstance(v, dict)}
+    fallback = [v for v in regimes.values() if v.get("fallback")]
+    clause = (" — and every provider no sector matches falls to the **horizontal** regime"
+              if fallback else "")
+    return text.format(sectoral=len(regimes) - len(fallback), fallback_clause=clause)
 
 DIMENSION_QUESTION = {
     "spec_presence": "Is there an OpenAPI contract to drive at all?",
@@ -205,7 +219,7 @@ def block_conditional_facets(rubric, **_):
     for fid, cfg in sorted(cond, key=lambda kv: -float(kv[1]["weight"])):
         rows.append(
             f"| **{cfg['label']}** | {float(cfg['weight']):.2f} | {counts.get(fid, 0)} | "
-            f"{CONDITIONAL_WHEN.get(fid, '')} |"
+            f"{_conditional_when(fid, rubric)} |"
         )
     return "\n".join(rows)
 

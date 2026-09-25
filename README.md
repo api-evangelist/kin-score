@@ -213,9 +213,9 @@ full catalog run crashed on exactly that, because nothing sits below `minimal`'s
 <!-- kin-score:conditional-facets:start -->
 | Conditional facet | Weight | Checks | Applies when |
 |---|:---:|:---:|---|
-| **Regulatory Posture** | 0.15 | 32 | The provider's tags match one of **nine regulated regimes** |
+| **Regulatory Posture** | 0.15 | 32 | The provider's tags match one of **10 sectoral regimes** — and every provider no sector matches falls to the **horizontal** regime |
 | **Open Source Surface** | 0.10 | 4 | The product itself is open source *and* we hold a live repository read |
-| **Create-or-Update Ergonomics** | 0.10 | 4 |  |
+| **Create-or-Update Ergonomics** | 0.10 | 4 | A contract parses *and* carries write operations |
 <!-- kin-score:conditional-facets:end -->
 
 Open Source Surface asks one question: does the repository publish the maintainership surface a
