@@ -15,6 +15,27 @@ has shipped.
 
 ---
 
+## Status 2026-09-25 — London (0.23.0) is live, five days early
+
+Everything milestoned to London shipped together on 2026-09-25: #285, #318, #323, #376, #427,
+#431, #442, #444, #452, #485, #501, #676/#680, plus #787 and #461, which joined the release the same
+day. See the CHANGELOG entry for the numbers. The #485/#501 queue below is now shipped.
+
+**Next, carried to Stockholm (0.24.0, 2026-10-13):**
+
+- **Generated-then-authored.** The three-state provenance model has no slot for an artifact a
+  script laid down and a person then edited. Our own Spectral ruleset stays `derived` until the state
+  exists for every provider (runbook, #285).
+- **`METHOD_RE` is anchored to column 0**, so a nested `method:` is invisible. Un-anchoring it
+  reclassifies an unknown number of artifacts downward; it needs its own measurement.
+- **Marker coverage is the binding constraint.** With `unknown` at 0.90, every contract stamped with
+  provenance at harvest time is a provider who gets the 10% back honestly.
+- **The agent-card registry rule (#461 part 3).** `/api/v1/agents/register` requires a card on a
+  host the registrant controls; a platform-hosted agent cannot register itself. Scoring now credits
+  that case; registration has not decided it.
+
+---
+
 ## Status 2026-09-22 — two approved changes queued for London (0.23.0)
 
 Both approved by Kin on 2026-09-22 and both staged in the London candidate

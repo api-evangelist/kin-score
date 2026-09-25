@@ -79,9 +79,9 @@ weights sum to 1.0 and are the argument the score is making about what matters.
 | **Access Clarity** | 0.20 | 9 |  |
 | **Operational Transparency** | 0.13 | 9 | Will it tell you when it changes or breaks? |
 | **Contract Governance** | 0.12 | 6 |  |
-| **Discoverability** | 0.10 | 12 | Can an agent find you *without being told where to look*? |
+| **Discoverability** | 0.10 | 15 | Can an agent find you *without being told where to look*? |
 
-**91 base checks.** Plus 26 more in the two conditional facets, for 117 in total.
+**94 base checks.** Plus 40 more in the two conditional facets, for 134 in total.
 <!-- kin-score:facets:end -->
 
 Checks on artifact types a provider doesn't ship are **N/A** — excluded from that facet's
@@ -191,16 +191,17 @@ and the systematic penalty disappears by construction. The means are **frozen pe
 rather than computed live, so a score stays reproducible from a published snapshot.
 
 <!-- kin-score:regime-means:start -->
-Measured at rubric 0.12.0 on 2026-08-18, across 8,991 regulated providers:
+Measured at rubric 0.23.0 on 2026-09-25, across 26,352 regulated providers:
 
 | Regime | Mean | | Regime | Mean |
 |---|---:|---|---|---:|
-| Securities & Market Data | 35.2 | | Insurance | 27.2 |
-| Payments | 32.5 | | Government & Public Sector | 21.7 |
-| Banking & Open Finance | 31.1 | | Energy & Utilities | 19.4 |
-| Telecommunications | 29.5 | | Health | 18.7 |
-| Education & Research | 27.6 | | | |
-| *All regulated* | *24.9* | | | |
+| Securities & Market Data | 20.9 | | Insurance | 16.7 |
+| Banking & Open Finance | 20.6 | | Horizontal (data, software, accessibility, platform) | 15.6 |
+| Telecommunications | 20.2 | | Energy & Utilities | 13.3 |
+| Payments | 19.7 | | Government & Public Sector | 13.1 |
+| Employment & Payroll | 18.8 | | Health | 12.4 |
+| Education & Research | 18.6 | | | |
+| *All regulated* | *16* | | | |
 <!-- kin-score:regime-means:end -->
 
 One consequence, paid for the hard way: re-centring subtracts a constant, so the composite can leave
@@ -212,7 +213,7 @@ full catalog run crashed on exactly that, because nothing sits below `minimal`'s
 <!-- kin-score:conditional-facets:start -->
 | Conditional facet | Weight | Checks | Applies when |
 |---|:---:|:---:|---|
-| **Regulatory Posture** | 0.15 | 18 | The provider's tags match one of **nine regulated regimes** |
+| **Regulatory Posture** | 0.15 | 32 | The provider's tags match one of **nine regulated regimes** |
 | **Open Source Surface** | 0.10 | 4 | The product itself is open source *and* we hold a live repository read |
 | **Create-or-Update Ergonomics** | 0.10 | 4 |  |
 <!-- kin-score:conditional-facets:end -->
@@ -255,15 +256,15 @@ denominator.
 | **Machine-Readable Auth** | 10 | Can auth be negotiated without reading prose? |
 | | | *partial credit:* bound 1 · served 0.9 · negotiable 0.75 · bearer 0.35 |
 | **Idempotency** | 9 | Can an agent retry without double-charging a card? |
-| | | *partial credit:* verified 1 · documented 0.5 |
+| | | *partial credit:* verified 1 · documented 0.5 · derived 0.125 |
 | **Stable Error Semantics** | 8 | Can an agent branch on errors, or only on free text? |
-| | | *partial credit:* verified 1 · documented 0.5 |
+| | | *partial credit:* verified 1 · documented 0.5 · derived 0.125 |
 | **A2A Agent Card** | 8 | Is there an agent discovery manifest at the well-known path? |
 | | | *partial credit:* conformant 1 · near-conformant 0.6 · flavored 0.25 · invalid 0 |
 | **Request/Response Examples** | 7 | Can an agent learn a payload shape before its first call? |
 | | | *partial credit:* verified 1 · partial 0.5 · documented 0.25 |
 | **Rate-Limit Signaling** | 7 | Does it surface live rate-limit state in response headers? |
-| | | *partial credit:* verified 1 · documented 0.5 |
+| | | *partial credit:* verified 1 · documented 0.5 · derived 0.125 |
 | **Documented Reversibility** | 6 | Can the action be taken back, and within what window? |
 | | | *partial credit:* verified 1 · documented 0.4 |
 | **Typed Event Surface** | 6 | Is the webhook/event surface described by a contract? |
@@ -494,7 +495,7 @@ The rubric is a living argument and is versioned (`schema_version`). Published s
 in [`ROADMAP.md`](ROADMAP.md).
 
 <!-- kin-score:version:start -->
-Current: **0.22.0** — published 2026-09-06.
+Current: **0.23.0** — published 2026-09-25.
 <!-- kin-score:version:end -->
 
 A score is only interpretable against the rubric that produced it, so `schema_version` is stamped on

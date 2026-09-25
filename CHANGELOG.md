@@ -16,6 +16,89 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.23.0 — 2026-09-25
+
+**The London release, published five days ahead of API Days London (30 September).** The rubric
+was frozen at 0.22.0 from 2026-09-13 with this release pinned to the 30th; it went live on the
+25th instead, deliberately, so the re-score would not be the last thing done before travelling.
+
+**Most of the catalog moves.** Against the 2026-09-24 scores, defunct companies excluded: 25,659 of
+26,192 composites move (7,456 up, 18,203 down, median −0.8, range −12.7..+12.5); 2,078 band
+changes (1,638 down, 440 up); 3,040 agent-readiness scores move and 515 agent bands change.
+**No band re-cut** — no band share moved more than 1.4 points (minimal 37.9% → 39.3%, developing
+14.6% → 13.4%), and this rubric re-cuts only when a band empties or swells. Our own record moves:
+apis.io 88.8 → 90.9 (#318, #323).
+
+### The regulatory layer reaches everyone
+
+- **A horizontal regime (roadmap#442).** The regulatory facet applied only where a sector matched,
+  so 67% of the catalog was scored as if no law reached it. A `fallback: true` regime — GDPR, EU AI
+  Act, Cyber Resilience Act, European Accessibility Act, DSA, Online Safety Act, US state privacy
+  law, BIPA, the DOJ bulk-data rule, CASL — now applies wherever no sector matches. 16,589
+  providers gain a regulatory facet. Sectoral matching is untouched.
+- **Fourteen regulatory-posture checks (roadmap#444)**, 4 points each: the facet goes 108 → 164
+  points. Adoption is near zero (`Subprocessors` on 9 repos, the other thirteen on none) and that
+  is accepted: a rubric that never asks can never drive adoption, and the 0% rows are the work list.
+- **Every regime mean re-measured.** The composite re-centres the regulatory facet on the regime's
+  mean, and the 0.12.0 means were measured against a 108-point facet. Re-centring against them would
+  have docked every regulated provider for checks nobody can pass yet. Measured 2026-09-25 on the
+  final candidate, defunct excluded: horizontal 15.6 (n=16,589), health 12.4, payments 19.7,
+  energy 13.3, education 18.6, government 13.1, insurance 16.7, banking 20.6, securities 20.9,
+  employment/payroll 18.8, telecommunications 20.2; `_default` 16.0. They fall by about a third,
+  which is the arithmetic of the larger facet (32.5 × 108/164 ≈ 21.4), not a change in providers.
+- **Employment and payroll is a regime (roadmap#427)** — payroll, EOR, PEO, HRIS, HCM; a bare
+  `lms` tag no longer places a provider in education. **`policy` no longer means insurance
+  (roadmap#431)**: 48 policy-as-code and network-policy companies leave the insurance regime.
+
+### Discoverability
+
+- **Can an agent address your MCP server? (roadmap#318)** `mcp_endpoint_discoverable`, 4 points,
+  graded by endpoint shape: addressable 1.0, documented 0.5, templated 0.0; N/A without a server.
+- **Newsroom and Leadership (roadmap#452)** are canonical pointer types, 1 point each.
+- **Self-hosting on a catalog host (roadmap#323).** `apis_json_self_hosted` recognises the
+  provider's own domain even when it is also a catalog host.
+- **A pointer has to lead somewhere (roadmap#376).** A repo-relative pointer earns credit only if
+  the file exists.
+
+### Provenance: who made it
+
+- **Mark your own work, and it pays (roadmap#285).** `method: declared | authored | published |
+  self-reported`, beside a `publisher:` and a resolvable `source:`, resolves first-party. An
+  unmarked artifact drops from full credit to **0.90**, so marking authorship is worth 10% on every
+  provenance-graded check. This is the change that moves most scores down; the remedy is published
+  on `/rating/#provenance`. 0.75 was modelled and rejected (2,155 band changes, exemplar halved).
+- **A WordPress plugin is not an MCP product (roadmap#485).** `/wp-json/mcp/...` is the
+  `site-plugin` provenance class (0.25, graded `platform`); manifests whose status says someone
+  else runs the server are `third-party`. 108 + 17 providers; `mcp_server` across the 112 plugin
+  URLs 913 → 348 points.
+- **A website or store platform's built-in endpoints are not the company's API (roadmap#676,
+  #680).** Wix `/_api/mcp`, Shopify Storefront GraphQL / UCP / customer-account, WordPress
+  `/wp-json` are one class, `platform-generated`, credited 0.25. Marked in the data from
+  response-header evidence, never the path alone.
+- **Our derivation is not your documentation (roadmap#787).** `idempotency`, `error_semantics`
+  and `rate_limit_signal` earn `documented` (0.5) from a provider-level artifact. When every such
+  artifact is one API Evangelist derived — its own `method:` says derived/generated/modeled — the
+  grade is `derived` at 0.125 (0.5 × the derived credit 0.25), and the agent-native gate does not
+  accept it. A `searched` transcription of the provider's own prose stays documented. Moves 77
+  idempotency, 1,435 error-semantics and 354 rate-limit records; 120 providers leave agent-native.
+- **A platform-served agent card (roadmap#461)** — fetched from a host outside the provider's own
+  domains, as Microsoft Foundry does for hosted agents and Mintlify for docs sites — is credited at
+  0.6 of its conformance grade: the operator's identity and content, the platform's host.
+
+### Unrated
+
+- **An acquisition that left nothing behind (roadmap#501).** `x-status: acquired` with no website
+  and no APIs carries no rating: 220 records. An acquired company with a website or an API keeps
+  its rating.
+
+### Shipping in the same pass, not rubric changes
+
+- A defunct company scores zero (roadmap#593).
+- Protected-resource metadata and dynamic client registration re-probed live on 656 MCP hosts
+  (roadmap#321, #337): PRM 360 → 891, DCR 340 → 745.
+- Marketing-site base URLs removed from 3,035 API records on 1,583 providers (roadmap#569, #628),
+  which lowers `base_url_per_api` where a provider's only base URL was its homepage.
+
 ## 0.22.0 — 2026-09-12
 
 **MCP servers are graded by who built them, not only by whether they answered.**
