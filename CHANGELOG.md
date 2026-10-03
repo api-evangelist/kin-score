@@ -18,6 +18,11 @@ changelog and the snapshots here are the canonical public record.
 
 ## 0.23.0 — 2026-09-25
 
+**Rule text corrected 2026-09-28 — no score changed.** `multiple_apis` and `overlay_published` still
+described pre-0.16/0.17 behaviour. The wording now says what the scorer has measured since then:
+`api_count` counts the OpenAPI documents a provider publishes (not index entries we split from
+them), and only a provider-hosted http(s) Overlay counts. The snapshot was re-frozen to match.
+
 **The London release, published five days ahead of API Days London (30 September).** The rubric
 was frozen at 0.22.0 from 2026-09-13 with this release pinned to the 30th; it went live on the
 25th instead, deliberately, so the re-score would not be the last thing done before travelling.
