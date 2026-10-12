@@ -52,7 +52,9 @@ Every point traces through a deterministic chain we can show:
 |---|---|---|
 | regulator register | 1.0 | listed in Australia's CDR Register, Open Finance Brasil, UK OBL directory |
 | network directory | 0.9 | listed by a health information network itself (TEFCA RCE, CommonWell) |
-| contract | 1.0 | named in the partner's own spec (a payment-method or network enum) |
+| contract | 1.0 | named in a partner's spec (a payment-method, network or carrier enum) |
+| standard / network directory | 0.9 | listed by a standards body or health network itself (CAMARA, TEFCA RCE, CommonWell) |
+| own contract | 0.8 | declared in the provider's own spec (a channel enum it routes to) |
 | partner-built | 0.9 | a partner's app in the provider's marketplace |
 | provider-built | 0.8 | a connector the provider built and lists |
 | claimed / workflow | 0.6 | named on the provider's own integrations page |
@@ -69,7 +71,9 @@ Every point traces through a deterministic chain we can show:
   event-driven (0.10). Floor 0.15: a declared, evidenced integration with nothing built still counts.
 - **Non-workflow integrations** (payment method, network, rail, platform app, standard participant,
   coverage, compatible, embedded, core infrastructure) cannot be built as Arazzo and are not judged on
-  it. Their substance is fixed at 0.5: their evidence is their substance.
+  it. Their substance is 0.5 plus 0.25 times a signal read from that one edge: API families maintained
+  in a standard, operations available per covered system, platform certification. Never the number of
+  edges. The cap keeps any such edge below a built workflow.
 - **Provider guesses:** each workflow step we had to guess because of the provider's own contract
   costs 0.1, floored at half.
 - **Provider depth:** mean of the top 10, averaged over at least 3, so a single strong edge reads as
@@ -100,11 +104,19 @@ Each market publishes its structure somewhere different, and the layer reads it 
 | payments | partners' contracts | contract-enum detection (payment methods, networks, rails) |
 | e-commerce / CRM | platform app stores | AppExchange, HubSpot, BigCommerce, Zoho, Shopify, Square, WooCommerce, commercetools |
 | open banking | regulators' registers, aggregator coverage | CDR Register, Open Finance Brasil, UK OBL; TrueLayer, Tink, Token.io |
+| accounting | ledger app stores, connector coverage lists | Xero, FreshBooks, NetSuite; Codat, Rutter, Merge |
+| HR / payroll | HR platform app stores, connector coverage lists | ADP, Workday, UKG, Paychex (AppDirect), Greenhouse, BambooHR; Finch, Merge, Kombo |
+| shipping | aggregators' carrier enums, carrier directories | Shippo, Karrio, shipcloud; 17TRACK |
+| telecom network APIs | the standards body's own records | CAMARA landscape and API-repo maintainers |
+| communications (CPaaS) | providers' channel enums, notification layers' provider enums | per provider spec |
 | healthcare (FHIR) | EHR endpoint directories, network directories, EHR partner directories | Epic, Oracle Health endpoint bundles; TEFCA QHINs (RCE) and CommonWell members/products; eClinicalWorks partner directory. Not machine-readable: Carequality directory (credentialed), TEFCA participants (credentialed), athenahealth Marketplace (403) |
 | iPaaS / agents (all markets) | connector catalogs | Zapier, n8n, Make, Composio, Monid |
 
-The four-market finding so far: **open markets integrate through workflows, regulated markets
-integrate through standards.**
+Nine markets so far show four shapes: **open markets** integrate through workflows, **regulated
+markets** through standards, **platform markets** through app stores where partners invest to build,
+and **coverage markets** through aggregators that publish who they reach. Coverage also makes visible
+companies that declare nothing themselves, so a provider's own declarations and who covers it are
+reported separately.
 
 ## 8. Two modes
 
