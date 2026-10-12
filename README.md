@@ -583,6 +583,7 @@ inspection alone would not have found, and those are queued in [`ROADMAP.md`](RO
 
 - **Live scores:** [APIs.io](https://apis.io) · [providers.apievangelist.com](https://providers.apievangelist.com)
 - **What the rubric has surfaced:** [FINDINGS.md](FINDINGS.md)
+- **The Market layer (draft, standalone):** [MARKET-LAYER.md](MARKET-LAYER.md) — reads a provider in its market: integrations, depth, and position
 - **The methodology, explained:** [The API Rating Rubric, Explained](https://papers.apievangelist.com/papers/the-api-rating-rubric-explained/) (API Evangelist paper)
 - **Sector reports** built on the score: [papers.apievangelist.com](https://papers.apievangelist.com)
 
