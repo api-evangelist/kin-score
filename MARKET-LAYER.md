@@ -155,3 +155,50 @@ reported separately.
 - Inbound vs outbound: reported beside the score, not folded in yet.
 - Vote baselines: universal apps (Sheets, Gmail, Notion) dominate iPaaS pairing and need a lift baseline.
 - Frontier metrics need at least four weekly snapshots before a trajectory is published.
+
+## 12. Draft: Alignment, shape votes beside integration votes (2026-10-13)
+
+Providers vote for each other in two ways: by integrating with each other, and by supporting the same API
+design. Two votes:
+
+| | Integration vote | Shape vote |
+|---|---|---|
+| What happens | A integrates with B | A re-serves B's contract (paths, vocabulary, schemas) |
+| Says | B's workflow matters to my customers | B's design is how this capability should work |
+| Who gains | B's depth (inbound) | B becomes a de facto standard; A becomes substitutable |
+
+### What the two frontier markets show
+
+| | Decision models | Model routing (chat completions) |
+|---|---|---|
+| Anchor shape | TypeSafe System One | OpenAI chat completions |
+| Declared re-servers in their own contracts | 5 (Telnyx, LLM Gateway, Cloudflare, Ollama, Kev) | 123 |
+| Same vocabulary, own path or names | Microsoft (`/systemone`, "similar to"), Upstage, Perplexity (`/decisions`), AWS Strands ("follows the docs") | not yet measured |
+| Rival shape | OpenAI `/decisions` (predicate, refusal) | — |
+| Who adopts | entrants and platforms alike, within a month | the long tail: hosts, neoclouds, gateways. Of the 12 makers every router carries, only DeepSeek declares OpenAI compatibility |
+| Who translates | LLM Gateway serves both shapes | routers (OpenRouter, LiteLLM, Portkey, LLM Gateway, Cloudflare) adapt every maker's own shape |
+| Calibration published | none | none |
+
+Two different convergence patterns: **decision models converged by imitation** (adopters copy the anchor's
+contract), **model routing converged by mediation** (the leading makers keep their own shapes and the routers
+translate; adoption of the anchor shape is a long-tail strategy for being substitutable). Alignment has to
+read both.
+
+### The measure (provisional, unweighted)
+
+1. **Graded `compatible` edges.** Each carries `shape` (+version, e.g. `openai-chat-completions`,
+   `typesafe-systemone`), `degree` (full | declared-subset | same-vocabulary-own-path | same-concepts-own-names),
+   and `evidence` (own contract > own docs/README > our structural detection, marked ours > a future conformance
+   test running the anchor's SDK against the endpoint, highest). "Similar to" is resemblance, never compatibility.
+2. **Alignment (adopters).** Whether a provider's contract matches the shape its capability has converged on,
+   graded by degree and evidence. Breadth is not credit: aligning with ten shapes is not ten times aligned.
+3. **Shape gravity (originators).** Who re-serves your contract and how faithfully, reported beside depth and
+   tracked weekly, never added into depth. OpenAI 123; TypeSafe 5 declared plus vocabulary adopters.
+4. **Mediation.** Router coverage is the second path to substitutability: a maker reachable through N routers is
+   substitutable without adopting any shape. Reported beside alignment (routers cover 112 providers; 12 by all five).
+5. **Convergence (per capability).** Share of providers on the dominant shape, the number of competing shapes, and
+   whether convergence is by imitation or mediation. This is the "category or feature" answer, measurable.
+
+Bedrock shapes are de jure standards and already read as `standard`; this section is for de facto shapes still
+forming, measured by movement in weekly dated snapshots. Nothing is weighted until it holds across at
+least four weekly snapshots.
