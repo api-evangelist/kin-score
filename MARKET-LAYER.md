@@ -86,14 +86,28 @@ against platforms, aggregators against aggregators.
 
 | Position | Rule (share of integrations) | Reads as |
 |---|---|---|
-| coverage | >= 50% coverage | reaches banks or customer sites through a standard (aggregators, EHR vendors) |
-| regulated | >= 50% contract or register | participates through the standard or partners' contracts |
+| coverage | >= 50% coverage | reaches banks, carriers, utilities or customer sites (aggregators, EHR vendors) |
+| covered | reached mainly through aggregators | carriers, car makers, utilities, exchanges that aggregators name |
+| standard | >= 50% voluntary standards directories | OpenTelemetry, CAMARA, OIDF, RESO, FIDO, health networks |
+| regulated | >= 50% regulator register or partner contract | MiCA, NYDFS, CDR, Open Finance Brasil, UK Open Banking |
 | gravity | >= 40% partner-built | other companies invest to build on it |
 | core | >= 35% provider-built | builds the connectors its customers need |
 | long-tail | >= 60% iPaaS | the long tail, reached through Zapier, n8n, Make |
 | list | >= 60% own-page claims | a long list on its own page, mostly unevidenced |
 | mixed | none dominates | |
 | undeclared | nothing declared | no number |
+
+## 6b. Three kinds of marketplace
+
+Listings are never lumped together:
+
+| Kind | Example | What it means |
+|---|---|---|
+| platform app store | AppExchange, Guidewire, Okta | a partner builds ON the platform: inbound depth |
+| cloud marketplace | AWS, Azure | the provider SELLS through it: a distribution channel, not an integration |
+| iPaaS connector | Zapier, Make, n8n, Workato | a bridge any two providers can meet on |
+
+Distribution and bridges are reported beside position, never counted inside it.
 
 ## 7. Structural sources, per market
 
