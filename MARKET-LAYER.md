@@ -124,6 +124,11 @@ Each market publishes its structure somewhere different, and the layer reads it 
 | telecom network APIs | the standards body's own records | CAMARA landscape and API-repo maintainers |
 | communications (CPaaS) | providers' channel enums, notification layers' provider enums | per provider spec |
 | healthcare (FHIR) | EHR endpoint directories, network directories, EHR partner directories | Epic, Oracle Health endpoint bundles; TEFCA QHINs (RCE) and CommonWell members/products; eClinicalWorks partner directory. Not machine-readable: Carequality directory (credentialed), TEFCA participants (credentialed), athenahealth Marketplace (403) |
+| object storage | providers' own S3 compatibility pages and operation matrices | fetched own docs, own contracts, structural detection (S3 operations and paths) |
+| databases (PostgreSQL) | providers' own PostgreSQL compatibility pages and feature lists | fetched own docs, own contracts (a wire protocol: no structural detection) |
+| streaming (Kafka) | providers' own Kafka protocol and feature tables | fetched own docs, own contracts; Kafka proxies reported as mediation |
+| search (Elasticsearch / OpenSearch) | providers' own compatibility pages | fetched own docs, own contracts, structural detection (`_bulk`, `_cat`, `/_plugins/`) |
+| container registries (OCI) | the OCI conformance register, providers' own OCI pages | register (PRODUCT.yaml + junit), fetched own docs, structural detection (`/v2/{name}/manifests`) |
 | iPaaS / agents (all markets) | connector catalogs | Zapier, n8n, Make, Composio, Monid |
 
 Nine markets so far show four shapes: **open markets** integrate through workflows, **regulated
@@ -184,21 +189,66 @@ contract), **model routing converged by mediation** (the leading makers keep the
 translate; adoption of the anchor shape is a long-tail strategy for being substitutable). Alignment has to
 read both.
 
+### Shape markets after seven readings (2026-10-13)
+
+Five more markets were read as shape markets beside the two frontier ones. Counts are companies (one edge per
+provider per shape, the best evidence kept; two repos of one company are one vote). Convergence is the share of the
+cohort, minus the anchor's own family, mediators and rival shapes, that declares the shape.
+
+| Market | Mode | Anchor shape | Adopters (companies) | Convergence | Pattern | Rival shapes |
+|---|---|---|---|---|---|---|
+| Object storage | bedrock | Amazon S3 API | 32 (34 repos) | 25 of 30, 83.3% | imitation | Azure Blob, GCS JSON API, OpenStack Swift |
+| Databases | bedrock | PostgreSQL wire protocol and dialect | 19 (21 repos) | 19 of 24, 79.2% | imitation | MySQL wire (TiDB, SingleStore, Vitess, MySQL) |
+| Streaming | bedrock | Apache Kafka wire protocol | 9 (10 repos) | 10 of 14, 71.4% | imitation, with mediation beside | Pulsar, AMQP (RabbitMQ), NATS, Kinesis, Pub/Sub |
+| Search | frontier | Elasticsearch REST API and its OpenSearch fork | 7 (6 Elasticsearch, 3 OpenSearch) | 7 of 11, 63.6% | fork | Algolia, Typesense, Meilisearch, Vespa, Solr, Azure AI Search, CloudSearch |
+| Container registries | bedrock | OCI Distribution Specification | 15 (6 in the conformance register) | 15 of 19, 78.9% | register | none |
+| Decision models | frontier | TypeSafe System One | 5 declared | not measured | imitation | OpenAI `/decisions` |
+| Model routing | frontier | OpenAI chat completions | 123 declared | not measured | mediation | each maker's own shape |
+
+Four patterns: **imitation** (adopters copy the anchor's contract), **mediation** (proxies or routers sit in front
+of the shape and translate; Kafka gateways and AI model routers), **fork** (two related shapes split from one
+codebase, and re-servers name one or both), **register** (a de jure shape with a conformance programme whose results
+are public). The leaders keep their own shapes and also re-serve the anchor (every hyperscaler serves Kafka and
+PostgreSQL beside its own); the long tail adopts the anchor to be substitutable.
+
 ### The measure (provisional, unweighted)
 
-1. **Graded `compatible` edges.** Each carries `shape` (+version, e.g. `openai-chat-completions`,
-   `typesafe-systemone`), `degree` (full | declared-subset | same-vocabulary-own-path | same-concepts-own-names),
-   and `evidence` (own contract > own docs/README > our structural detection, marked ours > a future conformance
-   test running the anchor's SDK against the endpoint, highest). "Similar to" is resemblance, never compatibility.
-2. **Alignment (adopters).** Whether a provider's contract matches the shape its capability has converged on,
-   graded by degree and evidence. Breadth is not credit: aligning with ten shapes is not ten times aligned.
-3. **Shape gravity (originators).** Who re-serves your contract and how faithfully, reported beside depth and
-   tracked weekly, never added into depth. OpenAI 123; TypeSafe 5 declared plus vocabulary adopters.
-4. **Mediation.** Router coverage is the second path to substitutability: a maker reachable through N routers is
-   substitutable without adopting any shape. Reported beside alignment (routers cover 112 providers; 12 by all five).
-5. **Convergence (per capability).** Share of providers on the dominant shape, the number of competing shapes, and
-   whether convergence is by imitation or mediation. This is the "category or feature" answer, measurable.
+1. **Graded `compatible` edges.** Each carries `shape`, `degree` and `evidence`. Degrees:
 
-Bedrock shapes are de jure standards and already read as `standard`; this section is for de facto shapes still
-forming, measured by movement in weekly dated snapshots. Nothing is weighted until it holds across at
-least four weekly snapshots.
+   | Degree | Meaning |
+   |---|---|
+   | `full` | the provider's own page says fully / 100% compatible and lists nothing unsupported |
+   | `declared-subset` | the provider publishes what is and is not supported; the operation matrix is the per-edge signal |
+   | `declared-unqualified` | the provider says "compatible" and publishes no list: a claim, not a matrix |
+   | `interoperable-subset` | the provider says only some tools interoperate |
+   | `same-vocabulary-own-path` | our structural detection: the contract carries the anchor's operations, the provider says nothing |
+   | `same-concepts-own-names` | the anchor's concepts under the provider's own names (resemblance, recorded, never compatibility) |
+
+   **A published operation matrix outranks a bare "full" claim.** In object storage every provider that publishes a
+   matrix lists something unsupported; every "full" claim is a sentence with no matrix. A `declared-subset` with its
+   supported share is the more trustworthy reading.
+2. **Serve versus consume.** Only a provider SERVING the API itself counts. Backup targets, connectors, sinks,
+   migration sources, "any S3-compatible storage" and clients that pull from a registry consume someone else's
+   endpoint and are not adopters. In a contract, only the API's own description (info, tags, servers, or a path
+   description that says the provider serves the shape) is a declaration; a field or parameter is not.
+3. **Evidence ladder**, strongest first: **conformance register** (someone ran the anchor's own test suite against
+   the implementation and published the result; the OCI conformance register is the only one that exists today) >
+   **own docs** (the provider's page, fetched and saved with a hash) > **own contract** > **own blog** > **our
+   structural detection** (marked ours). Page chrome is never evidence: our own fetch header and title or navigation
+   lines are excluded for every shape. "Similar to" is resemblance, never compatibility.
+4. **Mediation.** Proxies and routers in front of a shape (Kong Event Gateway, Gravitee, Conduktor and aklivity Zilla
+   for Kafka; OpenRouter, LiteLLM, Portkey for model routing) are reported beside, never as adopters. Mediation is
+   the second path to substitutability.
+5. **Shape gravity (originators).** Who re-serves your contract and how faithfully, counted by company, reported
+   beside depth. In databases the anchor project scores low on depth and has 19 companies re-serving it: gravity and
+   depth measure different things and are never added.
+6. **Convergence (per capability).** Share of the cohort on the shape, the rival shapes, and the pattern.
+
+**Bedrock versus frontier shape markets.** A bedrock shape market has a settled anchor that most of the cohort
+already serves (object storage, databases, streaming, container registries); it is read like any bedrock market,
+with a shape section beside position. A frontier shape market is still forming (decision models, model routing,
+search after the fork) and is read by movement in weekly dated snapshots.
+
+**Report only.** `compatible` edges carry no weight. They are shown on the market page as a shape section and as
+"declares compatibility" on a provider, and are excluded from depth, position and the own/covered declaration rate.
+Nothing is weighted until it holds across at least four weekly snapshots.
