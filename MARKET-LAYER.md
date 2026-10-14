@@ -45,6 +45,13 @@ Every point traces through a deterministic chain we can show:
    model's judgement.
 5. **Pinned instrument.** The generator, adapters and weights are versioned per weekly release, and
    change only on a release, measured.
+6. **Directory listings of a protocol are report only (2026-10-14).** A provider's listing in the official
+   MCP Registry (edges with partner `mcp`) is a frontier signal, read like a shape vote: shown on the provider
+   as "registered MCP server", in its own integration-mix mode `agent-registry`, and excluded from depth,
+   position shares and the own/covered declaration until it holds across four weekly snapshots. The
+   agent-tools market reads it on its frontier timeline instead. Publisher-vetting badges (Procore security
+   review, Olo partner tier, Clover Editor's Pick, Toast Featured, "Reviewed by Blackbaud") stay their own
+   signal at weight 0.
 
 ## 4. Evidence: what an integration is worth as proof
 
@@ -143,6 +150,13 @@ Each market publishes its structure somewhere different, and the layer reads it 
 | streaming (Kafka) | providers' own Kafka protocol and feature tables | fetched own docs, own contracts; Kafka proxies reported as mediation |
 | search (Elasticsearch / OpenSearch) | providers' own compatibility pages | fetched own docs, own contracts, structural detection (`_bulk`, `_cat`, `/_plugins/`) |
 | container registries (OCI) | the OCI conformance register, providers' own OCI pages | register (PRODUCT.yaml + junit), fetched own docs, structural detection (`/v2/{name}/manifests`) |
+| IoT / smart home | the standards body's certification ledger | CSA Distributed Compliance Ledger (Matter): vendor IDs and certified products, one signal per device type, never per model |
+| US open banking | the standards body's own registry | FDX Registry (role, newest FDX version per participant). Not machine-readable: CFPB 1033 lists, Plaid/MX/Finicity/Yodlee institution lists (keys), Akoya |
+| AI agent tools (frontier) | the protocol's own directory, providers' own MCP and agent-card surfaces | Official MCP Registry (verified reverse-DNS namespace = publisher domain), a2aregistry.org; gateways (Smithery, Composio, Glama, Zapier MCP, Pipedream) reported as mediation |
+| construction | platform app stores, connector coverage lists | Procore App Marketplace, ServiceTitan, Bluebeam; Trimble App Xchange coverage |
+| hospitality | PMS app stores, the channel manager's connectivity list | Mews, Apaleo, Hostaway, Guesty stores; SiteMinder partner list. Not machine-readable: Oracle OPERA/OHIP, Cloudbeds, Stayntouch, RateGain, D-EDGE, Lodgify |
+| restaurants / POS | POS app stores, middleware coverage lists | Clover, Toast, Olo, 7shifts, SpotOn; Otter, Deliverect coverage |
+| nonprofit / fundraising | donor-CRM marketplaces, giving platforms' integration pages | Blackbaud Marketplace (public listing API), GoFundMe Pro (Classy), Neon One; Givebutter, Bloomerang, Donorbox pages |
 | iPaaS / agents (all markets) | connector catalogs | Zapier, n8n, Make, Composio, Monid |
 
 Nine markets so far show four shapes: **open markets** integrate through workflows, **regulated
