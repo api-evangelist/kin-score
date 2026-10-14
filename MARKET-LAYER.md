@@ -72,7 +72,9 @@ Every point traces through a deterministic chain we can show:
 - **Non-workflow integrations** (payment method, network, rail, platform app, standard participant,
   coverage, compatible, embedded, core infrastructure) cannot be built as Arazzo and are not judged on
   it. Their substance is 0.5 plus 0.25 times a signal read from that one edge: API families maintained
-  in a standard, operations available per covered system, platform certification. Never the number of
+  in a standard, operations available per covered system, platform certification, a direct (vs GDS-resold)
+  airline connection and its features in production, what one CDP connector does (modes, event types, sync
+  modes), the strongest 1EdTech standard certified, the eIDAS qualified service types granted. Never the number of
   edges. The cap keeps any such edge below a built workflow.
 - **Provider guesses:** each workflow step we had to guess because of the provider's own contract
   costs 0.1, floored at half.
@@ -91,6 +93,7 @@ against platforms, aggregators against aggregators.
 | standard | >= 50% voluntary standards directories | OpenTelemetry, CAMARA, OIDF, RESO, FIDO, health networks |
 | regulated | >= 50% regulator register or partner contract | MiCA, NYDFS, CDR, Open Finance Brasil, UK Open Banking |
 | gravity | >= 40% partner-built | other companies invest to build on it |
+| builds-on | >= 50% builds-on-platform | its integrations are apps it publishes on other platforms' stores |
 | core | >= 35% provider-built | builds the connectors its customers need |
 | long-tail | >= 60% iPaaS | the long tail, reached through Zapier, n8n, Make |
 | list | >= 60% own-page claims | a long list on its own page, mostly unevidenced |
@@ -108,6 +111,17 @@ Listings are never lumped together:
 | iPaaS connector | Zapier, Make, n8n, Workato | a bridge any two providers can meet on |
 
 Distribution and bridges are reported beside position, never counted inside it.
+
+A platform app store listing has two sides, and both read one way (2026-10-14). The platform's side is
+`platform-app`, `partner-built`: someone built on it (gravity). The publisher's side is `platform-app`,
+`third-party`: mode `builds-on-platform`, written by the developer-tools sweep and, for every other platform, by
+`mirror-platform-listings.py` (one edge per publisher and platform, domain-linked listings only). It reads the
+same evidence as the platform side but the base substance only: the store's certification vets the listing on
+the platform's side and is not carried to the publisher. Store badges that vet the publisher (GitHub Verified
+creator, Atlassian Cloud Fortified, JetBrains Verified vendor, VS Code Verified publisher) are recorded as a
+separate `publisher_verified` signal with weight 0 until decided. An advertiser or publisher on Google's Ad Tech
+Providers list (no adtech tag, no TCF registration) is out of market and takes no position; TCF and ATP
+registrations are participation only, with no per-edge depth signal.
 
 ## 7. Structural sources, per market
 
