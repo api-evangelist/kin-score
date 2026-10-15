@@ -81,7 +81,7 @@ weights sum to 1.0 and are the argument the score is making about what matters.
 | **Contract Governance** | 0.12 | 6 |  |
 | **Discoverability** | 0.10 | 15 | Can an agent find you *without being told where to look*? |
 
-**94 base checks.** Plus 40 more in the two conditional facets, for 134 in total.
+**94 base checks.** Plus 41 more in the two conditional facets, for 135 in total.
 <!-- kin-score:facets:end -->
 
 Checks on artifact types a provider doesn't ship are **N/A** — excluded from that facet's
@@ -191,16 +191,16 @@ and the systematic penalty disappears by construction. The means are **frozen pe
 rather than computed live, so a score stays reproducible from a published snapshot.
 
 <!-- kin-score:regime-means:start -->
-Measured at rubric 0.23.0 on 2026-09-25, across 26,352 regulated providers:
+Measured at rubric 0.24.0 on 2026-10-15, across 27,830 regulated providers:
 
 | Regime | Mean | | Regime | Mean |
 |---|---:|---|---|---:|
-| Securities & Market Data | 20.9 | | Insurance | 16.7 |
-| Banking & Open Finance | 20.6 | | Horizontal (data, software, accessibility, platform) | 15.6 |
-| Telecommunications | 20.2 | | Energy & Utilities | 13.3 |
-| Payments | 19.7 | | Government & Public Sector | 13.1 |
-| Employment & Payroll | 18.8 | | Health | 12.4 |
-| Education & Research | 18.6 | | | |
+| Securities & Market Data | 20.6 | | AI & Biometrics | 17.9 |
+| Banking & Open Finance | 20.4 | | Insurance | 16.6 |
+| Telecommunications | 20.4 | | Horizontal (data, software, accessibility, platform) | 15.1 |
+| Payments | 19.5 | | Government & Public Sector | 13.3 |
+| Employment & Payroll | 18.8 | | Energy & Utilities | 13.2 |
+| Education & Research | 18.4 | | Health | 12.1 |
 | *All regulated* | *16* | | | |
 <!-- kin-score:regime-means:end -->
 
@@ -213,7 +213,7 @@ full catalog run crashed on exactly that, because nothing sits below `minimal`'s
 <!-- kin-score:conditional-facets:start -->
 | Conditional facet | Weight | Checks | Applies when |
 |---|:---:|:---:|---|
-| **Regulatory Posture** | 0.15 | 32 | The provider's tags match one of **10 sectoral regimes** — and every provider no sector matches falls to the **horizontal** regime |
+| **Regulatory Posture** | 0.15 | 33 | The provider's tags match one of **11 sectoral regimes** — and every provider no sector matches falls to the **horizontal** regime |
 | **Open Source Surface** | 0.10 | 4 | The product itself is open source *and* we hold a live repository read |
 | **Create-or-Update Ergonomics** | 0.10 | 4 | A contract parses *and* carries write operations |
 <!-- kin-score:conditional-facets:end -->
@@ -347,21 +347,21 @@ after any material rubric change with `signals/band_distribution.rb`.
 <!-- kin-score:bands:start -->
 | Band | Composite | Share of catalog | What it means |
 |------|:---------:|:----------------:|---------------|
-| **Exemplar** | 66.5+ | 1.1% | Reference-quality API operations across every facet — a rich contract, published governance, transparent operations, and machine-readable commercial terms. |
+| **Exemplar** | 66.5+ | 1.5% | Reference-quality API operations across every facet — a rich contract, published governance, transparent operations, and machine-readable commercial terms. |
 | **Strong** | 54.3 – 66.4 | 4.3% | Solid contracts, transparent operations, and an easy start. |
-| **Developing** | 39.3 – 54.2 | 14.4% | Real signal across most facets with visible, nameable gaps. |
-| **Thin** | 26.2 – 39.2 | 16.5% | Limited machine-readable signal and partial portal coverage. |
-| **Emerging** | 11 – 26.1 | 24.6% | More than an index entry, but the surface is still mostly links rather than artifacts. |
-| **Minimal** | 0 – 10.9 | 39.0% | Index entry only; little beyond a description and a link. |
+| **Developing** | 39.3 – 54.2 | 12.9% | Real signal across most facets with visible, nameable gaps. |
+| **Thin** | 26.2 – 39.2 | 16.3% | Limited machine-readable signal and partial portal coverage. |
+| **Emerging** | 11 – 26.1 | 23.2% | More than an index entry, but the surface is still mostly links rather than artifacts. |
+| **Minimal** | 0 – 10.9 | 41.9% | Index entry only; little beyond a description and a link. |
 <!-- kin-score:bands:end -->
 
 <!-- kin-score:agent-bands:start -->
 | Band | Score | Share | Meaning |
 |---|:---:|:---:|---|
-| **Agent-Native** | 38.7+ | 1.5% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
-| **Agent-Ready** | 28.6 – 38.6 | 11.4% | An agent can drive the core surface. |
-| **Agent-Aware** | 5.1 – 28.5 | 27.0% | Partial machine-readable surface. |
-| **Human-Only** | 0 – 5 | 60.1% | Little an agent can consume without a human first reading the site. |
+| **Agent-Native** | 38.7+ | 1.4% | Built to be driven by agents, and the provider built it — a contract, a real agent surface the provider itself publishes, and the safety rails the band gate now requires: idempotency AND a stable error envelope. |
+| **Agent-Ready** | 28.6 – 38.6 | 13.1% | An agent can drive the core surface. |
+| **Agent-Aware** | 5.1 – 28.5 | 25.5% | Partial machine-readable surface. |
+| **Human-Only** | 0 – 5 | 60.0% | Little an agent can consume without a human first reading the site. |
 <!-- kin-score:agent-bands:end -->
 
 **`Emerging` was split out of `Minimal`**, and it is the most useful band on the list. A quarter of
@@ -495,7 +495,7 @@ The rubric is a living argument and is versioned (`schema_version`). Published s
 in [`ROADMAP.md`](ROADMAP.md).
 
 <!-- kin-score:version:start -->
-Current: **0.23.0** — published 2026-09-25.
+Current: **0.24.0** — published 2026-10-15.
 <!-- kin-score:version:end -->
 
 A score is only interpretable against the rubric that produced it, so `schema_version` is stamped on

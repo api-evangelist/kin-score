@@ -16,6 +16,38 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.24.0 — 2026-10-15
+
+**The first weekly release.** Conference-pinned releases are retired; the rubric now ships on one
+day a week. 0.24.0 was built for 2026-10-09 and published 2026-10-15. No weight or band-cut changes.
+
+**Against the scores published 2026-10-11**, full catalog (28,952 providers): 7,232 composites move
+by more than 0.1 (7,044 down, 188 up, median -1.6); 1,949 band changes (1,845 down, 104 up). No band
+share moved more than 1.3 points, so no re-cut. Agent readiness is not touched by this release.
+
+- **A plans file we generated is credited as ours (roadmap#943).** A correction to our own credit,
+  not a penalty on providers. Since 2026-10-07 the pipeline stamps the plans, rate-limit, schema and
+  ruleset files it writes `method: generated`; 0.24.0 reads the stamp. 5,460 providers whose plans
+  file we generated now earn derived credit (0.25) rather than full credit. Purdue, the worked
+  example: `plans_present` 7.2 -> 2.0.
+- **`finops_mapped` needs a stated unit (roadmap#942).** The 3-point check awarded for any FinOps
+  artifact; nearly all 6,680 restate the FinOps framework. It now needs a billing unit, a source and
+  a non-template artifact: 96 providers keep it. The network builder was corrected the same day to
+  read `billingModel.primaryUnit`, where 99 of the 101 unit-stating artifacts put it.
+- **Rulesets graded by the one the score uses (roadmap#795, #791).** An unmarked ruleset reads as
+  derived. 174 composites fall (median -3.8), 45 band changes. Our own record rises: apis.io's
+  ruleset is marked authored by apis.io.
+- **Nested authorship markers count (roadmap#794).** `method:` under `x-provenance`, `x-apievangelist*`
+  or `info` is read. 89 providers; 75 composites fall, median -0.9.
+- **AI & Biometrics regime (roadmap#797).** EU AI Act Art. 5 / Annex III / Art. 50 / Art. 53-55, GDPR
+  Art. 9, BIPA, Texas CUBI + TRAIGA, Washington RCW 19.375 + My Health My Data. Yields to every
+  sectoral regime, so it only moves providers off the horizontal fallback: 763 do. New check
+  `reg_biometric_retention_policy` (4 pts, BIPA s.15(a)), N/A without a biometric surface.
+- **Every regime mean re-measured** (defunct excluded, 27,830 providers): horizontal 15.6 -> 15.1,
+  health 12.1, payments 19.5, energy & utilities 13.2, education 18.4, government 13.3, insurance
+  16.6, banking & open finance 20.4, securities & market data 20.6, employment & payroll 18.8,
+  telecommunications 20.4, AI & biometrics 17.9. The re-centring alone moves composites by at most 0.1.
+
 ## 0.23.0 — 2026-09-25
 
 **Rule text corrected 2026-09-28 — no score changed.** `multiple_apis` and `overlay_published` still
