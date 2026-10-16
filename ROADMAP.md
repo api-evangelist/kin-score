@@ -15,6 +15,17 @@ has shipped.
 
 ---
 
+## Status 2026-10-15 — 0.24.0 published, the first weekly release
+
+Shipped: #794, #795/#791, #797, #942, #943 (see CHANGELOG). Scores land with the Friday build.
+
+**Next, carried to 0.25.0:**
+
+- **#793 — stamp provenance forward at harvest.** 92.8% of OpenAPI files carry no marker; stamping
+  at harvest is score-moving and ships on a weekly release, not between them.
+
+---
+
 ## Status 2026-09-25 — London (0.23.0) is live, five days early
 
 Everything milestoned to London shipped together on 2026-09-25: #285, #318, #323, #376, #427,
