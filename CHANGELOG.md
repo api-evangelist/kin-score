@@ -18,6 +18,15 @@ changelog and the snapshots here are the canonical public record.
 
 ## 0.24.0 — 2026-10-15
 
+**Re-frozen 2026-10-18 — planned list only, no score change.** The *Planned — deeper, spec-level checks* list
+was three months old and had no roadmap behind it. `auth_scheme_strength` is removed: it shipped in 0.13.0 as
+the graded `auth_clarity` (roadmap#97). `artifact_liveness` is narrowed to the half that does not exist —
+type-matching and freshness on the pointer-liveness grader that already ships (roadmap#16). Every remaining
+entry now carries a `status` (in build / parked) and the roadmap issue that owns it: #981
+extensions_in_served_contract, #982 pagination_ratio, #983 operation_distinctiveness, #984 artifact_liveness,
+#985 the two parked identity dimensions with their unpark thresholds. Same precedent as the 0.23.0 re-freeze
+of 2026-10-03: nothing scored changed, so the version does not move.
+
 **The first weekly release.** Conference-pinned releases are retired; the rubric now ships on one
 day a week. 0.24.0 was built for 2026-10-09 and published 2026-10-15. No weight or band-cut changes.
 

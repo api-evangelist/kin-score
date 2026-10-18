@@ -4444,6 +4444,8 @@ agent_readiness:
       signal: 'x-agentic-access (and peers) present in the spec the provider serves, not only the catalog artifact'
       supersedes: agentic_access
       blocked_on: probe
+      status: build
+      issue: https://github.com/api-evangelist/roadmap/issues/981
       description: >
         `agentic_access` credits a provider-authored agentic-access artifact in
         the catalog. It cannot see whether those classifications reach the
@@ -4456,8 +4458,10 @@ agent_readiness:
         diff against the catalog copy, not new rubric math.
     - id: artifact_liveness
       label: Declared Artifact Liveness
-      signal: 'declared common[] URLs resolve, and their content matches the declared type'
+      signal: 'a live common[] URL whose content matches its declared type, on a pointer-liveness file kept fresh — liveness itself already ships (roadmap#16)'
       blocked_on: probe
+      status: build
+      issue: https://github.com/api-evangelist/roadmap/issues/984
       description: >
         Most operational and commercial checks are presence-only — they credit
         `common[].type` and never fetch the URL. A StatusPage entry pointing at
@@ -4472,6 +4476,8 @@ agent_readiness:
       label: Pagination Coverage
       signal: 'share of collection-returning GET operations declaring pagination'
       blocked_on: parser
+      status: build
+      issue: https://github.com/api-evangelist/roadmap/issues/982
       description: >
         JAIRF scores pagination as a RATIO of paginated GET resources and this model
         does not read it at all. Computable from the refined per-tag OpenAPIs the
@@ -4481,6 +4487,8 @@ agent_readiness:
       label: Operation Distinctiveness
       signal: 'embedding distance between operation summaries within a spec'
       blocked_on: parser
+      status: build
+      issue: https://github.com/api-evangelist/roadmap/issues/983
       description: >
         Whether an agent can tell two operations apart from their descriptions.
         JAIRF computes it with embeddings; nothing equivalent exists here. The most
@@ -4518,24 +4526,12 @@ agent_readiness:
     # A cluster this empty discriminates at the top only. Weight it accordingly,
     # and do not add it to the composite until the distribution justifies it.
     # -----------------------------------------------------------------------
-    - id: auth_scheme_strength
-      label: Bound vs Bearer Authentication
-      signal: 'grade auth_clarity by scheme class rather than crediting any declared scheme equally'
-      supersedes: auth_clarity
-      blocked_on: rubric
-      description: >
-        Regrade, not a new dimension. `auth_clarity` reads presence and stops:
-        `apiKey` earns the same 10 points as `openIdConnect`. Proposed credit —
-        bound (mutualTLS, or an http scheme naming DPoP/Signature) 1.00;
-        negotiable (oauth2 with an authorizationCode or clientCredentials flow, or
-        openIdConnect) 0.75; bearer-only (http bearer, apiKey) 0.35. The floor stays
-        well above zero on purpose: a documented API key is still machine-readable
-        auth, and zeroing 2,209 providers would measure the market rather than them.
-        Readable TODAY from the refined per-tag OpenAPIs — no probe, no new artifact.
     - id: aauth_resource_metadata
       label: AAuth Resource Metadata
       signal: 'a served /.well-known/aauth-resource.json carrying `issuer` and `jwks_uri`'
       blocked_on: adoption
+      status: parked
+      issue: https://github.com/api-evangelist/roadmap/issues/985
       description: >
         draft-hardt-oauth-aauth-protocol (Dick Hardt, 20 August 2026, Standards Track,
         expires 21 February 2027) — catalogued at /store/aauth/. Unlike
@@ -4574,6 +4570,8 @@ agent_readiness:
       label: Workload Identity for Callers
       signal: 'WIMSE/SPIFFE identifiers, WIT/SVID credentials, or Workload-Proof-Token accepted at the API surface'
       blocked_on: collection
+      status: parked
+      issue: https://github.com/api-evangelist/roadmap/issues/985
       description: >
         Sections 5-6 — the identifier and its cryptographic binding, the actual spine
         of the draft. Almost certainly near-empty on the public API surface today:
