@@ -18,6 +18,25 @@ changelog and the snapshots here are the canonical public record.
 
 ## 0.24.0 — 2026-10-15
 
+**Classifier fix 2026-10-18 — no rubric change (roadmap#956).** The OpenAPI provenance reader treated any
+`x-provenance` block as API Evangelist's authorship, so a provider's own claim inside it — GatiFlow's
+`{method: published, publisher: GatiFlow, source: https://gatiflow.io/openapi.json}`, carried verbatim into
+refine's per-API splits — paid the 0.25 `derived` floor on every contract check (Contract Quality 56 -> 33).
+The reader now applies the rubric's existing `provenance.author_markers` rule (since 0.23.0) inside the block,
+with the same guard: a `publisher` and an http(s) `source` beside the marker. Measured catalog-wide, two
+providers move: gatiflow (4 specs) and smklog-com (3). Separately, refine's standardize step no longer cuts a
+document description to its first sentence (GatiFlow's 2,049 characters had become 42). Proposed for 0.25.0
+and not shipped: excluding an operationless (webhooks-only) document from per-operation checks.
+
+**Re-frozen 2026-10-18 — planned list only, no score change.** The *Planned — deeper, spec-level checks* list
+was three months old and had no roadmap behind it. `auth_scheme_strength` is removed: it shipped in 0.13.0 as
+the graded `auth_clarity` (roadmap#97). `artifact_liveness` is narrowed to the half that does not exist —
+type-matching and freshness on the pointer-liveness grader that already ships (roadmap#16). Every remaining
+entry now carries a `status` (in build / parked) and the roadmap issue that owns it: #981
+extensions_in_served_contract, #982 pagination_ratio, #983 operation_distinctiveness, #984 artifact_liveness,
+#985 the two parked identity dimensions with their unpark thresholds. Same precedent as the 0.23.0 re-freeze
+of 2026-10-03: nothing scored changed, so the version does not move.
+
 **The first weekly release.** Conference-pinned releases are retired; the rubric now ships on one
 day a week. 0.24.0 was built for 2026-10-09 and published 2026-10-15. No weight or band-cut changes.
 
