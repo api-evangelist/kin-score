@@ -16,6 +16,30 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.25.0 — 2026-10-22
+
+**Two graded agent-readiness dimensions, five credit corrections, no weight or band-cut changes.**
+Measured against 0.24.0 on the full catalog (31,234 providers, same pages): 2,318 composites move
+(2,315 up, 3 down, median +1.4, range -1.4..+4.5), 247 band changes. Agent readiness moves for
+7,889 (6,449 up, median +1.4, range -4.1..+9.9), 468 agent band changes. No re-cut.
+
+- **Pagination** (`pagination_ratio`, 5 pts, graded; roadmap#982). Share of collection GETs that
+  declare paging (page/limit/offset/cursor, a Link header or a next/cursor field). Not applicable
+  without collection GETs.
+- **Distinct Operations** (`operation_distinctiveness`, 3 pts, graded; roadmap#983). Share of
+  operations whose summary is unique within the document.
+- **Operationless documents** are skipped by the per-operation contract checks (roadmap#986).
+- **Security disclosure** credits a Security / VulnerabilityDisclosure / SecurityTxt pointer or a
+  served security.txt, not a Security link to an auth page (roadmap#524). Done in code, not through
+  aliases: aliasing the types cost 4,908 providers their regulatory points in the first model.
+- **Agentic access from the served contract** (roadmap#981): `x-agentic-*` in a fetched original
+  earns full credit.
+- **MCP served by another record** (roadmap#958): inherits a parent's live-probed verified grade.
+- **Authorship, both directions**: our Arazzo and vocabularies credited as ours (roadmap#527);
+  contracts split from a fetch-verified provider original credited as theirs (roadmap#793).
+- **Observed, not scored**: `mcp_tool_quality` (roadmap#994), graded from 596 live tools/list
+  captures; proposed as a 6-point dimension for 0.26.0.
+
 ## 0.24.0 — 2026-10-15
 
 **Classifier fix 2026-10-18 — no rubric change (roadmap#956).** The OpenAPI provenance reader treated any
