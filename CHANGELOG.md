@@ -18,6 +18,13 @@ changelog and the snapshots here are the canonical public record.
 
 ## 0.25.0 — 2026-10-22
 
+**Reader fix 2026-10-24 — no rubric change (roadmap#1002).** `dry_run_mode` now also reads a BOOLEAN
+`test` / `test_mode` / `is_test` / `sandbox` field on a mutating operation, as a parameter or a request-body
+property. Stannp's Letters contract documents `test: true` ("Produce sample PDF without dispatch or charges")
+and the check read false. Boolean only, so AWS Device Farm's `test` (a test-run definition) does not count.
+Measured: providers credited 301 -> 386 (85 gain; Stannp, Clover, DocRaptor, DocSpring...), upward only,
+about +2.7 agent readiness each (Stannp 40.2 -> 43.0, Clover 33.8 -> 36.5).
+
 **Two graded agent-readiness dimensions, five credit corrections, no weight or band-cut changes.**
 Measured against 0.24.0 on the full catalog (31,234 providers, same pages): 2,318 composites move
 (2,315 up, 3 down, median +1.4, range -1.4..+4.5), 247 band changes. Agent readiness moves for
