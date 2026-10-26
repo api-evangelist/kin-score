@@ -16,6 +16,36 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+## 0.25.0 — 2026-10-23
+
+**Two agent-readiness dimensions ship from the 0.24.0 planned list.** Both were recorded there as
+`in build` with the roadmap issues that own them, and both are graded rather than binary.
+
+- **`pagination_ratio`** (5 points, roadmap#982) — the share of collection GETs that declare a
+  `page`/`limit`/`offset`/`cursor` parameter, a `Link` header or a `next`/`cursor` field. `paginated`
+  at 90% of collection GETs, `partial` at 50%, `na` where a provider has no collection GETs. An agent
+  that cannot page a collection either truncates silently or pulls everything. Measured on a
+  1,000-provider sample: 35% of providers with collection GETs paginate none of them.
+- **`operation_distinctiveness`** (3 points, roadmap#983, step 1) — the share of operations whose
+  summary is unique within its document after light normalisation. `distinct` at 98% unique, `mostly`
+  at 90%, `na` without two summarised operations. An agent choosing a tool by its description cannot
+  tell two identical summaries apart, and it is the cheapest agent-readiness failure to fix. Exact
+  and normalised matches only; embedding distance is a later step.
+
+**The glyph carries them at slots 20 and 21, appended.** `DIMENSIONS` in
+`kin-score/glyph/kin-glyph.js`, the badge Lambda's vendored copy
+(`apis-io-aws/lambdas/badge/kin-glyph.mjs`) and `DIM_ORDER` in
+`api-search/network/scripts/build_listings.py` all move from 19 entries to 21, in the same order.
+Appended rather than inserted at the position `scoring.yml` uses, for the reason recorded at slot 15:
+the trit string in `provider_bands.yml` carries no header naming its own order, so an encoding written
+before this lands decodes identically and the new slots read absent until rebuilt. `operation_distinctiveness`
+grades `mostly` at 0.5, so `mostly` joins `PARTIAL_GRADES` in all three files — without it `rayState()`
+falls through to `full` and half credit would draw a ray identical to full credit.
+
+**Score movement is not yet measured.** The catalog rebuild that would quantify it was blocked by the
+rubric-record gate this entry closes; the published-score delta belongs here once a full rebuild has run
+against it.
+
 ## 0.24.0 — 2026-10-15
 
 **Classifier fix 2026-10-18 — no rubric change (roadmap#956).** The OpenAPI provenance reader treated any
