@@ -103,6 +103,9 @@ export const DIMENSIONS = [
   { id: 'dynamic_client_registration', label: 'Registration Without a Human' },
   // Slot 19, appended 0.13.0 (roadmap#123).
   { id: 'agentic_commerce', label: 'Agentic Commerce Surface' },
+  // Slots 20-21, appended 0.25.0 (roadmap#982, #983) -- same append-only rule as slot 15.
+  { id: 'pagination_ratio', label: 'Pagination' },
+  { id: 'operation_distinctiveness', label: 'Distinct Operations' },
 ];
 
 /* Grades that mean PARTIAL credit rather than full. 0.6 made seven of the
@@ -128,6 +131,10 @@ export const PARTIAL_GRADES = new Set([
   'served',
   // 0.13.0 (roadmap#123) — agentic_commerce `platform` at 0.25.
   'platform',
+  // 0.25.0 (roadmap#983) -- operation_distinctiveness `mostly` at 0.5. `distinct` (1.0) and
+  // pagination's `paginated` (1.0) are deliberately absent: full credit draws a full ray.
+  // pagination's own 0.5 tier reuses `partial`, already above.
+  'mostly',
 ]);
 
 /* off | partial | full — from a bool, a grade string, or a trit char. */
