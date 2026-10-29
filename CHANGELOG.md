@@ -16,6 +16,17 @@ changelog and the snapshots here are the canonical public record.
 > scores straight from 0.9.1 to 0.11.0. Anything scored or quoted before that date is on the
 > older rubric.
 
+
+## Market layer — design signed off, 2026-10-29
+
+Not a rubric version: the Market layer is a standalone, unweighted block ([`MARKET-LAYER.md`](MARKET-LAYER.md)).
+Kin signed off draft 1 as a design, with three edits:
+- **Position labels are provisional,** `undeclared` included, on the same terms as the depth number.
+- **The network-directory weight is settled at 0.9.** The two overlapping rows are merged into one.
+- **Section 9 names the live correction path:** apis.io `report_correction` and `dispute_finding`.
+
+No provider number moves; the layer carries no weight until it has been stable across several weekly releases.
+
 ## 0.25.0 — 2026-10-22
 
 **Reader fix 2026-10-24 — no rubric change (roadmap#1002).** `dry_run_mode` now also reads a BOOLEAN

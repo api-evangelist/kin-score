@@ -1,6 +1,7 @@
 # The Kin Score Market layer: design
 
-Status: draft 1, 2026-10-12. Provisional and unweighted; not part of the composite or agent readiness.
+Status: draft 1, 2026-10-12; design signed off by Kin 2026-10-29. Provisional and unweighted; not part of the
+composite or agent readiness.
 Introduced in https://apievangelist.com/2026/10/12/the-kin-score-is-getting-a-third-dimension-the-market/
 Changes land only on a weekly release and are recorded in the CHANGELOG.
 
@@ -58,9 +59,8 @@ Every point traces through a deterministic chain we can show:
 | Evidence | Weight | Example |
 |---|---|---|
 | regulator register | 1.0 | listed in Australia's CDR Register, Open Finance Brasil, UK OBL directory |
-| network directory | 0.9 | listed by a health information network itself (TEFCA RCE, CommonWell) |
 | contract | 1.0 | named in a partner's spec (a payment-method, network or carrier enum) |
-| standard / network directory | 0.9 | listed by a standards body or health network itself (CAMARA, TEFCA RCE, CommonWell) |
+| standard / network directory | 0.9 | listed by a standards body or health network itself (CAMARA, TEFCA RCE, CommonWell). Signed off 2026-10-29: kept below a regulator register because the body maintains its own list |
 | own contract | 0.8 | declared in the provider's own spec (a channel enum it routes to) |
 | partner-built | 0.9 | a partner's app in the provider's marketplace |
 | provider-built | 0.8 | a connector the provider built and lists |
@@ -106,6 +106,9 @@ against platforms, aggregators against aggregators.
 | list | >= 60% own-page claims | a long list on its own page, mostly unevidenced |
 | mixed | none dominates | |
 | undeclared | nothing declared | no number |
+
+Position labels, `undeclared` included, are provisional on the same terms as the depth number: they
+change only on a weekly release, and a provider can change its own label by declaring integrations (section 9).
 
 ## 6b. Three kinds of marketplace
 
@@ -180,7 +183,9 @@ reported separately.
 - Publish a contract that names partners where they belong (payment-method and network enums,
   webhook event types).
 - Publish Arazzo for the workflows you support. We will validate it and use it where it beats ours.
-- Dispute any edge through the normal correction path. Every edge cites its evidence.
+- Dispute any edge, or a position label, through the apis.io correction path: `report_correction` (free,
+  no key) or `dispute_finding` on the MCP server, or the matching REST routes. Every edge cites its
+  evidence, and a person works each request.
 
 ## 10. Open questions before any weight
 
