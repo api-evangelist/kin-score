@@ -29,6 +29,8 @@ No provider number moves; the layer carries no weight until it has been stable a
 
 ## 0.26.0 — 2026-10-31
 
+> **Snapshot re-frozen 2026-11-01.** Four aliases added to the rule ruleset pointer type: `OpenLint`, `OpenLint Rules`, `OpenLintRules`, `OpenLintRuleset` all count as `SpectralRules`. No check, weight or band changed, and the version does not move.
+
 One change, to agent readiness only: **MCP Tool Quality** becomes a 6-point graded dimension (roadmap#994),
 after one release as an observed signal. Annotations 2, parameter descriptions 2, hazard hints 1, weight 1;
 credit rounded to the nearest quarter. Not applicable, and out of the denominator, with no live `tools/list`

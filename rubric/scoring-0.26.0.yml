@@ -66,6 +66,10 @@ aliases:
     - Spectral
     - Spectral Rules
     - SpectralRuleset
+    - OpenLint
+    - OpenLint Rules
+    - OpenLintRules
+    - OpenLintRuleset
     - Rules
   GitHubOrganization:
     - GitHubOrg
