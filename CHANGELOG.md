@@ -27,6 +27,18 @@ Kin signed off draft 1 as a design, with three edits:
 
 No provider number moves; the layer carries no weight until it has been stable across several weekly releases.
 
+## 0.26.0 — 2026-10-31
+
+One change, to agent readiness only: **MCP Tool Quality** becomes a 6-point graded dimension (roadmap#994),
+after one release as an observed signal. Annotations 2, parameter descriptions 2, hazard hints 1, weight 1;
+credit rounded to the nearest quarter. Not applicable, and out of the denominator, with no live `tools/list`
+capture or for a platform-authored server. Reads 641 live captures from 2026-10-27 (initialize and tools/list
+only, anonymous, no tool called).
+
+Modelled 2026-10-27 on 31,237 providers: composite unchanged; agent readiness 561 move (523 up, 38 down, median
++2.2, range -1.4 to +4.0); 42 agent-band changes, all upward; no re-cut. The catalog has grown to about 36,400
+since, so the numbers at the first write will differ.
+
 ## 0.25.0 — 2026-10-22
 
 **Reader fix 2026-10-24 — no rubric change (roadmap#1002).** `dry_run_mode` now also reads a BOOLEAN

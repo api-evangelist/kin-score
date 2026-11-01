@@ -271,18 +271,24 @@ denominator.
 | **Delegated User Identity** | 6 |  |
 | | | *partial credit:* served 1 · documented 0.5 |
 | **Registration Without a Human** | 6 |  |
+| **MCP Tool Quality** | 6 |  |
+| | | *partial credit:* full 1 · three_quarters 0.75 · half 0.5 · quarter 0.25 |
 | **Agent Skills** | 5 | Are operating instructions packaged, not inferred? |
 | **Protected Resource Metadata** | 5 |  |
 | | | *partial credit:* verified 1 · documented 0.5 |
 | **Agentic Commerce Well-Known Document** | 5 |  |
 | | | *partial credit:* self 1 · platform 0.25 |
+| **Pagination** | 5 |  |
+| | | *partial credit:* paginated 1 · partial 0.5 |
 | **Well-Known Catalog** | 4 | Is there an RFC 9727 `api-catalog` linkset? |
 | **Dry-Run / Simulate Mode** | 4 | Can a destructive operation be rehearsed before it commits? |
 | **Consent & Bot Identity** | 3 | AIPREF / Content-Signals / Web Bot Auth — the frontier signals. |
+| **Distinct Operations** | 3 |  |
+| | | *partial credit:* distinct 1 · mostly 0.5 |
 
-**19 dimensions, 139 points**, normalised to 0–100.
+**22 dimensions, 153 points**, normalised to 0–100.
 
-11 dimensions award **partial credit**: the multiplier beside each tier is applied to the dimension's points, so a tier at 0.25 on a 12‑point dimension earns 3. A dimension with no tiers listed is all‑or‑nothing.
+Fourteen dimensions award **partial credit**: the multiplier beside each tier is applied to the dimension's points, so a tier at 0.25 on a 12‑point dimension earns 3. A dimension with no tiers listed is all‑or‑nothing.
 <!-- kin-score:agent-dimensions:end -->
 
 **`reversibility_documented` is the 0.12 addition**, and it was preferred over a consequence
@@ -495,7 +501,7 @@ The rubric is a living argument and is versioned (`schema_version`). Published s
 in [`ROADMAP.md`](ROADMAP.md).
 
 <!-- kin-score:version:start -->
-Current: **0.25.0** — published 2026-10-22.
+Current: **0.26.0** — published 2026-10-15.
 <!-- kin-score:version:end -->
 
 A score is only interpretable against the rubric that produced it, so `schema_version` is stamped on
