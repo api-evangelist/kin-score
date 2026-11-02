@@ -53,16 +53,23 @@ ${src}
   }
 
   /* Dimensions accept a keyed object or a COMPACT TRIT STRING in DIMENSIONS
-     order:  '0' unsatisfied, '1' satisfied, '2' PARTIAL.  data-dims='11020120...'
+     order:  '0' unsatisfied, '1' satisfied, '2' PARTIAL, '3' NOT APPLICABLE.
+     data-dims='11020120...'
 
-     '2' is the 0.6 addition. '1' deliberately keeps its old meaning so an
-     encoding written before 0.6 still renders correctly rather than silently
-     demoting every satisfied dimension to a stub. Keyed objects may instead
-     carry the grade verbatim ('verified', 'documented', 'derived'), which is
-     what provider frontmatter does — rayState() normalizes either form. */
+     '2' is the 0.6 addition, '3' the 2026-11-02 one. '1' deliberately keeps its old
+     meaning so an encoding written before 0.6 still renders correctly rather
+     than silently demoting every satisfied dimension to a stub. Keyed objects
+     may instead carry the grade verbatim ('verified', 'documented', 'derived'),
+     which is what provider frontmatter does — rayState() normalizes either form.
+
+     THE ALPHABET HERE IS A GATE, NOT A FORMALITY. A trit string this regex
+     rejects is handed to parseJSONAttr instead, which fails on it and returns
+     nothing — so agent_dims comes back EMPTY and all 22 rays draw as
+     unsatisfied, on every page, with no error. Widen this in the same change as
+     any writer that adds a symbol. */
   function readDims(el) {
     const raw = el.getAttribute('data-dims');
-    if (raw && /^[012]+$/.test(raw.trim())) {
+    if (raw && /^[0-3]+$/.test(raw.trim())) {
       const bits = raw.trim(), out = {};
       for (let i = 0; i < DIMENSIONS.length; i++) out[DIMENSIONS[i].id] = bits.charAt(i);
       return out;

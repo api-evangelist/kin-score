@@ -158,7 +158,17 @@ function rayState(v) {
   if (v === true || v === 1 || v === '1') return 'full';
   if (v === false || v === 0 || v === '0' || v == null) return 'off';
   if (v === 2 || v === '2') return 'partial';
+  // NOT APPLICABLE is its own state as of 2026-11-02. The scorer writes `na` for a dimension
+  // that does not apply to a provider and the composite leaves it out of the denominator,
+  // but this function used to fall through to `return 'full'` for it -- so the badge drew
+  // full credit for a dimension nothing had measured, on 36,145 providers for
+  // mcp_tool_quality alone, 31,478 for pagination_ratio and 27,289 for
+  // operation_distinctiveness. `off` was not the fix: it renders identically to a failed
+  // dimension, which would have published a false negative about every one of them.
+  // '3' is the trit encoding; see _dim_trit() in build_listings.py.
+  if (v === 3 || v === '3') return 'na';
   const s = String(v).toLowerCase();
+  if (s === 'na') return 'na';
   if (PARTIAL_GRADES.has(s)) return 'partial';
   return 'full';   // 'verified', 'conformant', 'first-party'
 }
@@ -320,7 +330,10 @@ function kinGlyph(p, opts = {}) {
       const state = rayState(raw);
       // A partial ray reaches 55% of the way out. Solid, so it still reads as a
       // ray; short, so the shortfall is visible without colour or opacity.
-      const reach = state === 'partial' ? 0.55 : 1;
+      // An `na` ray is shorter still AND dashed AND unfilled, so it reads as
+      // "nothing was claimed here" rather than as either credit or failure --
+      // the three other states are all solid or continuous.
+      const reach = state === 'partial' ? 0.55 : state === 'na' ? 0.40 : 1;
       const thisTipR = baseR + (tipR - baseR) * reach;
       const px = Math.cos(a), py = Math.sin(a), nx = -py, ny = px;
       const pts = [
@@ -329,18 +342,26 @@ function kinGlyph(p, opts = {}) {
         [cx + px * baseR - nx * halfW, cy + py * baseR - ny * halfW],
       ].map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' ');
 
-      const filled = state !== 'off';
+      const filled = state !== 'off' && state !== 'na';
       // The grade itself is the most useful thing the tooltip can say — "MCP
       // Server: derived" is a different fact from "MCP Server: satisfied", and
       // telling them apart is the entire point of 0.6.
-      const detail = typeof raw === 'string' && raw !== 'true'
-        ? raw
-        : (state === 'off' ? 'not satisfied' : 'satisfied');
+      const detail = state === 'na'
+        ? 'not applicable'
+        : typeof raw === 'string' && raw !== 'true'
+          ? raw
+          : (state === 'off' ? 'not satisfied' : 'satisfied');
 
       parts.push(
         `<polygon points="${pts}" ` +
-        (filled ? `fill="${rayCol}" stroke="${rayCol}" stroke-width="${(strokeW * 0.5).toFixed(2)}"`
-                : `fill="none" stroke="${C.rayOff}" stroke-width="${strokeW.toFixed(2)}"`) +
+        (filled
+          ? `fill="${rayCol}" stroke="${rayCol}" stroke-width="${(strokeW * 0.5).toFixed(2)}"`
+          : state === 'na'
+            // Dashes are scaled off `size`, never fixed px, so the state survives the
+            // 44px row glyph and the 1200px card alike.
+            ? `fill="none" stroke="${C.rayOff}" stroke-width="${(strokeW * 0.7).toFixed(2)}"` +
+              ` stroke-dasharray="${(size * 0.016).toFixed(2)} ${(size * 0.013).toFixed(2)}"`
+            : `fill="none" stroke="${C.rayOff}" stroke-width="${strokeW.toFixed(2)}"`) +
         ` stroke-linejoin="round" data-kind="ray" data-label="${esc(d.label)}" ` +
         `data-on="${filled}" data-state="${state}">` +
         `<title>${esc(d.label)}: ${esc(detail)}</title></polygon>`);
@@ -406,16 +427,23 @@ function kinGlyph(p, opts = {}) {
   }
 
   /* Dimensions accept a keyed object or a COMPACT TRIT STRING in DIMENSIONS
-     order:  '0' unsatisfied, '1' satisfied, '2' PARTIAL.  data-dims='11020120...'
+     order:  '0' unsatisfied, '1' satisfied, '2' PARTIAL, '3' NOT APPLICABLE.
+     data-dims='11020120...'
 
-     '2' is the 0.6 addition. '1' deliberately keeps its old meaning so an
-     encoding written before 0.6 still renders correctly rather than silently
-     demoting every satisfied dimension to a stub. Keyed objects may instead
-     carry the grade verbatim ('verified', 'documented', 'derived'), which is
-     what provider frontmatter does — rayState() normalizes either form. */
+     '2' is the 0.6 addition, '3' the 2026-11-02 one. '1' deliberately keeps its old
+     meaning so an encoding written before 0.6 still renders correctly rather
+     than silently demoting every satisfied dimension to a stub. Keyed objects
+     may instead carry the grade verbatim ('verified', 'documented', 'derived'),
+     which is what provider frontmatter does — rayState() normalizes either form.
+
+     THE ALPHABET HERE IS A GATE, NOT A FORMALITY. A trit string this regex
+     rejects is handed to parseJSONAttr instead, which fails on it and returns
+     nothing — so agent_dims comes back EMPTY and all 22 rays draw as
+     unsatisfied, on every page, with no error. Widen this in the same change as
+     any writer that adds a symbol. */
   function readDims(el) {
     const raw = el.getAttribute('data-dims');
-    if (raw && /^[012]+$/.test(raw.trim())) {
+    if (raw && /^[0-3]+$/.test(raw.trim())) {
       const bits = raw.trim(), out = {};
       for (let i = 0; i < DIMENSIONS.length; i++) out[DIMENSIONS[i].id] = bits.charAt(i);
       return out;

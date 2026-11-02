@@ -190,11 +190,19 @@ The dimension string was a bitstring through 0.5.1 and is a **trit string** from
 | `0` | not satisfied |
 | `1` | satisfied, full credit |
 | `2` | **partial credit** — graded on evidence (`documented`, `partial`) or on authorship (`derived`, `mixed`) |
+| `3` | **not applicable** — the dimension does not apply to this provider and is excluded from the agent-readiness denominator (2026-11-02) |
 
 `1` deliberately keeps its old meaning, so an encoding written before 0.6 still renders correctly
 rather than silently demoting every satisfied dimension to a stub. Keyed objects may instead carry the
 grade verbatim — `"mcp_server": "derived"`, which is what provider frontmatter emits — and
 `rayState()` normalizes either form.
+
+**Widening this alphabet is a two-sided change, and the reader has to go first.** `readDims()` in
+`build.mjs` validates the string against a regex, and a trit string it rejects is handed to the JSON
+parser instead — which fails on it, leaves `agent_dims` empty, and draws *every* ray as unsatisfied,
+on every page, with no error anywhere. So a new symbol ships in this order: widen the regex,
+rebuild `dist/`, re-vendor all consuming sites, let the asset cache (1h) rotate, and only then let a
+writer emit it. `3` was added that way.
 
 ## Known limitations
 
