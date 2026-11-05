@@ -27,6 +27,26 @@ Kin signed off draft 1 as a design, with three edits:
 
 No provider number moves; the layer carries no weight until it has been stable across several weekly releases.
 
+## 0.27.0 — 2026-11-06
+
+Three changes. No provider goes down.
+
+- **First-party share of an OpenAPI corpus** (contract quality). A spec stamped `method: harvested` against the
+  provider's own source was credited like an unmarked one, and a corpus with a few derived specs slid down from
+  0.90. The first-party share now lifts the credit from 0.90 toward 1.00. Derived, scaffold and platform-generated
+  corpora are unchanged.
+- **`overlay_published` becomes graded** (contract governance, roadmap#809). A hosted OpenAPI Overlay still earns
+  the full 4 points. No Overlay, but public evidence of a CI-enforced bundling pipeline (a Redocly, Fern or Speakeasy
+  config run by a `pull_request` workflow in the provider's own GitHub org), earns half. Spectral and SDK generators
+  do not count. 27 providers carry the evidence, probed read-only 2026-10-27.
+- **x402 counts as agentic commerce** (agent readiness). A live x402 payment challenge earns `agentic_commerce`,
+  graded like UCP and ACP: `self` on the provider's own domain, `platform` on a vendor's. The probe requires a 402
+  with protocol evidence, refuses catch-all hosts, and pays nothing. 9 adopters of 132 tagged x402, 2026-10-28.
+
+Modelled 2026-11-04 on the full catalog of 37,880 providers, same pages under both rubrics. Composite: 2,213 move,
+all up, median +1.1, at most +2.2; 155 band changes, all upward. Agent readiness: 8 move, all up, at most +3.9; no
+agent band changes. No re-cut.
+
 ## 0.26.0 — 2026-10-31
 
 > **Snapshot re-frozen 2026-11-01.** Four aliases added to the rule ruleset pointer type: `OpenLint`, `OpenLint Rules`, `OpenLintRules`, `OpenLintRuleset` all count as `SpectralRules`. No check, weight or band changed, and the version does not move.
