@@ -106,14 +106,34 @@ export function extract(file) {
 /* Delisted providers must never get a generated share card. Read as text —
    pulling in a YAML dependency for a 12-entry allow/deny list is not worth it,
    and the file's shape is a flat list of `- slug:` entries. */
-function delistedSlugs() {
-  if (!fs.existsSync(DELISTED)) return new Set();
+export function delistedSlugs(file = DELISTED) {
+  if (!fs.existsSync(file)) return new Set();
   const out = new Set();
-  for (const line of fs.readFileSync(DELISTED, 'utf8').split('\n')) {
+  for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
     const m = /^\s*-?\s*slug:\s*(.+)$/.exec(line);
     if (m) out.add(unquote(m[1]));
   }
   return out;
+}
+
+/* WITHDRAW a delisted provider's card (roadmap#1152). Skipping a delisted slug at render
+   time is not enough: a card rendered while the provider was still listed stays in the
+   output directory and the manifest forever, emit-index.mjs keeps indexing it from the
+   PNGs on disk, and upload-cards.sh keeps serving it. 146 delisted providers -- eleven of
+   them `restricted`, whose whole posture is "unrated" -- still had a published score card
+   after their takedowns. Returns the withdrawn slugs; removes nothing when dryRun. */
+export function withdrawDelisted(out, manifest, skipped, dryRun = false) {
+  const withdrawn = [];
+  for (const slug of [...skipped].sort()) {
+    const png = path.join(out, `${slug}.png`);
+    const onDisk = fs.existsSync(png);
+    if (!onDisk && !(manifest.cards && manifest.cards[slug])) continue;
+    withdrawn.push(slug);
+    if (dryRun) continue;
+    if (onDisk) fs.unlinkSync(png);
+    if (manifest.cards) delete manifest.cards[slug];
+  }
+  return withdrawn;
 }
 
 const fingerprint = (r) => crypto.createHash('sha1').update(JSON.stringify([
@@ -197,6 +217,16 @@ if (IS_ENTRY) {
   manifest.cards ||= {};
 
   fs.mkdirSync(out, { recursive: true });
+
+  const withdrawn = withdrawDelisted(out, manifest, skipped, dryRun);
+  if (withdrawn.length) {
+    console.log(`${dryRun ? 'would withdraw' : 'withdrew'} ${withdrawn.length} delisted card(s): ` +
+      withdrawn.slice(0, 20).join(', ') + (withdrawn.length > 20 ? ', ...' : ''));
+    if (!dryRun) {
+      manifest.count = Object.keys(manifest.cards).length;
+      fs.writeFileSync(MANIFEST, JSON.stringify(manifest, null, 2) + '\n');
+    }
+  }
 
   if (reconcile) {
     let stamped = 0, absent = 0;
