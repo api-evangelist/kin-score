@@ -457,6 +457,50 @@ def source_drift(version, rubric):
     return None
 
 
+PARITY = os.path.join(ROOT, "parity", "external-checklists.yml")
+PARITY_STATUSES = {"scored", "measured", "excluded", "todo"}
+
+
+def _ids(node, out):
+    if isinstance(node, dict):
+        if isinstance(node.get("id"), str):
+            out.add(node["id"])
+        for v in node.values():
+            _ids(v, out)
+    elif isinstance(node, list):
+        for v in node:
+            _ids(v, out)
+    return out
+
+
+def parity_problems(version, rubric):
+    """roadmap#1164 -- every external checklist item has a decision, reviewed for THIS release."""
+    if not os.path.isfile(PARITY):
+        return ["parity/external-checklists.yml is missing"]
+    with open(PARITY, encoding="utf-8") as fh:
+        doc = yaml.safe_load(fh) or {}
+    out = []
+    if str(doc.get("reviewed_for")) != str(version):
+        out.append(f"reviewed_for is {doc.get('reviewed_for')}, rubric is {version}: re-read each scanner's check list "
+                   f"and update the decisions before releasing")
+    ids = _ids(rubric, set())
+    for cl in doc.get("checklists") or []:
+        for c in cl.get("checks") or []:
+            name = f"{cl.get('name')}: {c.get('check')}"
+            st = c.get("status")
+            if st not in PARITY_STATUSES:
+                out.append(f"{name}: status {st!r} is not one of {sorted(PARITY_STATUSES)}")
+            elif st == "scored":
+                missing = [i for i in c.get("rubric") or [] if i not in ids]
+                if not c.get("rubric") or missing:
+                    out.append(f"{name}: scored under {missing or 'nothing'} -- not in rubric {version}")
+            elif st in ("measured", "excluded") and not c.get("why"):
+                out.append(f"{name}: {st} needs a why")
+            elif st == "todo" and not c.get("issue"):
+                out.append(f"{name}: todo needs the issue that decides it")
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser(description="Align Kin Score documents with the published rubric.")
     ap.add_argument("--check", action="store_true", help="report drift without writing; exit 1 if any")
@@ -495,6 +539,9 @@ def main():
                 fh.write(after)
             written.append(doc["label"])
             print(f"  wrote {doc['label']}")
+
+    for msg in parity_problems(version, rubric):
+        problems.append(("parity", "parity/external-checklists.yml", msg))
 
     drift = source_drift(version, rubric)
     if drift:

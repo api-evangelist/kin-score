@@ -27,6 +27,97 @@ Kin signed off draft 1 as a design, with three edits:
 
 No provider number moves; the layer carries no weight until it has been stable across several weekly releases.
 
+## 0.28.1 — 2026-11-20
+
+Restores what the 0.28.0 candidate carried and the 0.28.0 release dropped, and settles the measured-standards
+and agent-discovery questions in one release (roadmap#1155, #1160, #1161, #1162, #1163, #1164).
+
+**Why a point release carries this much.** 0.28.0 shipped as the business-building-blocks release, built from
+the live rubric rather than the 0.28.0 candidate, so the candidate's yml-defined entries -- the onboarding
+descriptor dimension and the POST-lookup vocabulary -- never reached the catalog, while its `R28` code paths
+did. The scorer read `lookup_posts` only when present, so that fix was silently off.
+
+- **Onboarding Descriptor Published** (agent readiness, 3 pts) is back (roadmap#987). 39 providers publish one.
+- **A POST lookup is not a write** again: `write_classification.lookup_posts` (api-evangelist/ipgeolocation#1).
+- **Well-Known Catalog** also credits a served AI Catalog (`/.well-known/ai-catalog.json` with entries) or MCP
+  Server Card, by the same served-document rule as everything else (roadmap#1050, #721). 2,034 -> 3,172.
+- **Consent & Bot Identity is graded on deployment** (roadmap#1051): a served Web Bot Auth key directory earns
+  full credit, a robots.txt Content-Signal / Content-Usage line half, an `apis.yml` type claim nothing. 109
+  claim-credited providers before; 207 deployed and 2,996 signal now.
+- **DNS-AID** (`dns_aid_index`, 2 pts) and **markdown content negotiation** (`markdown_negotiation`, 1 pt) are
+  scored ADDITIVE ONLY: absence is `na`, so nobody is rescaled down by a dimension that did not exist yesterday
+  (roadmap#1161, #1163). 259 and 4,376 providers.
+- **llms.txt and Content-Signal are re-probed per provider** on every profiling wave and dated, instead of only by
+  an occasional census -- a provider that shipped one after 2026-10-31 scored 0 (roadmap#1162).
+- **Stable Error Semantics follows a shared error response** (`components/responses`); valid, arguably better
+  OpenAPI that scored zero (roadmap#1160). Verified 4,291 -> 6,154.
+- **External-checklist parity** (roadmap#1164): [`parity/external-checklists.yml`](parity/external-checklists.yml)
+  maps all 22 isitagentready checks to a decision; `sync-rubric-docs.py --check` fails on an unmapped one.
+
+**Modelled 2026-11-20**, 41,636 providers, same pages under both rubrics: composite 8,561 up, none down, 438 band
+changes all upward; agent readiness 7,181 up and 14,661 down (median -0.3, worst -3.2 -- the onboarding
+denominator), 1,088 band changes, 870 upward. No band re-cut.
+
+Not in it: the #1061 aggregator rule, which needs its own measurement.
+
+## 0.28.0 — 2026-11-13
+
+Eight new checks, all of them the same idea: the facts as DATA, not as a page. Most of the catalog
+goes down, because the denominator grew.
+
+Access clarity and operational transparency were scored almost entirely on whether a provider
+published a *page* — terms, privacy, an SLA, a deprecation notice. A page is for a person. An agent
+that has to agree to terms, plan around a retirement, or know whether it may train on a response
+cannot read one. These eight score the same facts as API Commons documents.
+
+- **Deprecation policy as data** (operational transparency, 2 pts). Notice period, support window and
+  channels, quoted from the provider's own page. An agent can plan around a retirement only if it can
+  read the schedule.
+- **Service levels as data** (operational transparency, 2 pts). An SLA4OAI document read from the
+  provider's own SLA or status page. Synthetic documents never count (roadmap#1086).
+- **Terms as data** (access clarity, 2 pts). An ODRL profile: permitted and prohibited use, caching,
+  redistribution, notice periods. The page alone remains `terms_of_service`; this rewards what an
+  agent can read *before* it agrees.
+- **Data processing as data** (access clarity, 2 pts). A W3C DPV profile: data categories, retention,
+  residency, subprocessors, DPA.
+- **Compliance attestations as data** (access clarity, 2 pts). Framework, scope, period and how to get
+  the report, quoted from the trust or compliance page.
+- **Eligibility as data** (access clarity, 1 pt). Countries served and excluded, entity types,
+  verification required.
+- **AI usage preferences as data** (access clarity, 1 pt). The provider's stated position on AI
+  training, inference and agent use, aligned with IETF AIPREF.
+- **Data license as data** (access clarity, 1 pt). The license on what the API returns, SPDX where the
+  page names one.
+
+**The denominator grew and that is why scores fall**: access clarity 38 → 47 points, operational
+transparency 38 → 42. Nothing was removed and no weight was re-cut, so a provider publishing none of
+these scores lower today on exactly the artifacts it had yesterday. `access_clarity` moved by a factor
+of 0.810 catalog-wide against a predicted 38/47 = 0.809 — the facet was diluted, not re-judged. The
+`regulatory` facet moves with it because the composite scores it against the regime mean, not the
+catalog (`composite = base + 0.15 * (reg - regime_mean)`), so a catalog-wide shift moves the reference
+point.
+
+Modelled 2026-11-13 on the full catalog of 39,537 providers, same pages under both rubrics. Composite:
+36,422 move — 691 up, 35,731 down — median −1.6, at most −9.1 and +2.6; mean 21.95 → 20.34, median
+15.60 → 13.80. 4,562 band changes, 4,553 of them downward: exemplar 901 → 533, strong 2,269 → 1,912,
+emerging 10,058 → 9,070, minimal 15,487 → 17,338. Agent readiness: 2,563 move — 493 up, 2,070 down —
+median −2.9, at most −10.5 and +5.0; 354 band changes, including 196 from agent-aware to human-only.
+No band is re-cut: the ladder measures the same thing and the catalog has moved down it.
+
+**What actually shipped is higher than that, because the catalog also moved.** The figures above
+isolate the rubric: same pages, both rubrics, nothing else varying. The 2026-11-13 build that
+published 0.28.0 also hydrated the store, re-split 58 providers, canonicalised tags at rest and
+picked up providers the model did not hold (41,125 scored against the model's 39,537). Those gains
+more than offset the denominator: the published distribution is exemplar 980, strong 2,186,
+developing 4,732, emerging 11,246, thin 6,514, minimal 15,467 — exemplar ABOVE where 0.27.0 had it.
+So a provider's published `delta` compares two different catalogs under two different rubrics and
+will not match the rubric-only movement quoted here. Both numbers are real; they answer different
+questions.
+
+Adoption is real but thin, which is the argument for scoring these rather than tracking them as
+observed signals: 1,984 providers earn at least one of the new access-clarity checks and 2,870 at
+least one of the new operational-transparency checks.
+
 ## 0.27.0 — 2026-11-06
 
 Three changes. No provider goes down.

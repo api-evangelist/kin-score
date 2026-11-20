@@ -11,6 +11,8 @@ version bump so the score stays citable and its history auditable. See [`../CHAN
 
 | Version | File | Notes |
 |---------|------|-------|
+| 0.28.1 | [`scoring-0.28.1.yml`](scoring-0.28.1.yml) | **What 0.28.0 dropped, plus agent discovery.** Onboarding descriptor and the POST-lookup rule restored; AI Catalog / MCP Server Card credited; consent graded on deployment; DNS-AID and markdown negotiation additive-only; llms.txt re-probed per provider; shared error responses followed. Composite 8,561 up, none down; agent 7,181 up / 14,661 down (median -0.3). |
+| 0.28.0 | [`scoring-0.28.0.yml`](scoring-0.28.0.yml) | **The facts as data.** Eight business-building-block checks (terms, privacy, attestations, eligibility, AI preferences, data license, deprecation schedule, SLA4OAI); the denominator grew, most of the catalog went down. (Frozen 2026-11-13, committed 2026-11-20.) |
 | 0.27.0 | [`scoring-0.27.0.yml`](scoring-0.27.0.yml) | **First-party contracts pay.** The first-party share of an OpenAPI corpus lifts its credit from 0.90 toward 1.00; `overlay_published` becomes graded, half credit for a public CI-enforced bundling pipeline (roadmap#809); a live x402 challenge earns agentic commerce. 2,213 composites up, none down, 155 band changes all upward; 8 agent scores up. |
 | 0.26.0 | [`scoring-0.26.0.yml`](scoring-0.26.0.yml) | **MCP Tool Quality becomes scored.** A 6-point graded agent-readiness dimension, promoted from the 0.25 observed signal (roadmap#994). Composite unchanged. |
 | 0.25.0 | [`scoring-0.25.0.yml`](scoring-0.25.0.yml) | Published 2026-10-22. See the [CHANGELOG](../CHANGELOG.md). MCP Tool Quality ships as an observed signal. |

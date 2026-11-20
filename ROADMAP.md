@@ -15,6 +15,15 @@ has shipped.
 
 ---
 
+## Status 2026-11-20 — 0.28.1: the dropped candidate entries, and agent discovery
+
+Shipped: roadmap#1155 (onboarding descriptor + lookup_posts restored; AI Catalog / MCP card credit; consent graded
+on deployment), #1160, #1161, #1162, #1163, #1164 (see CHANGELOG). Next:
+- **#1061 aggregator rule** -- an identity well-known document credits only on the Website's registrable domain;
+  measure how many legitimate providers serve their API elsewhere first.
+- **Link headers** (RFC 8288 to an api-catalog) -- the one `todo` in the parity table; probe, then decide.
+- **Auth.md, ARD, Poppy** stay measured-only until a specification stabilises and adoption is non-trivial.
+
 ## Status 2026-10-15 — 0.24.0 published, the first weekly release
 
 Shipped: #794, #795/#791, #797, #942, #943 (see CHANGELOG). Scores land with the Friday build.

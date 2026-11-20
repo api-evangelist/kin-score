@@ -1,0 +1,44 @@
+# External agent-readiness checklists vs the Kin Score rubric (roadmap#1164).
+#
+# Every check an outside scanner tests providers on gets a decision here, every release:
+#   scored    -- earned under these rubric check / dimension ids (must exist in the snapshot)
+#   measured  -- probed and published as adoption numbers, deliberately not scored (say why)
+#   excluded  -- not a provider-side API signal we measure (say why)
+#   todo      -- not decided yet; must name the issue that decides it
+# `reviewed_for` must equal the newest rubric snapshot: bin/sync-rubric-docs.py --check fails otherwise, so a
+# release cannot ship without someone re-reading the scanner's list. DNS-AID sat in this list for weeks before
+# it reached the rubric (#1161); that is what this file exists to stop.
+reviewed_for: 0.28.1
+reviewed_on: '2026-11-20'
+checklists:
+  - name: Cloudflare Is It Agent Ready
+    url: https://isitagentready.com/
+    source_note: 22 checks, read from the page's "Customize which checks to run" list on 2026-11-20 (display names;
+      the page publishes no identifiers)
+    checks:
+      - {check: robots.txt, status: measured, by: [probe-agent-docs.py robots], why: 'presence alone is not an agent signal; its Content-Signal / Content-Usage lines are scored under Content Signals'}
+      - {check: Sitemap, status: excluded, why: a crawl aid for web pages, not an API or agent surface}
+      - {check: Link headers, status: todo, issue: 'roadmap#1164', why: 'RFC 8288 Link to an api-catalog (RFC 9727 allows it) is a legitimate discovery route; needs a probe before a decision'}
+      - {check: DNS for AI Discovery (DNS-AID), status: scored, rubric: [dns_aid_index]}
+      - {check: Markdown negotiation, status: scored, rubric: [markdown_negotiation]}
+      - {check: AI bot rules, status: measured, why: 'robots.txt user-agent rules for AI crawlers govern crawling a site, not an agent calling an API; recorded with the robots probe, not scored'}
+      - {check: Content Signals, status: scored, rubric: [consent_identity], grade: signal}
+      - {check: Web Bot Auth, status: scored, rubric: [consent_identity], grade: deployed}
+      - {check: API Catalog, status: scored, rubric: [well_known_catalog, well_known_published]}
+      - {check: OAuth discovery, status: scored, rubric: [dynamic_client_registration, delegated_identity]}
+      - {check: OAuth Protected Resource, status: scored, rubric: [protected_resource_metadata]}
+      - {check: Auth.md, status: measured, why: 'no adopters measured in the catalog yet and no stable specification; measure first (decided 2026-11-20, roadmap#1164)'}
+      - {check: MCP Server Card, status: scored, rubric: [well_known_catalog, mcp_server]}
+      - {check: A2A Agent Card, status: scored, rubric: [agent_card]}
+      - {check: Agent Skills, status: scored, rubric: [agent_skills]}
+      - {check: WebMCP, status: scored, rubric: [webmcp]}
+      - {check: ARD manifest, status: measured, why: 'referenced by the pipeline, single-digit adoption; measure until a spec stabilises (decided 2026-11-20, roadmap#1164)'}
+      - {check: Personal Agent Protocol (Poppy), status: measured, by: [harvest-well-known poppy.json], why: 'probed since October; near-zero adoption; consumer-agent protocol rather than a provider API signal (decided 2026-11-20)'}
+      - {check: x402, status: scored, rubric: [agentic_commerce]}
+      - {check: MPP, status: excluded, why: 'Payment HTTP Auth is negotiated in-band per request; the rubric deliberately scores no in-band payment scheme except a live x402 challenge (see agentic_commerce)'}
+      - {check: UCP, status: scored, rubric: [agentic_commerce]}
+      - {check: ACP, status: scored, rubric: [agentic_commerce]}
+  - name: Kin Score extras the scanner does not list
+    checks:
+      - {check: llms.txt, status: scored, rubric: [llms_txt_published]}
+      - {check: docs AI assistant / llms-full.txt / per-page .md / open-in-Claude links, status: measured, why: 'no standard to measure against yet; adoption measured only (roadmap#1164)'}

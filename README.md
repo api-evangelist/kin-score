@@ -76,12 +76,12 @@ weights sum to 1.0 and are the argument the score is making about what matters.
 |-------|:------:|:------:|----------------------|
 | **Contract Quality** | 0.25 | 42 | Is there a machine-readable contract at all — in any format — and can you call it? |
 | **Developer Ergonomics** | 0.20 | 13 | Can a human get started — docs, portal, SDKs, auth clarity, a real description? |
-| **Access Clarity** | 0.20 | 9 |  |
-| **Operational Transparency** | 0.13 | 9 | Will it tell you when it changes or breaks? |
+| **Access Clarity** | 0.20 | 15 |  |
+| **Operational Transparency** | 0.13 | 11 | Will it tell you when it changes or breaks? |
 | **Contract Governance** | 0.12 | 6 |  |
 | **Discoverability** | 0.10 | 15 | Can an agent find you *without being told where to look*? |
 
-**94 base checks.** Plus 41 more in the two conditional facets, for 135 in total.
+**102 base checks.** Plus 41 more in the two conditional facets, for 143 in total.
 <!-- kin-score:facets:end -->
 
 Checks on artifact types a provider doesn't ship are **N/A** — excluded from that facet's
@@ -283,12 +283,16 @@ denominator.
 | **Well-Known Catalog** | 4 | Is there an RFC 9727 `api-catalog` linkset? |
 | **Dry-Run / Simulate Mode** | 4 | Can a destructive operation be rehearsed before it commits? |
 | **Consent & Bot Identity** | 3 | AIPREF / Content-Signals / Web Bot Auth — the frontier signals. |
+| | | *partial credit:* deployed 1 · signal 0.5 |
 | **Distinct Operations** | 3 |  |
 | | | *partial credit:* distinct 1 · mostly 0.5 |
+| **Onboarding Descriptor Published** | 3 |  |
+| **DNS-AID Agent Index** | 2 |  |
+| **Markdown Content Negotiation** | 1 |  |
 
-**22 dimensions, 153 points**, normalised to 0–100.
+**25 dimensions, 159 points**, normalised to 0–100.
 
-Fourteen dimensions award **partial credit**: the multiplier beside each tier is applied to the dimension's points, so a tier at 0.25 on a 12‑point dimension earns 3. A dimension with no tiers listed is all‑or‑nothing.
+Fifteen dimensions award **partial credit**: the multiplier beside each tier is applied to the dimension's points, so a tier at 0.25 on a 12‑point dimension earns 3. A dimension with no tiers listed is all‑or‑nothing.
 <!-- kin-score:agent-dimensions:end -->
 
 **`reversibility_documented` is the 0.12 addition**, and it was preferred over a consequence
@@ -501,7 +505,7 @@ The rubric is a living argument and is versioned (`schema_version`). Published s
 in [`ROADMAP.md`](ROADMAP.md).
 
 <!-- kin-score:version:start -->
-Current: **0.27.0** — published 2026-11-06.
+Current: **0.28.1** — published 2026-11-06.
 <!-- kin-score:version:end -->
 
 A score is only interpretable against the rubric that produced it, so `schema_version` is stamped on
