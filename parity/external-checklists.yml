@@ -8,8 +8,8 @@
 # `reviewed_for` must equal the newest rubric snapshot: bin/sync-rubric-docs.py --check fails otherwise, so a
 # release cannot ship without someone re-reading the scanner's list. DNS-AID sat in this list for weeks before
 # it reached the rubric (#1161); that is what this file exists to stop.
-reviewed_for: 0.28.1
-reviewed_on: '2026-11-20'
+reviewed_for: 0.29.0
+reviewed_on: '2026-11-23'
 checklists:
   - name: Cloudflare Is It Agent Ready
     url: https://isitagentready.com/
