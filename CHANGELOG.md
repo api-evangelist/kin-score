@@ -27,6 +27,43 @@ Kin signed off draft 1 as a design, with three edits:
 
 No provider number moves; the layer carries no weight until it has been stable across several weekly releases.
 
+## 0.29.0 — 2026-11-23
+
+Seven scorer defects, each a place where the code credited something other than what the rubric says
+(roadmap#1166-#1172). Two of them were also rubric decisions, and are stated as such.
+
+- **Examples are keys, not words** (roadmap#1166). Request/Response Examples (agent readiness, 7 pts) and Examples
+  present (contract quality, 4 pts) counted an operation whenever the text of its request or responses contained
+  "example": "for example" in a description counted, and an example on a shared component schema did not. Both now
+  count an `example`/`examples` key on a media type, a parameter, or the schema it references, after one level of
+  local `$ref` (components/examples included). 2,390 providers' examples grade rises and 863 fall.
+- **Typed Event Surface is graded** (roadmap#1167, decided). A Webhooks docs link earned the same 6 points as an
+  AsyncAPI document. A contract (AsyncAPI, or webhooks/callbacks in the as-published OpenAPI) is now `verified`; a
+  docs link alone is `documented` at 0.25, the same credit Request/Response Examples gives a docs link. 341
+  providers move to `documented`. Authorship still applies, published as `score.provenance.events`.
+- **OpenAPI versions are a ladder** (roadmap#1169, decided). openapi_3_0 / 3_1 / 3_2 were exclusive, so moving
+  from 3.1 to 3.2 earned nothing while keeping a stale 3.1 copy beside the 3.2 one earned both. Each check now asks
+  "at or above", read from the version the provider published.
+- **AsyncAPI 3.0 read correctly** (roadmap#1171). `channels.<x>.messages` is a map in 3.0, and every message failed
+  the payload test, so a correct 3.0 document scored about half. A server's own `security` now counts for Server
+  security schemes. Publishes an AsyncAPI spec (12 pts) is n/a for a provider with no event surface, as the
+  section always said; it had stayed in every denominator.
+- **Contact-us is not published pricing** (roadmap#1168). Pricing published (4 pts) no longer credits a pointer to a
+  contact, demo or quote page, nor a provider whose structured plans all read contact-for-price; 338 providers move.
+  plan_count is unchanged.
+- **An idempotency key is not a match key** (roadmap#1170). The caller declares the key to match on (upsert, 10 pts)
+  no longer credits `idempotency_key`, and now detects the alternate-key path shape (Salesforce's
+  `/sobjects/{OBJECT}/{FIELD}/{value}`) when the operation names the key. 218 providers lose it, 1 gains it.
+- **A self-hosted APIs.json must be served** (roadmap#1172). Self-hosts the APIs.json index (4 pts) read only the
+  host of apis.yml's url and fetched nothing. It now needs a parsing index at /apis.json or /.well-known/apis.json on
+  the provider's own host, probe-verified behind a negative control. 1,606 providers lose it, 160 gain it.
+
+**Modelled 2026-11-23 on 43,788 providers**, the same pages and the same upsert scan under both rubrics. Composite:
+15,616 move, 13,899 up and 1,717 down, at most +4.0 and -3.4; mean 22.08 -> 22.41, mostly the AsyncAPI presence
+check leaving the denominator of providers with no events. 1,275 band changes, 1,215 of them upward; exemplar 1,004
+-> 1,132. Agent readiness: 3,663 move, 2,412 up and 1,251 down; mean 13.19 -> 13.27; 545 band changes, 429 upward.
+**No band re-cut**: no band empties or swells, and the largest share move is exemplar 2.29% -> 2.59%.
+
 ## 0.28.1 — 2026-11-20
 
 Restores what the 0.28.0 candidate carried and the 0.28.0 release dropped, and settles the measured-standards

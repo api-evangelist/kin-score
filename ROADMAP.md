@@ -15,6 +15,15 @@ has shipped.
 
 ---
 
+## Status 2026-11-23 — 0.29.0: the scorer credits what the rubric says
+
+Shipped: roadmap#1166-#1172 -- seven places the code credited something other than the rubric's own words (see
+CHANGELOG). Two were decisions: a Webhooks docs link grades `documented`, and the OpenAPI version checks are a ladder.
+Next:
+- **The 15-in-994 agent-credit reader gap** -- `build_kin_facets.py` dim_credit disagrees with the scorer by ~1.5
+  points (and on zeroed headlines) for ~1.5% of providers, identically under 0.28.1; find the dimension.
+- **#1061 aggregator rule** and **Link headers** carry over from 0.28.1.
+
 ## Status 2026-11-20 — 0.28.1: the dropped candidate entries, and agent discovery
 
 Shipped: roadmap#1155 (onboarding descriptor + lookup_posts restored; AI Catalog / MCP card credit; consent graded
