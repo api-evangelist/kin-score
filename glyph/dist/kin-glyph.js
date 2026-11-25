@@ -116,6 +116,13 @@ const DIMENSIONS = [
   { id: 'operation_distinctiveness', label: 'Distinct Operations' },
   // Slot 22, appended 0.26.0 (roadmap#994) -- same append-only rule as slot 15.
   { id: 'mcp_tool_quality', label: 'MCP Tool Quality' },
+  // Slots 23-25, appended 0.29.0 -- same append-only rule as slot 15. All three were
+  // scored and served while drawn on no badge: onboarding_descriptor since 0.28.0
+  // (roadmap#987), the other two since 0.28.1 (roadmap#1161, #1163). The index
+  // builder's badge-shard check is fatal now, which is what surfaced them.
+  { id: 'onboarding_descriptor', label: 'Onboarding Descriptor Published' },
+  { id: 'dns_aid_index', label: 'DNS-AID Agent Index' },
+  { id: 'markdown_negotiation', label: 'Markdown Content Negotiation' },
 ];
 
 /* Grades that mean PARTIAL credit rather than full. 0.6 made seven of the
