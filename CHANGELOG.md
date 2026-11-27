@@ -27,6 +27,35 @@ Kin signed off draft 1 as a design, with three edits:
 
 No provider number moves; the layer carries no weight until it has been stable across several weekly releases.
 
+## 0.30.0 — 2026-11-26
+
+Which OAuth discovery document decides, where it may come from, and one new agent readiness dimension
+(roadmap#1185-#1188). No facet, check or composite weight changes: every number that moves is agent readiness.
+
+- **The document that protects the API decides** (roadmap#1187). Dynamic Client Registration, Delegated Identity and
+  Auth Clarity read the first saved discovery document in file order. They now read a selection, best tier first: an
+  issuer the API's own Protected Resource Metadata names in `authorization_servers`; a document on an API host; one on
+  the provider's own domain; any other. Salesforce Experience Cloud portals (`/services/oauth2/`) are never selected --
+  portal sign-up is not API onboarding. 157 providers whose only discovery document was such a portal lose the credit;
+  8 more whose only registering document was one lose Dynamic Client Registration (Xero, Databricks). Amazon's
+  workforce SSO (`midway-auth.amazon.com`) is not API onboarding either: 131 AWS providers whose profiles saved it lose
+  the Delegated Identity and Auth Clarity credit it gave them.
+- **The documents the census found count** (roadmap#1185, #1186 part 1). The weekly standards census finds PRM, RFC
+  8414 and OIDC documents the provider's profile never saved (47% of PRM servers). `network/_qc/onboarding_documents.json`
+  keeps the rubric's fields and the scorer reads them beside the profile under the same own-domain rule. A PRM's
+  `authorization_servers` are followed, and the issuer's metadata is kept only when it names itself (RFC 8414 s3.3).
+  1,235 providers gain Protected Resource Metadata. Following the 401 `resource_metadata` pointer is deferred.
+- **Unattended Agent Grants** (roadmap#1188, new, 2 points). Device authorization, CIBA, token exchange or an ID-JAG
+  grant profile in a selected document is `served`; an OpenAPI `deviceAuthorization` flow is `documented` (0.5).
+  Additive: absent is n/a, so nobody is rescaled. Only a document the provider operates counts (PRM-named, API host
+  or own domain), so a profile that saved Google's IdP does not inherit Google's grants. 973 providers serve one.
+- **Measured, not scored** (roadmap#1189, recommended; Kin's call): Auth.md (a draft served in five or more shapes)
+  and Poppy (mostly Wix and Shopify templates, not providers). See `parity/external-checklists.yml`.
+
+Modelled on 43,905 providers, same pages and onboarding documents under both rubrics. Composite: no provider moves.
+Agent readiness: 3,012 move, 2,713 up and 299 down (168 portal, 131 Midway), median mover +7.7, at most +21.2 / -14.8;
+mean 13.20 -> 13.72; 1,334 agent band changes, 1,133 upward; agent-native 1,364 -> 1,331. No band re-cut.
+
 ## 0.29.0 — 2026-11-23
 
 Seven scorer defects, each a place where the code credited something other than what the rubric says

@@ -115,6 +115,8 @@ export const DIMENSIONS = [
   { id: 'onboarding_descriptor', label: 'Onboarding Descriptor Published' },
   { id: 'dns_aid_index', label: 'DNS-AID Agent Index' },
   { id: 'markdown_negotiation', label: 'Markdown Content Negotiation' },
+  // Slot 26, appended 0.30.0 (roadmap#1188) -- same append-only rule as slot 15.
+  { id: 'unattended_agent_grants', label: 'Unattended Agent Grants' },
 ];
 
 /* Grades that mean PARTIAL credit rather than full. 0.6 made seven of the

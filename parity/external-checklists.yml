@@ -8,8 +8,8 @@
 # `reviewed_for` must equal the newest rubric snapshot: bin/sync-rubric-docs.py --check fails otherwise, so a
 # release cannot ship without someone re-reading the scanner's list. DNS-AID sat in this list for weeks before
 # it reached the rubric (#1161); that is what this file exists to stop.
-reviewed_for: 0.29.0
-reviewed_on: '2026-11-23'
+reviewed_for: 0.30.0
+reviewed_on: '2026-11-26'
 checklists:
   - name: Cloudflare Is It Agent Ready
     url: https://isitagentready.com/
@@ -27,13 +27,14 @@ checklists:
       - {check: API Catalog, status: scored, rubric: [well_known_catalog, well_known_published]}
       - {check: OAuth discovery, status: scored, rubric: [dynamic_client_registration, delegated_identity]}
       - {check: OAuth Protected Resource, status: scored, rubric: [protected_resource_metadata]}
-      - {check: Auth.md, status: measured, why: 'no adopters measured in the catalog yet and no stable specification; measure first (decided 2026-11-20, roadmap#1164)'}
+      - {check: 'Unattended agent grants (device grant, CIBA, token exchange, ID-JAG)', status: scored, rubric: [unattended_agent_grants], why: 'additive 2-point frontier dimension from 0.30.0 (roadmap#1188); read from the discovery document that protects the API (roadmap#1187)'}
+      - {check: Auth.md, status: measured, why: 'adoption is real now (census 2026-11-25: 202 hosts serve an agent_auth block; 187 on the provider''s own issuer, 13 on a vendor''s: authkit.app 4, supabase.co 3), but the block itself is not stable: at least five shapes in the wild (claim_uri vs claim_endpoint, with and without anonymous{}), so a check written today would pass one draft and fail the next. Blocker is spec draft, not adoption (re-measured 2026-11-26, roadmap#1189)'}
       - {check: MCP Server Card, status: scored, rubric: [well_known_catalog, mcp_server]}
       - {check: A2A Agent Card, status: scored, rubric: [agent_card]}
       - {check: Agent Skills, status: scored, rubric: [agent_skills]}
       - {check: WebMCP, status: scored, rubric: [webmcp]}
       - {check: ARD manifest, status: measured, why: 'referenced by the pipeline, single-digit adoption; measure until a spec stabilises (decided 2026-11-20, roadmap#1164)'}
-      - {check: Personal Agent Protocol (Poppy), status: measured, by: [harvest-well-known poppy.json], why: 'probed since October; near-zero adoption; consumer-agent protocol rather than a provider API signal (decided 2026-11-20)'}
+      - {check: Personal Agent Protocol (Poppy), status: measured, by: [harvest-well-known poppy.json], why: 'the census counts 742 hosts, but they are platform-generated: 223 Wix template (/_api/mcp), 192 Shopify template (UCP checkout scopes), 63 web-only stubs; 34 hosts publish one of their own (AT&T, T-Mobile, Mercury, You.com, Unified.to...). Scoring it would rank merchants on their storefront vendor, the agentic_commerce attribution problem. Blocker is attribution, not adoption (re-measured 2026-11-26, roadmap#1189)'}
       - {check: x402, status: scored, rubric: [agentic_commerce]}
       - {check: MPP, status: excluded, why: 'Payment HTTP Auth is negotiated in-band per request; the rubric deliberately scores no in-band payment scheme except a live x402 challenge (see agentic_commerce)'}
       - {check: UCP, status: scored, rubric: [agentic_commerce]}

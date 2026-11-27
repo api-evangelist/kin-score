@@ -15,6 +15,17 @@ has shipped.
 
 ---
 
+## Status 2026-11-26 — 0.30.0: which discovery document decides
+
+Shipped: roadmap#1185, #1187, #1188 and #1186 part 1 (see CHANGELOG). #1189 left measured-only.
+Next:
+- **#1186 part 2** -- follow the 401 `WWW-Authenticate` `resource_metadata` pointer (engine harvest change, a catalog run
+  and store uploads).
+- **Census documents on lapsed domains** -- three defunct providers' old domains now serve OAuth documents; the defunct
+  rule holds them at zero, but a live provider whose domain lapsed would be credited.
+- **The agent-credit reader gap** carries over: 606 of 43,905 (1.4%) disagree with `build_kin_facets.py` dim_credit,
+  identically under 0.29.0.
+
 ## Status 2026-11-23 — 0.29.0: the scorer credits what the rubric says
 
 Shipped: roadmap#1166-#1172 -- seven places the code credited something other than the rubric's own words (see
