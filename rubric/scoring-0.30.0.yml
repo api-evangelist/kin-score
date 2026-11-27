@@ -30,7 +30,9 @@ release_note:
     names in authorization_servers, else a document on an API host, else one on the provider's own domain, else
     any. A Salesforce Experience Cloud portal (/services/oauth2/) is not API onboarding and is never selected:
     157 providers whose only discovery document was a support or community portal lose the credit, and 8 more
-    whose only registering document was one lose Dynamic Client Registration (Xero, Databricks).
+    whose only registering document was one lose Dynamic Client Registration (Xero, Databricks). Amazon's
+    workforce SSO (midway-auth.amazon.com) is likewise not API onboarding: 131 AWS providers whose profiles saved
+    it lose the Delegated Identity and Auth Clarity credit it gave them (mean -8.0).
 
     The documents the census found count (roadmap#1185). The weekly standards census finds Protected Resource
     Metadata, RFC 8414 and OIDC documents on provider websites that the provider's own profile never saved
@@ -43,14 +45,16 @@ release_note:
     Unattended Agent Grants (roadmap#1188, new, 2 points, additive). A selected discovery document advertising
     a device authorization endpoint, CIBA, token exchange or an ID-JAG grant profile is `served`; an OpenAPI
     oauth2 deviceAuthorization flow is `documented` at half credit. Absent is n/a, not a zero, so no provider is
-    rescaled for not offering it. 1,414 providers serve one.
+    rescaled for not offering it. Only a document the provider operates counts -- one the API's PRM names, on an
+    API host, or on its own domain -- so a profile that saved Google's or another platform's IdP does not inherit
+    that platform's grants. 973 providers serve one.
 
     Modelled 2026-11-26 on 43,905 providers, same pages and the same onboarding documents under both rubrics.
-    Composite: no provider moves. Agent readiness: 3,309 move, 3,141 up and 168 down, median mover +5.2, at most
-    +21.2 and -14.8; mean 13.20 -> 13.75. 1,255 agent band changes, 1,137 upward (human-only -> agent-aware
-    872). Dynamic Client Registration 1,688 gain and 166 lose; Delegated Identity 1,434 gain, 113 lose; Auth
-    Clarity served 1,424 gain, 157 lose. No band is re-cut: the new dimension leaves the denominator when
-    absent, and no band empties or swells (agent-native 1,364 -> 1,385).
+    Composite: no provider moves. Agent readiness: 3,012 move, 2,713 up and 299 down (168 portal, 131 Midway),
+    median mover +7.7, at most +21.2 and -14.8; mean 13.20 -> 13.72. 1,334 agent band changes, 1,133 upward
+    (human-only -> agent-aware 872). Dynamic Client Registration 1,688 gain and 166 lose; Delegated Identity
+    1,434 gain, 244 lose; Auth Clarity served 1,424 gain, 288 lose. No band is re-cut: the new dimension leaves
+    the denominator when absent, and no band empties or swells (agent-native 1,364 -> 1,331).
 
 aliases:
   # 0.13 (roadmap#71) — the Examples family. A provider publishing a separate example
